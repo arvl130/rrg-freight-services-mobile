@@ -127,13 +127,13 @@ export function useSession(
     // If a session is required, but there is no session user,
     // then redirect to the login page.
     if (typeof required === "boolean" && required && session.user === null) {
-      router.push("/login")
+      router.replace("/(app)/login")
       return
     }
 
     if (typeof required === "object") {
       if (session.user === null) {
-        router.push("/login")
+        router.replace("/(app)/login")
 
         return
       }
