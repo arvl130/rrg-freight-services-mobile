@@ -94,15 +94,26 @@ export default function LoginScreen() {
                 typeof e.code === "string"
               ) {
                 if (invalidCredentialsErrorCodes.includes(e.code)) {
+                  setUserCredentials((currUserCredentials) => ({
+                    ...currUserCredentials,
+                    password: "",
+                  }))
+
                   Alert.alert("Invalid email or password", "Please try again.")
                   return
                 }
 
                 if (e.code === FIREBASE_AUTH_ERROR_TOO_MANY_REQUESTS) {
+                  setUserCredentials((currUserCredentials) => ({
+                    ...currUserCredentials,
+                    password: "",
+                  }))
+
                   Alert.alert(
                     "Too many requests",
                     "Please try again in a few minutes.",
                   )
+
                   return
                 }
               }
