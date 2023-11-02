@@ -1,9 +1,18 @@
 import auth from "@react-native-firebase/auth"
 import { router } from "expo-router"
 import { useEffect, useState } from "react"
-import { View, Text, Button, TextInput, StyleSheet } from "react-native"
+import { View, Text, Button, TextInput, StyleSheet, Alert } from "react-native"
 
 import { getUserRoleRedirectPath, useSession } from "../../components/auth"
+
+const invalidCredentialsErrorCodes = [
+  "auth/invalid-login",
+  "auth/invalid-login-credentials",
+  "auth/wrong-password",
+  "auth/user-not-found",
+]
+
+const FIREBASE_AUTH_ERROR_TOO_MANY_REQUESTS = "auth/too-many-requests"
 
 export default function LoginScreen() {
   const { user, role } = useSession()
@@ -54,6 +63,18 @@ export default function LoginScreen() {
           title={isSigningIn ? "Logging In ..." : "Login"}
           disabled={isSigningIn}
           onPress={async () => {
+            if (
+              userCredentials.email === "" ||
+              userCredentials.password === ""
+            ) {
+              Alert.alert(
+                "Invalid email or password",
+                "Please enter your email and password.",
+              )
+
+              return
+            }
+
             setIsSigningIn(true)
             try {
               await auth().signInWithEmailAndPassword(
@@ -61,7 +82,30 @@ export default function LoginScreen() {
                 userCredentials.password,
               )
             } catch (e) {
-              console.log("Error occured", e)
+              console.log("Error occured while signing in", e)
+
+              // RN Firebase doesn't export types for error handling,
+              // so we have to manually check if the error is of an
+              // expected type.
+              if (
+                typeof e === "object" &&
+                e !== null &&
+                "code" in e &&
+                typeof e.code === "string"
+              ) {
+                if (invalidCredentialsErrorCodes.includes(e.code)) {
+                  Alert.alert("Invalid email or password", "Please try again.")
+                  return
+                }
+
+                if (e.code === FIREBASE_AUTH_ERROR_TOO_MANY_REQUESTS) {
+                  Alert.alert(
+                    "Too many requests",
+                    "Please try again in a few minutes.",
+                  )
+                  return
+                }
+              }
             } finally {
               setIsSigningIn(false)
             }
