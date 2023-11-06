@@ -1,12 +1,15 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import auth from "@react-native-firebase/auth"
 import { Picker } from "@react-native-picker/picker"
 import { BarCodeScannedCallback, BarCodeScanner } from "expo-barcode-scanner"
+import { router } from "expo-router"
 import { useState } from "react"
 import toast from "react-hot-toast/headless"
-import { Text, View, StyleSheet, TextInput, Button } from "react-native"
+import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
 import { useBarCodePermissions } from "../../../utils/barcode-scanner"
+import { PackageStatus } from "../../../utils/constants"
 
 function ScannerTab({
   onBarCodeScanned,
@@ -38,8 +41,12 @@ function ScannerTab({
 
 export default function ScannerScreen() {
   const [isScannerVisible, setIsScannerVisible] = useState(false)
-  const [formData, setFormData] = useState({
-    status: "",
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState<{
+    packageId: string
+    status: PackageStatus
+  }>({
+    status: "DELIVERED",
     packageId: "",
   })
 
@@ -138,12 +145,74 @@ export default function ScannerScreen() {
           </View>
           <View>
             <TouchableOpacity
-              style={styles.button}
+              style={[
+                styles.button,
+                isSubmitting ? { opacity: 0.2 } : { opacity: 1 },
+              ]}
+              disabled={isSubmitting}
               activeOpacity={0.7}
-              onPress={() => {
-                toast("Package Updated", {
-                  icon: "✅",
-                })
+              onPress={async () => {
+                if (formData.packageId === "") {
+                  Alert.alert(
+                    "Missing package ID",
+                    "Please enter or scan a package ID.",
+                  )
+
+                  return
+                }
+
+                setIsSubmitting(true)
+                try {
+                  const { currentUser } = auth()
+                  if (!currentUser) {
+                    Alert.alert(
+                      "Not logged in",
+                      "Please login before making this request.",
+                    )
+
+                    return
+                  }
+
+                  const token = await currentUser.getIdToken()
+                  const response = await fetch(
+                    `${process.env.EXPO_PUBLIC_API_URL}/package/${formData.packageId}/status`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
+                        status: formData.status,
+                      }),
+                    },
+                  )
+                  const responseJson = await response.json()
+                  if (!response.ok) {
+                    console.log(
+                      "An error occured while updating the package status",
+                      responseJson,
+                    )
+                    toast("Update failed", {
+                      icon: "⚠️",
+                    })
+                    return
+                  }
+
+                  toast("Update successful", {
+                    icon: "✅",
+                  })
+
+                  if (router.canGoBack()) router.back()
+                  else router.push("/(app)/warehouse/dashboard")
+                } catch (e) {
+                  console.log(
+                    "An error occured while updating the package status",
+                    e,
+                  )
+                } finally {
+                  setIsSubmitting(false)
+                }
               }}
             >
               <Text style={styles.buttonText}>Save</Text>
