@@ -27,9 +27,9 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="warehouse/dashboard"
+        name="warehouse"
         options={{
-          title: "Dashboard",
+          headerShown: false,
         }}
       />
       <Stack.Screen

@@ -10,6 +10,7 @@ import { useEffect } from "react"
 import { useColorScheme } from "react-native"
 
 import { AuthProvider } from "../components/auth"
+import { Notifications } from "../components/notifications"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -57,6 +58,7 @@ function RootLayoutNav() {
             }}
           />
         </Stack>
+        <Notifications />
       </AuthProvider>
     </ThemeProvider>
   )
