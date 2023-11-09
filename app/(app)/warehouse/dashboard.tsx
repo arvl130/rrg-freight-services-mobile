@@ -28,7 +28,11 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.7}
+            onPress={() => router.push("/(app)/warehouse/tracker")}
+          >
             <Text style={styles.buttonText}>Location Tracker</Text>
           </TouchableOpacity>
         </View>

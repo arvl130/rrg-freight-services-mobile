@@ -15,6 +15,12 @@ export default function Layout() {
           title: "Package Scanner",
         }}
       />
+      <Stack.Screen
+        name="tracker"
+        options={{
+          title: "Location Tracker",
+        }}
+      />
     </Stack>
   )
 }
