@@ -1,3 +1,4 @@
+import auth from "@react-native-firebase/auth"
 import {
   useForegroundPermissions,
   startLocationUpdatesAsync,
@@ -10,6 +11,9 @@ import {
 import { TaskManagerTaskBody, defineTask } from "expo-task-manager"
 import { useEffect, useState } from "react"
 
+import { createLocation } from "./api"
+import { getSavedShipmentId } from "./storage"
+
 const LOCATION_TRACKER_TASK_NAME = "location-tracker"
 
 defineTask(
@@ -21,12 +25,38 @@ defineTask(
     if (error) {
       console.error(
         `[${LOCATION_TRACKER_TASK_NAME}]:`,
-        "Something went wrong within the background location task...",
+        "Something went wrong within the background location task.",
         error,
       )
 
       return
     }
+
+    if (locations.length === 0) {
+      console.error(`[${LOCATION_TRACKER_TASK_NAME}]:`, "No locations given.")
+
+      return
+    }
+
+    const { currentUser } = auth()
+    if (currentUser === null) {
+      console.error(`[${LOCATION_TRACKER_TASK_NAME}]:`, "Not logged in.")
+
+      return
+    }
+
+    const shipmentId = await getSavedShipmentId()
+    if (shipmentId === null) {
+      console.error(
+        `[${LOCATION_TRACKER_TASK_NAME}]:`,
+        "Could not retrieve shipment id.",
+      )
+
+      return
+    }
+
+    const [{ coords }] = locations
+    await createLocation(shipmentId, coords.longitude, coords.latitude)
 
     console.log(
       `[${LOCATION_TRACKER_TASK_NAME}]:`,
