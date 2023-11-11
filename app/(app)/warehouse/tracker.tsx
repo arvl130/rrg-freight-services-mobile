@@ -63,21 +63,23 @@ function EditForm({
           }
         }}
       />
-      <View style={{ marginTop: 8 }}>
-        <Button
-          title="Close"
-          disabled={isLoading}
-          onPress={async () => {
-            setIsLoading(true)
+      {initialShipmentId !== null && (
+        <View style={{ marginTop: 8 }}>
+          <Button
+            title="Close"
+            disabled={isLoading}
+            onPress={async () => {
+              setIsLoading(true)
 
-            try {
-              await close()
-            } finally {
-              setIsLoading(false)
-            }
-          }}
-        />
-      </View>
+              try {
+                await close()
+              } finally {
+                setIsLoading(false)
+              }
+            }}
+          />
+        </View>
+      )}
     </View>
   )
 }
@@ -148,7 +150,7 @@ function LocationsList({ shipmentId }: { shipmentId: number }) {
   )
 }
 
-export default function LocationTrackerScreen() {
+function LocationTracker() {
   const [isEditing, setIsEditing] = useState(false)
   const { isLoading, selectedShipmentId, refresh } = useSelectedShipmentId()
   const { isTracking, startTracking, stopTracking } = useLocationTracker()
@@ -160,7 +162,11 @@ export default function LocationTrackerScreen() {
   }, [isLoading, selectedShipmentId, isTracking, stopTracking])
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
       {isLoading ? (
         <Text style={{ textAlign: "center", paddingVertical: 8 }}>
           Loading ...
@@ -228,6 +234,28 @@ export default function LocationTrackerScreen() {
             )}
           </View>
         </>
+      )}
+    </View>
+  )
+}
+
+export default function LocationTrackerScreen() {
+  const { status, requestPermission } = useLocationTracker()
+
+  return (
+    <View style={styles.container}>
+      {status?.granted === true ? (
+        <LocationTracker />
+      ) : (
+        <View>
+          <Text style={{ paddingVertical: 8 }}>
+            To monitor the package delivery, we need access to your location.
+          </Text>
+          <Button
+            title="Grant permission"
+            onPress={() => requestPermission()}
+          />
+        </View>
       )}
     </View>
   )
