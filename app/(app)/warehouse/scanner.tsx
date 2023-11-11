@@ -161,6 +161,15 @@ export default function ScannerScreen() {
                   return
                 }
 
+                if (isNaN(parseInt(formData.packageId, 10))) {
+                  Alert.alert(
+                    "Invalid input",
+                    "Please enter a valid package ID.",
+                  )
+
+                  return
+                }
+
                 setIsSubmitting(true)
                 try {
                   const { currentUser } = auth()
