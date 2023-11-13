@@ -137,9 +137,6 @@ export default function ScannerScreen() {
                 }
               >
                 <Picker.Item label="Delivered" value="DELIVERED" />
-                <Picker.Item label="Delivering" value="DELIVERING" />
-                <Picker.Item label="In Warehouse" value="IN_WAREHOUSE" />
-                <Picker.Item label="Shipping" value="SHIPPING" />
               </Picker>
             </View>
           </View>
