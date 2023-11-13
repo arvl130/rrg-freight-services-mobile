@@ -142,10 +142,6 @@ export default function ScannerScreen() {
           </View>
           <View>
             <TouchableOpacity
-              style={[
-                styles.button,
-                isSubmitting ? { opacity: 0.2 } : { opacity: 1 },
-              ]}
               disabled={isSubmitting}
               activeOpacity={0.7}
               onPress={() => {
@@ -236,7 +232,18 @@ export default function ScannerScreen() {
                 )
               }}
             >
-              <Text style={styles.buttonText}>Save</Text>
+              {/* NOTE: Switch button styles in a child View, instead of the
+                  TouchableOpacity, so that the new styles apply correctly.
+                  Source: https://stackoverflow.com/a/64346898
+              */}
+              <View
+                style={[
+                  styles.button,
+                  isSubmitting ? { opacity: 0.2 } : { opacity: 1 },
+                ]}
+              >
+                <Text style={styles.buttonText}>Save</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
