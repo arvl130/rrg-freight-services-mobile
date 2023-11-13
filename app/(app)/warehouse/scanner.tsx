@@ -188,6 +188,7 @@ export default function ScannerScreen() {
                     {
                       text: "OK",
                       onPress: async () => {
+                        setIsSubmitting(true)
                         try {
                           const token = await currentUser.getIdToken()
                           const response = await fetch(
