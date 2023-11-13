@@ -8,7 +8,7 @@ import toast from "react-hot-toast/headless"
 import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
-import { useBarCodePermissions } from "../../../utils/barcode-scanner"
+import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
 import { PackageStatus } from "../../../utils/constants"
 
 function ScannerTab({
