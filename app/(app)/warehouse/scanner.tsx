@@ -148,7 +148,7 @@ export default function ScannerScreen() {
               ]}
               disabled={isSubmitting}
               activeOpacity={0.7}
-              onPress={async () => {
+              onPress={() => {
                 if (formData.packageId === "") {
                   Alert.alert(
                     "Missing package ID",
@@ -167,58 +167,72 @@ export default function ScannerScreen() {
                   return
                 }
 
-                setIsSubmitting(true)
-                try {
-                  const { currentUser } = auth()
-                  if (!currentUser) {
-                    Alert.alert(
-                      "Not logged in",
-                      "Please login before making this request.",
-                    )
-
-                    return
-                  }
-
-                  const token = await currentUser.getIdToken()
-                  const response = await fetch(
-                    `${process.env.EXPO_PUBLIC_API_URL}/package/${formData.packageId}/status`,
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({
-                        status: formData.status,
-                      }),
-                    },
+                const { currentUser } = auth()
+                if (!currentUser) {
+                  Alert.alert(
+                    "Not logged in",
+                    "Please login before making this request.",
                   )
-                  const responseJson = await response.json()
-                  if (!response.ok) {
-                    console.log(
-                      "An error occured while updating the package status",
-                      responseJson,
-                    )
-                    toast("Update failed", {
-                      icon: "⚠️",
-                    })
-                    return
-                  }
 
-                  toast("Update successful", {
-                    icon: "✅",
-                  })
-
-                  if (router.canGoBack()) router.back()
-                  else router.push("/(app)/warehouse/dashboard")
-                } catch (e) {
-                  console.log(
-                    "An error occured while updating the package status",
-                    e,
-                  )
-                } finally {
-                  setIsSubmitting(false)
+                  return
                 }
+
+                Alert.alert(
+                  "Confirm Update",
+                  "Are you sure you want to update this package. This action cannot be undone.",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel",
+                    },
+                    {
+                      text: "OK",
+                      onPress: async () => {
+                        try {
+                          const token = await currentUser.getIdToken()
+                          const response = await fetch(
+                            `${process.env.EXPO_PUBLIC_API_URL}/package/${formData.packageId}/status`,
+                            {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                              },
+                              body: JSON.stringify({
+                                status: formData.status,
+                              }),
+                            },
+                          )
+                          const responseJson = await response.json()
+                          if (!response.ok) {
+                            console.log(
+                              "An error occured while updating the package status",
+                              responseJson,
+                            )
+                            toast("Update failed", {
+                              icon: "⚠️",
+                            })
+                            return
+                          }
+
+                          toast("Update successful", {
+                            icon: "✅",
+                          })
+
+                          if (router.canGoBack()) router.back()
+                          else router.push("/(app)/warehouse/dashboard")
+                        } catch (e) {
+                          console.log(
+                            "An error occured while updating the package status",
+                            e,
+                          )
+                        } finally {
+                          setIsSubmitting(false)
+                        }
+                      },
+                    },
+                  ],
+                )
               }}
             >
               <Text style={styles.buttonText}>Save</Text>
