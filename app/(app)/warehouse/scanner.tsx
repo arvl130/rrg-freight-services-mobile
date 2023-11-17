@@ -11,7 +11,7 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
 import { PackageStatus } from "../../../utils/constants"
 
-function ScannerTab({
+function ScannerView({
   onBarCodeScanned,
   cancel,
 }: {
@@ -59,7 +59,7 @@ export default function ScannerScreen() {
   return (
     <View style={styles.container}>
       {isScannerVisible ? (
-        <ScannerTab
+        <ScannerView
           cancel={() => setIsScannerVisible(false)}
           onBarCodeScanned={({ data }) => {
             setIsScannerVisible(false)
