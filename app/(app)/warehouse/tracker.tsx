@@ -11,6 +11,38 @@ import {
   saveShipmentId,
 } from "../../../utils/storage"
 
+function NotTrackingView({
+  selectedShipmentId,
+  stopTracking,
+}: {
+  selectedShipmentId: null | number
+  stopTracking: () => void
+}) {
+  return (
+    <>
+      <Text style={{ paddingVertical: 8 }}>Location tracking: active</Text>
+      <View style={{ flex: 1 }}>
+        {selectedShipmentId === null ? (
+          <>
+            <Text style={{ paddingVertical: 8 }}>
+              No shipment ID was selected. The location tracker will be stopped
+              automatically.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Button title="Stop" onPress={() => stopTracking()} />
+            <Text style={{ paddingVertical: 8 }}>
+              Tracking Shipment: {selectedShipmentId}
+            </Text>
+            <LocationsList shipmentId={selectedShipmentId} />
+          </>
+        )}
+      </View>
+    </>
+  )
+}
+
 function EditForm({
   initialShipmentId,
   close,
@@ -150,8 +182,57 @@ function LocationsList({ shipmentId }: { shipmentId: number }) {
   )
 }
 
-function LocationTracker() {
+function IsTrackingView({
+  selectedShipmentId,
+  startTracking,
+  refresh,
+}: {
+  selectedShipmentId: null | number
+  startTracking: () => void
+  refresh: () => Promise<void>
+}) {
   const [isEditing, setIsEditing] = useState(false)
+
+  return (
+    <>
+      <Text style={{ paddingVertical: 8 }}>Location tracking: inactive</Text>
+      <View style={{ flex: 1 }}>
+        {selectedShipmentId === null ? (
+          <>
+            <EditForm
+              initialShipmentId={selectedShipmentId}
+              close={async () => {
+                await refresh()
+                setIsEditing(false)
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Button title="Start" onPress={() => startTracking()} />
+            <Text style={{ paddingVertical: 8 }}>
+              Tracking Shipment: {selectedShipmentId}
+            </Text>
+            {isEditing ? (
+              <EditForm
+                initialShipmentId={selectedShipmentId}
+                close={async () => {
+                  await refresh()
+                  setIsEditing(false)
+                }}
+              />
+            ) : (
+              <Button title="Edit" onPress={() => setIsEditing(true)} />
+            )}
+            <LocationsList shipmentId={selectedShipmentId} />
+          </>
+        )}
+      </View>
+    </>
+  )
+}
+
+function LocationTracker() {
   const { isLoading, selectedShipmentId, refresh } = useSelectedShipmentId()
   const { isTracking, startTracking, stopTracking } = useLocationTracker()
 
@@ -172,68 +253,24 @@ function LocationTracker() {
           Loading ...
         </Text>
       ) : (
-        <>
-          <Text style={{ paddingVertical: 8 }}>
-            Location tracking: {isTracking ? "active" : "inactive"}
-          </Text>
-          <View
-            style={{
-              flex: 1,
-            }}
-          >
-            {isTracking ? (
-              <View style={{ flex: 1 }}>
-                {selectedShipmentId === null ? (
-                  <Text style={{ paddingVertical: 8 }}>
-                    No shipment ID was selected. The location tracker will be
-                    stopped automatically.
-                  </Text>
-                ) : (
-                  <>
-                    <Button title="Stop" onPress={() => stopTracking()} />
-                    <Text style={{ paddingVertical: 8 }}>
-                      Tracking Shipment: {selectedShipmentId}
-                    </Text>
-                    <LocationsList shipmentId={selectedShipmentId!} />
-                  </>
-                )}
-              </View>
-            ) : (
-              <View style={{ flex: 1 }}>
-                {selectedShipmentId === null ? (
-                  <>
-                    <EditForm
-                      initialShipmentId={selectedShipmentId}
-                      close={async () => {
-                        await refresh()
-                        setIsEditing(false)
-                      }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Button title="Start" onPress={() => startTracking()} />
-                    <Text style={{ paddingVertical: 8 }}>
-                      Tracking Shipment: {selectedShipmentId}
-                    </Text>
-                    {isEditing ? (
-                      <EditForm
-                        initialShipmentId={selectedShipmentId}
-                        close={async () => {
-                          await refresh()
-                          setIsEditing(false)
-                        }}
-                      />
-                    ) : (
-                      <Button title="Edit" onPress={() => setIsEditing(true)} />
-                    )}
-                    <LocationsList shipmentId={selectedShipmentId} />
-                  </>
-                )}
-              </View>
-            )}
-          </View>
-        </>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          {isTracking ? (
+            <NotTrackingView
+              selectedShipmentId={selectedShipmentId}
+              stopTracking={() => stopTracking()}
+            />
+          ) : (
+            <IsTrackingView
+              selectedShipmentId={selectedShipmentId}
+              startTracking={() => startTracking()}
+              refresh={refresh}
+            />
+          )}
+        </View>
       )}
     </View>
   )
