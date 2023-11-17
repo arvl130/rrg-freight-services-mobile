@@ -1,8 +1,19 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useState } from "react"
-import { Button, StyleSheet, Text, View, ScrollView, Alert } from "react-native"
+import {
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 
+import { ScannerView } from "../../../components/scanner-view"
+import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
 import { getLocations, getShipment } from "../../../utils/api"
 import { useLocationTracker } from "../../../utils/location-tracker"
 import {
@@ -55,36 +66,47 @@ function EditForm({
     initialShipmentId === null ? "" : initialShipmentId.toString(),
   )
 
-  return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={{ marginBottom: 8 }}>Shipment ID: </Text>
-      <TextInput
-        style={[styles.input, { marginBottom: 12 }]}
-        value={selectedShipmentId}
-        onChangeText={(text) => setSelectedShipmentId(text)}
-      />
-      <Button
-        title="Save"
-        disabled={isLoading}
-        onPress={async () => {
+  const {
+    isLoading: isLoadingBarCodePermission,
+    hasPermission: hasBarCodePermission,
+    getPermission: getBarCodePermission,
+  } = useBarCodePermissions()
+  const [isScannerVisible, setIsScannerVisible] = useState(false)
+
+  if (isScannerVisible)
+    return (
+      <ScannerView
+        cancel={() => setIsScannerVisible(false)}
+        onBarCodeScanned={async ({ data }) => {
+          setSelectedShipmentId(data)
+          setIsScannerVisible(false)
           setIsLoading(true)
 
           try {
-            if (selectedShipmentId === "") {
-              await clearSavedShipmentId()
-              await close()
+            if (data === "") {
+              Alert.alert(
+                "Invalid QR Code",
+                "The QR Code scanned maybe malformed or invalid. Please try again.",
+              )
               return
             }
 
-            const shipmentId = parseInt(selectedShipmentId, 10)
+            const shipmentId = parseInt(data, 10)
             if (isNaN(shipmentId)) {
-              Alert.alert("Invalid input", "Please enter a valid shipment ID.")
+              Alert.alert(
+                "Invalid QR Code",
+                "The QR Code scanned maybe malformed or invalid. Please try again.",
+              )
+              console.log("reached here")
               return
             }
 
             const shipment = await getShipment(shipmentId)
             if (shipment === null) {
-              Alert.alert("Not found", "No such shipment was found.")
+              Alert.alert(
+                "Invalid QR Code",
+                "The QR Code scanned does not seem to belong to any shipment.",
+              )
               return
             }
 
@@ -95,24 +117,95 @@ function EditForm({
           }
         }}
       />
-      {initialShipmentId !== null && (
-        <View style={{ marginTop: 8 }}>
-          <Button
-            title="Close"
-            disabled={isLoading}
-            onPress={async () => {
-              setIsLoading(true)
+    )
 
-              try {
-                await close()
-              } finally {
-                setIsLoading(false)
-              }
-            }}
+  return (
+    <>
+      <Text style={{ paddingVertical: 8 }}>Location tracking: inactive</Text>
+      <View style={{ marginBottom: 12 }}>
+        <Text style={{ marginBottom: 8 }}>Shipment ID: </Text>
+        <View
+          style={{
+            flexDirection: "row",
+          }}
+        >
+          <TextInput
+            style={[styles.input, { flex: 1, marginBottom: 12 }]}
+            value={selectedShipmentId}
+            onChangeText={(text) => setSelectedShipmentId(text)}
           />
+          <View
+            style={
+              isLoadingBarCodePermission ? { opacity: 0.2 } : { opacity: 1 }
+            }
+          >
+            <TouchableOpacity
+              disabled={isLoadingBarCodePermission}
+              onPress={async () => {
+                if (!hasBarCodePermission) {
+                  await getBarCodePermission()
+                  setIsScannerVisible(true)
+                } else setIsScannerVisible(true)
+              }}
+            >
+              <MaterialCommunityIcons name="qrcode" size={48} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
-    </View>
+        <Button
+          title="Save"
+          disabled={isLoading}
+          onPress={async () => {
+            setIsLoading(true)
+
+            try {
+              if (selectedShipmentId === "") {
+                await clearSavedShipmentId()
+                await close()
+                return
+              }
+
+              const shipmentId = parseInt(selectedShipmentId, 10)
+              if (isNaN(shipmentId)) {
+                Alert.alert(
+                  "Invalid input",
+                  "Please enter a valid shipment ID.",
+                )
+                return
+              }
+
+              const shipment = await getShipment(shipmentId)
+              if (shipment === null) {
+                Alert.alert("Not found", "No such shipment was found.")
+                return
+              }
+
+              await saveShipmentId(shipmentId)
+              await close()
+            } finally {
+              setIsLoading(false)
+            }
+          }}
+        />
+        {initialShipmentId !== null && (
+          <View style={{ marginTop: 8 }}>
+            <Button
+              title="Close"
+              disabled={isLoading}
+              onPress={async () => {
+                setIsLoading(true)
+
+                try {
+                  await close()
+                } finally {
+                  setIsLoading(false)
+                }
+              }}
+            />
+          </View>
+        )}
+      </View>
+    </>
   )
 }
 
@@ -195,7 +288,6 @@ function IsTrackingView({
 
   return (
     <>
-      <Text style={{ paddingVertical: 8 }}>Location tracking: inactive</Text>
       <View style={{ flex: 1 }}>
         {selectedShipmentId === null ? (
           <>
@@ -209,10 +301,6 @@ function IsTrackingView({
           </>
         ) : (
           <>
-            <Button title="Start" onPress={() => startTracking()} />
-            <Text style={{ paddingVertical: 8 }}>
-              Tracking Shipment: {selectedShipmentId}
-            </Text>
             {isEditing ? (
               <EditForm
                 initialShipmentId={selectedShipmentId}
@@ -222,9 +310,18 @@ function IsTrackingView({
                 }}
               />
             ) : (
-              <Button title="Edit" onPress={() => setIsEditing(true)} />
+              <>
+                <Text style={{ paddingVertical: 8 }}>
+                  Location tracking: inactive
+                </Text>
+                <Button title="Start" onPress={() => startTracking()} />
+                <Text style={{ paddingVertical: 8 }}>
+                  Tracking Shipment: {selectedShipmentId}
+                </Text>
+                <Button title="Edit" onPress={() => setIsEditing(true)} />
+                <LocationsList shipmentId={selectedShipmentId} />
+              </>
             )}
-            <LocationsList shipmentId={selectedShipmentId} />
           </>
         )}
       </View>

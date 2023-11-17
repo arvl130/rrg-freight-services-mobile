@@ -1,43 +1,15 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import auth from "@react-native-firebase/auth"
 import { Picker } from "@react-native-picker/picker"
-import { BarCodeScannedCallback, BarCodeScanner } from "expo-barcode-scanner"
 import { router } from "expo-router"
 import { useState } from "react"
 import toast from "react-hot-toast/headless"
-import { Text, View, StyleSheet, TextInput, Button, Alert } from "react-native"
+import { Text, View, StyleSheet, TextInput, Alert } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
+import { ScannerView } from "../../../components/scanner-view"
 import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
 import { PackageStatus } from "../../../utils/constants"
-
-function ScannerView({
-  onBarCodeScanned,
-  cancel,
-}: {
-  onBarCodeScanned: BarCodeScannedCallback
-  cancel: () => void
-}) {
-  return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
-      <View
-        style={{
-          flex: 1,
-        }}
-      >
-        <BarCodeScanner
-          onBarCodeScanned={onBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-      </View>
-      <Button title="Cancel" onPress={cancel} />
-    </View>
-  )
-}
 
 export default function ScannerScreen() {
   const [isScannerVisible, setIsScannerVisible] = useState(false)
