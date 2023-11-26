@@ -33,6 +33,12 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
+        name="driver"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="overseas/dashboard"
         options={{
           title: "Dashboard",

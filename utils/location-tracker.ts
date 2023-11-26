@@ -11,8 +11,8 @@ import {
 import { TaskManagerTaskBody, defineTask } from "expo-task-manager"
 import { useEffect, useState } from "react"
 
-import { createLocation } from "./api"
-import { getSavedShipmentId } from "./storage"
+import { createDeliveryLocation } from "./api"
+import { getId } from "./storage"
 
 const LOCATION_TRACKER_TASK_NAME = "location-tracker"
 
@@ -45,8 +45,8 @@ defineTask(
       return
     }
 
-    const shipmentId = await getSavedShipmentId()
-    if (shipmentId === null) {
+    const saved = await getId()
+    if (saved === null) {
       console.error(
         `[${LOCATION_TRACKER_TASK_NAME}]:`,
         "Could not retrieve shipment id.",
@@ -56,7 +56,12 @@ defineTask(
     }
 
     const [{ coords }] = locations
-    await createLocation(shipmentId, coords.longitude, coords.latitude)
+    // TODO: Handle transfer shipment locations?
+    await createDeliveryLocation({
+      deliveryId: saved.id,
+      lat: coords.latitude,
+      long: coords.longitude,
+    })
 
     console.log(
       `[${LOCATION_TRACKER_TASK_NAME}]:`,

@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
-  plugins: ["expo-router", "@react-native-firebase/app"],
+  plugins: ["expo-router", "@react-native-firebase/app", "expo-camera"],
   experiments: {
     typedRoutes: true,
   },

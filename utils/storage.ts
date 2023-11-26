@@ -26,3 +26,33 @@ export function saveShipmentId(shipmentId: number) {
 export function clearSavedShipmentId() {
   return AsyncStorage.removeItem(LOCATION_TRACKER_STORAGE_NAME)
 }
+
+export async function getId() {
+  const storageStr = await AsyncStorage.getItem(LOCATION_TRACKER_STORAGE_NAME)
+  if (storageStr === null) return null
+
+  return JSON.parse(storageStr) as {
+    id: number
+    type: "DELIVERY" | "TRANSFER"
+  }
+}
+
+export function saveId({
+  id,
+  type,
+}: {
+  id: number
+  type: "DELIVERY" | "TRANSFER"
+}) {
+  return AsyncStorage.setItem(
+    LOCATION_TRACKER_STORAGE_NAME,
+    JSON.stringify({
+      id,
+      type,
+    }),
+  )
+}
+
+export function clearStorage() {
+  return AsyncStorage.removeItem(LOCATION_TRACKER_STORAGE_NAME)
+}

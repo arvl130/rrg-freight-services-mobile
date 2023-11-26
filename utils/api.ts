@@ -95,3 +95,185 @@ export async function getShipment(shipmentId: number) {
 
   return responseJson.shipment as Shipment
 }
+
+export type Delivery = {
+  status: string
+  id: number
+  createdAt: string
+  isArchived: number
+  driverId: string
+  vehicleId: number
+  isExpress: number
+}
+
+export async function getDeliveries() {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving locations: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/deliveries`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving deliveries")
+  }
+
+  return responseJson as { message: string; deliveries: Delivery[] }
+}
+
+export async function getDelivery(id: number) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving delivery: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving delivery")
+  }
+
+  return responseJson as { message: string; delivery: Delivery }
+}
+
+export type Vehicle = {
+  id: number
+  type: "TRUCK" | "VAN" | "MOTORCYCLE"
+  displayName: string
+  isExpressAllowed: number
+}
+
+export async function getVehicle(id: number) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving delivery: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/vehicle/${id}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving vehicle")
+  }
+
+  return responseJson as { message: string; vehicle: Vehicle }
+}
+
+export async function createDeliveryLocation({
+  deliveryId,
+  long,
+  lat,
+}: {
+  deliveryId: number
+  long: number
+  lat: number
+}) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving locations: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/location`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        deliveryId,
+        long,
+        lat,
+      }),
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    console.log(responseJson)
+    throw new Error("An error occured while saving location")
+  }
+
+  return responseJson as { newLocation: NewShipmentLocation[] }
+}
+
+export async function updatePackageStatusToDelivered({
+  packageId,
+  imageUrl,
+}: {
+  packageId: number
+  imageUrl: string
+}) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while updating package status: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/package/${packageId}/deliver`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        imageUrl,
+      }),
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    console.log(responseJson)
+    throw new Error("An error occured while updating package status")
+  }
+
+  return responseJson as { message: string; package: any }
+}

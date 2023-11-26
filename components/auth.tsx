@@ -15,6 +15,7 @@ const userRoleRedirectPaths = {
   WAREHOUSE: "/warehouse/dashboard",
   OVERSEAS_AGENT: "/overseas/dashboard",
   DOMESTIC_AGENT: "/domestic/dashboard",
+  DRIVER: "/driver/dashboard",
 } as const
 
 export function getUserRoleRedirectPath(role: UserRole | null) {
