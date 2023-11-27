@@ -1,8 +1,19 @@
+import auth from "@react-native-firebase/auth"
 import { router } from "expo-router"
+import { useState } from "react"
 import { Text, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
+import { useSession } from "../../../components/auth"
+
 export default function DashboardPage() {
+  useSession({
+    required: {
+      role: "DRIVER",
+    },
+  })
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
   return (
     <View
       style={{
@@ -75,7 +86,17 @@ export default function DashboardPage() {
         </View>
       </View>
       <View>
-        <TouchableOpacity activeOpacity={0.6}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          onPress={async () => {
+            setIsSigningOut(true)
+            try {
+              await auth().signOut()
+            } finally {
+              setIsSigningOut(false)
+            }
+          }}
+        >
           <View
             style={{
               backgroundColor: "#ef4444",
@@ -92,7 +113,7 @@ export default function DashboardPage() {
                 fontSize: 16,
               }}
             >
-              Logout
+              {isSigningOut ? "Logging Out ..." : "Logout"}
             </Text>
           </View>
         </TouchableOpacity>

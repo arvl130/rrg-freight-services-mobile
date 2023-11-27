@@ -1,15 +1,10 @@
 import { FontAwesome5 } from "@expo/vector-icons"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
-import { Button, Text, TouchableOpacity, View } from "react-native"
+import { Text, TouchableOpacity, View } from "react-native"
 
-import {
-  getDelivery,
-  getDeliveryPackages,
-  getVehicle,
-  updateDeliveryStatusToCompleted,
-} from "../../../../../utils/api"
+import { getTransferShipment, getVehicle } from "../../../../../utils/api"
 import { useLocationTracker } from "../../../../../utils/location-tracker"
 import { clearStorage, saveId } from "../../../../../utils/storage"
 
@@ -59,13 +54,13 @@ function VehicleDetails({ id }: { id: number }) {
   )
 }
 
-function StartDelivery({
-  deliveryId,
+function StartTransfer({
+  transferShipmentId,
   status,
   requestPermission,
   startTracking,
 }: {
-  deliveryId: number
+  transferShipmentId: number
   status: null | LocationPermissionResponse
   requestPermission: () => Promise<void>
   startTracking: () => Promise<void>
@@ -74,7 +69,8 @@ function StartDelivery({
     return (
       <View>
         <Text>
-          Before we can start the delivery, please allow access to location.
+          Before we can start the shipment transfer, please allow access to
+          location.
         </Text>
         <TouchableOpacity
           style={{
@@ -102,7 +98,7 @@ function StartDelivery({
     return (
       <View>
         <Text>
-          Deliveries cannot be started if location access is not enabled.
+          Shipment transfer cannot be started if location access is not enabled.
         </Text>
         <TouchableOpacity
           style={{
@@ -136,8 +132,8 @@ function StartDelivery({
         activeOpacity={0.6}
         onPress={async () => {
           await saveId({
-            id: deliveryId,
-            type: "DELIVERY",
+            id: transferShipmentId,
+            type: "TRANSFER",
           })
           await startTracking()
         }}
@@ -150,29 +146,32 @@ function StartDelivery({
             fontSize: 16,
           }}
         >
-          Start Delivery
+          Start Transfer
         </Text>
       </TouchableOpacity>
     </View>
   )
 }
 
-function StopDelivery({
-  deliveryId,
+function StopTransfer({
+  transferShipmentId,
   status,
   requestPermission,
   stopTracking,
+  isCompleted,
 }: {
-  deliveryId: number
+  transferShipmentId: number
   status: null | LocationPermissionResponse
   requestPermission: () => Promise<void>
   stopTracking: () => Promise<void>
+  isCompleted: boolean
 }) {
   if (status === null)
     return (
       <View>
         <Text>
-          Before we can stop the delivery, please allow access to location.
+          Before we can stop the shipment transfer, please allow access to
+          location.
         </Text>
         <TouchableOpacity
           style={{
@@ -200,7 +199,7 @@ function StopDelivery({
     return (
       <View>
         <Text>
-          Deliveries cannot be stopped if location access is not enabled.
+          Shipment transfer cannot be stopped if location access is not enabled.
         </Text>
         <TouchableOpacity
           style={{
@@ -230,7 +229,6 @@ function StopDelivery({
         style={{
           backgroundColor: "#ef4444",
           borderRadius: 8,
-          marginBottom: 8,
         }}
         activeOpacity={0.6}
         onPress={async () => {
@@ -246,41 +244,50 @@ function StopDelivery({
             fontSize: 16,
           }}
         >
-          Stop Delivery
+          Stop Transfer
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#3b82f6",
-          paddingVertical: 12,
-          borderRadius: 8,
-        }}
-        activeOpacity={0.6}
-        onPress={() => {
-          router.push({
-            pathname: "/(app)/driver/deliveries/[id]/deliver",
-            params: {
-              id: deliveryId,
-            },
-          })
-        }}
-      >
-        <Text
+      {!isCompleted && (
+        <TouchableOpacity
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 16,
+            backgroundColor: "#3b82f6",
+            paddingVertical: 12,
+            borderRadius: 8,
+            marginTop: 8,
+          }}
+          activeOpacity={0.6}
+          onPress={() => {
+            router.push({
+              pathname: "/(app)/driver/transfer-shipments/[id]/transfer",
+              params: {
+                id: transferShipmentId,
+              },
+            })
           }}
         >
-          Deliver Package
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontSize: 16,
+            }}
+          >
+            Mark as Transferred
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   )
 }
 
-function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
+function StartStopTransfer({
+  transferShipmentId,
+  isCompleted,
+}: {
+  transferShipmentId: number
+  isCompleted: boolean
+}) {
   const {
     isTracking,
     status: permissionStatus,
@@ -296,8 +303,8 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
       }}
     >
       {isTracking ? (
-        <StopDelivery
-          deliveryId={deliveryId}
+        <StopTransfer
+          transferShipmentId={transferShipmentId}
           status={permissionStatus}
           requestPermission={async () => {
             await requestPermission()
@@ -305,10 +312,11 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
           stopTracking={async () => {
             await stopTracking()
           }}
+          isCompleted={isCompleted}
         />
       ) : (
-        <StartDelivery
-          deliveryId={deliveryId}
+        <StartTransfer
+          transferShipmentId={transferShipmentId}
           status={permissionStatus}
           requestPermission={async () => {
             await requestPermission()
@@ -322,108 +330,16 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
   )
 }
 
-function DeliveryProgress({
-  isCompleted,
-  deliveryId,
-}: {
-  deliveryId: string
-  isCompleted: boolean
-}) {
-  const { status, data, error } = useQuery({
-    queryKey: ["getDeliveryPackages", deliveryId],
-    queryFn: () => getDeliveryPackages(Number(deliveryId)),
-  })
-
-  const queryClient = useQueryClient()
-  const { isPending, mutate } = useMutation({
-    mutationKey: ["updateDeliveryStatusToCompleted", deliveryId],
-    mutationFn: () => updateDeliveryStatusToCompleted(Number(deliveryId)),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getDeliveryPackages", deliveryId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDelivery", deliveryId],
-      })
-    },
-  })
-
-  return (
-    <View
-      style={{
-        marginBottom: 8,
-        backgroundColor: "#22c55e",
-        paddingHorizontal: 8,
-        paddingVertical: 12,
-        borderRadius: 8,
-      }}
-    >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error {error.message}</Text>}
-      {status === "success" && (
-        <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: 16,
-              }}
-            >
-              Packages Delivered:
-            </Text>
-            <Text
-              style={{
-                color: "white",
-                fontSize: 16,
-              }}
-            >
-              {
-                data.packages.filter(
-                  (_package: any) => _package.status === "DELIVERED",
-                ).length
-              }
-              /{data.packages.length}
-            </Text>
-          </View>
-
-          {data.packages.filter(
-            (_package: any) => _package.status === "DELIVERED",
-          ).length === data.packages.length &&
-            !isCompleted && (
-              <View
-                style={{
-                  marginTop: 8,
-                }}
-              >
-                <Button
-                  title="Mark as Completed"
-                  disabled={isPending}
-                  onPress={() => mutate()}
-                />
-              </View>
-            )}
-        </View>
-      )}
-    </View>
-  )
-}
-
-export default function ViewDeliveryPage() {
+export default function ViewTransferShipmentPage() {
   const params = useLocalSearchParams<{ id: string }>()
   const { status, data, error } = useQuery({
-    queryKey: ["getDelivery", params.id],
-    queryFn: () => getDelivery(Number(params.id)),
+    queryKey: ["getTransferShipment", params.id],
+    queryFn: () => getTransferShipment(Number(params.id)),
   })
 
   return (
     <View
       style={{
-        flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
       }}
@@ -433,15 +349,15 @@ export default function ViewDeliveryPage() {
       {status === "success" && (
         <>
           {data === null ? (
-            <Text>No such delivery</Text>
+            <Text>No such transfer shipment.</Text>
           ) : (
-            <View>
-              <VehicleDetails id={data.delivery.vehicleId} />
-              <DeliveryProgress
-                isCompleted={data.delivery.status === "ARRIVED"}
-                deliveryId={params.id}
+            <>
+              <VehicleDetails id={data.transferShipment.vehicleId} />
+              <StartStopTransfer
+                transferShipmentId={data.transferShipment.id}
+                isCompleted={data.transferShipment.status === "ARRIVED"}
               />
-              <StartStopDelivery deliveryId={data.delivery.id} />
+
               <TouchableOpacity
                 activeOpacity={0.6}
                 style={{
@@ -451,9 +367,9 @@ export default function ViewDeliveryPage() {
                 }}
                 onPress={() =>
                   router.push({
-                    pathname: "/(app)/driver/deliveries/[id]/packages",
+                    pathname: "/(app)/driver/transfer-shipments/[id]/packages",
                     params: {
-                      id: data.delivery.id,
+                      id: data.transferShipment.id,
                     },
                   })
                 }
@@ -477,9 +393,9 @@ export default function ViewDeliveryPage() {
                 }}
                 onPress={() =>
                   router.push({
-                    pathname: "/(app)/driver/deliveries/[id]/locations",
+                    pathname: "/(app)/driver/transfer-shipments/[id]/locations",
                     params: {
-                      id: data.delivery.id,
+                      id: data.transferShipment.id,
                     },
                   })
                 }
@@ -495,7 +411,7 @@ export default function ViewDeliveryPage() {
                   View Locations
                 </Text>
               </TouchableOpacity>
-            </View>
+            </>
           )}
         </>
       )}

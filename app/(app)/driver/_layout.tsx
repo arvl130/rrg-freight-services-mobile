@@ -46,7 +46,25 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="transfer-shipments/[id]"
+        name="transfer-shipments/[id]/index"
+        options={{
+          title: "View Transfer Shipment",
+        }}
+      />
+      <Stack.Screen
+        name="transfer-shipments/[id]/transfer"
+        options={{
+          title: "Transfer Shipment",
+        }}
+      />
+      <Stack.Screen
+        name="transfer-shipments/[id]/packages"
+        options={{
+          title: "View Transfer Shipment",
+        }}
+      />
+      <Stack.Screen
+        name="transfer-shipments/[id]/locations"
         options={{
           title: "View Transfer Shipment",
         }}

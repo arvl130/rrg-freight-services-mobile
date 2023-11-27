@@ -11,7 +11,7 @@ import {
 import { TaskManagerTaskBody, defineTask } from "expo-task-manager"
 import { useEffect, useState } from "react"
 
-import { createDeliveryLocation } from "./api"
+import { createDeliveryLocation, createTransferShipmentLocation } from "./api"
 import { getId } from "./storage"
 
 const LOCATION_TRACKER_TASK_NAME = "location-tracker"
@@ -56,12 +56,18 @@ defineTask(
     }
 
     const [{ coords }] = locations
-    // TODO: Handle transfer shipment locations?
-    await createDeliveryLocation({
-      deliveryId: saved.id,
-      lat: coords.latitude,
-      long: coords.longitude,
-    })
+    if (saved.type === "DELIVERY")
+      await createDeliveryLocation({
+        deliveryId: saved.id,
+        lat: coords.latitude,
+        long: coords.longitude,
+      })
+    else
+      await createTransferShipmentLocation({
+        transferShipmentId: saved.id,
+        lat: coords.latitude,
+        long: coords.longitude,
+      })
 
     console.log(
       `[${LOCATION_TRACKER_TASK_NAME}]:`,
