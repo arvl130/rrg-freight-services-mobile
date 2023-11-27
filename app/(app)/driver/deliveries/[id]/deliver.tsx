@@ -159,7 +159,7 @@ export default function MarkPackageAsDelivered() {
         </>
       ) : (
         <Button
-          title="Request Barcode Permission"
+          title="Request Camera Permission"
           disabled={isLoading}
           onPress={() => getPermission()}
         />
