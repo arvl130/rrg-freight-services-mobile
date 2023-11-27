@@ -22,50 +22,62 @@ export default function DeliveriesPage() {
       {status === "error" && <Text>Error {error.message}</Text>}
       {status === "success" && (
         <View>
-          {data.deliveries.map((delivery) => (
-            <View key={delivery.id}>
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: "/(app)/driver/deliveries/[id]/",
-                    params: {
-                      id: delivery.id,
-                    },
-                  })
-                }
-                activeOpacity={0.6}
-                style={{
-                  backgroundColor: "black",
-                  borderRadius: 8,
-                  paddingVertical: 12,
-                  paddingHorizontal: 16,
-                }}
-              >
-                <View>
-                  <Text
+          {data.deliveries.length === 0 ? (
+            <Text
+              style={{
+                textAlign: "center",
+              }}
+            >
+              No deliveries assigned.
+            </Text>
+          ) : (
+            <>
+              {data.deliveries.map((delivery) => (
+                <View key={delivery.id}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/(app)/driver/deliveries/[id]/",
+                        params: {
+                          id: delivery.id,
+                        },
+                      })
+                    }
+                    activeOpacity={0.6}
                     style={{
-                      color: "white",
-                      fontSize: 24,
+                      backgroundColor: "black",
+                      borderRadius: 8,
+                      paddingVertical: 12,
+                      paddingHorizontal: 16,
                     }}
                   >
-                    {delivery.id}
-                  </Text>
+                    <View>
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: 24,
+                        }}
+                      >
+                        {delivery.id}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text
+                        style={{
+                          color: "white",
+                        }}
+                      >
+                        Assigned:{" "}
+                        {DateTime.fromISO(delivery.createdAt).toLocaleString(
+                          DateTime.DATETIME_SHORT,
+                        )}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-                <View>
-                  <Text
-                    style={{
-                      color: "white",
-                    }}
-                  >
-                    Assigned:{" "}
-                    {DateTime.fromISO(delivery.createdAt).toLocaleString(
-                      DateTime.DATETIME_SHORT,
-                    )}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          ))}
+              ))}
+            </>
+          )}
         </View>
       )}
     </View>
