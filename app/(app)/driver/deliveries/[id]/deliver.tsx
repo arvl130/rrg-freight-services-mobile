@@ -1,6 +1,7 @@
 import storage from "@react-native-firebase/storage"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Camera, CameraType } from "expo-camera"
-import { router } from "expo-router"
+import { router, useLocalSearchParams } from "expo-router"
 import { useRef, useState } from "react"
 import { View, Text, Button, StyleSheet, Image, Alert } from "react-native"
 
@@ -9,12 +10,39 @@ import { useBarCodePermissions } from "../../../../../hooks/barcode-scanner"
 import { updatePackageStatusToDelivered } from "../../../../../utils/api"
 
 export default function MarkPackageAsDelivered() {
+  const { id } = useLocalSearchParams<{ id: string }>()
   const [isUploading, setIsUploading] = useState(false)
   const [packageId, setPackageId] = useState<null | number>(null)
   const { isLoading, hasPermission, getPermission } = useBarCodePermissions()
 
   const [newPicture, setNewPicture] = useState<null | string>(null)
   const cameraRef = useRef<null | Camera>(null)
+
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationFn: (props: { imageUrl: string; packageId: number }) =>
+      updatePackageStatusToDelivered(props),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", id],
+      })
+
+      Alert.alert(
+        "Status Updated",
+        "The package status has been successfully updated.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.back(),
+          },
+        ],
+      )
+    },
+    onSettled: () => setIsUploading(false),
+  })
 
   return (
     <View
@@ -106,33 +134,21 @@ export default function MarkPackageAsDelivered() {
                     />
                     <Button
                       title="Mark as Delivered"
-                      disabled={isUploading}
+                      disabled={isUploading || isPending}
                       onPress={async () => {
                         setIsUploading(true)
-                        try {
-                          const ref = storage().ref(
-                            `proof-of-delivery/${packageId}`,
-                          )
-                          await ref.putFile(newPicture)
-                          const downloadUrl = await ref.getDownloadURL()
-                          await updatePackageStatusToDelivered({
-                            packageId,
-                            imageUrl: downloadUrl,
-                          })
 
-                          Alert.alert(
-                            "Status Updated",
-                            "The package status has been successfully updated.",
-                            [
-                              {
-                                text: "OK",
-                                onPress: () => router.back(),
-                              },
-                            ],
-                          )
-                        } finally {
-                          setIsUploading(false)
-                        }
+                        const ref = storage().ref(
+                          `proof-of-delivery/${packageId}`,
+                        )
+
+                        await ref.putFile(newPicture)
+                        const downloadUrl = await ref.getDownloadURL()
+
+                        mutate({
+                          packageId,
+                          imageUrl: downloadUrl,
+                        })
                       }}
                     />
                   </View>

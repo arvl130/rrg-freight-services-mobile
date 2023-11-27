@@ -1,10 +1,15 @@
 import { FontAwesome5 } from "@expo/vector-icons"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
 import { Button, Text, TouchableOpacity, View } from "react-native"
 
-import { getDelivery, getVehicle } from "../../../../../utils/api"
+import {
+  getDelivery,
+  getDeliveryPackages,
+  getVehicle,
+  updateDeliveryStatusToCompleted,
+} from "../../../../../utils/api"
 import { useLocationTracker } from "../../../../../utils/location-tracker"
 import { clearStorage, saveId } from "../../../../../utils/storage"
 
@@ -285,7 +290,11 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
   } = useLocationTracker()
 
   return (
-    <View>
+    <View
+      style={{
+        marginBottom: 8,
+      }}
+    >
       {isTracking ? (
         <StopDelivery
           deliveryId={deliveryId}
@@ -313,10 +322,101 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
   )
 }
 
+function DeliveryProgress({
+  isCompleted,
+  deliveryId,
+}: {
+  deliveryId: string
+  isCompleted: boolean
+}) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDeliveryPackages", deliveryId],
+    queryFn: () => getDeliveryPackages(Number(deliveryId)),
+  })
+
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["updateDeliveryStatusToCompleted", deliveryId],
+    mutationFn: () => updateDeliveryStatusToCompleted(Number(deliveryId)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", deliveryId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", deliveryId],
+      })
+    },
+  })
+
+  return (
+    <View
+      style={{
+        marginBottom: 8,
+        backgroundColor: "#22c55e",
+        paddingHorizontal: 8,
+        paddingVertical: 12,
+        borderRadius: 8,
+      }}
+    >
+      {status === "pending" && <Text>Loading ...</Text>}
+      {status === "error" && <Text>Error {error.message}</Text>}
+      {status === "success" && (
+        <View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontSize: 16,
+              }}
+            >
+              Packages Delivered:
+            </Text>
+            <Text
+              style={{
+                color: "white",
+                fontSize: 16,
+              }}
+            >
+              {
+                data.packages.filter(
+                  (_package: any) => _package.status === "DELIVERED",
+                ).length
+              }
+              /{data.packages.length}
+            </Text>
+          </View>
+
+          {data.packages.filter(
+            (_package: any) => _package.status === "DELIVERED",
+          ).length === data.packages.length &&
+            !isCompleted && (
+              <View
+                style={{
+                  marginTop: 8,
+                }}
+              >
+                <Button
+                  title="Mark as Completed"
+                  disabled={isPending}
+                  onPress={() => mutate()}
+                />
+              </View>
+            )}
+        </View>
+      )}
+    </View>
+  )
+}
+
 export default function ViewDeliveryPage() {
   const params = useLocalSearchParams<{ id: string }>()
   const { status, data, error } = useQuery({
-    queryKey: ["getDeliveries", params.id],
+    queryKey: ["getDelivery", params.id],
     queryFn: () => getDelivery(Number(params.id)),
   })
 
@@ -337,9 +437,64 @@ export default function ViewDeliveryPage() {
           ) : (
             <View>
               <VehicleDetails id={data.delivery.id} />
+              <DeliveryProgress
+                isCompleted={data.delivery.status === "ARRIVED"}
+                deliveryId={params.id}
+              />
               <StartStopDelivery deliveryId={data.delivery.id} />
-              <Button title="View Packages" />
-              <Button title="View Locations" />
+              <TouchableOpacity
+                activeOpacity={0.6}
+                style={{
+                  backgroundColor: "#3b82f6",
+                  borderRadius: 8,
+                  marginBottom: 8,
+                }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(app)/driver/deliveries/[id]/packages",
+                    params: {
+                      id: data.delivery.id,
+                    },
+                  })
+                }
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    textAlign: "center",
+                    paddingVertical: 12,
+                    fontSize: 16,
+                  }}
+                >
+                  View Packages
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                style={{
+                  backgroundColor: "#3b82f6",
+                  borderRadius: 8,
+                }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(app)/driver/deliveries/[id]/locations",
+                    params: {
+                      id: data.delivery.id,
+                    },
+                  })
+                }
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    textAlign: "center",
+                    paddingVertical: 12,
+                    fontSize: 16,
+                  }}
+                >
+                  View Locations
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         </>

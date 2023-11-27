@@ -198,6 +198,15 @@ export async function getVehicle(id: number) {
   return responseJson as { message: string; vehicle: Vehicle }
 }
 
+type DeliveryLocation = {
+  id: number
+  createdAt: string
+  deliveryId: number
+  long: number
+  lat: number
+  createdById: string
+}
+
 export async function createDeliveryLocation({
   deliveryId,
   long,
@@ -240,6 +249,60 @@ export async function createDeliveryLocation({
   return responseJson as { newLocation: NewShipmentLocation[] }
 }
 
+export async function getDeliveryLocations(deliveryId: number) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving locations: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/location`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving delivery locations")
+  }
+
+  return responseJson as { message: string; locations: DeliveryLocation[] }
+}
+
+export async function getDeliveryPackages(deliveryId: number) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving delivery packages: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/packages`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving delivery packages")
+  }
+
+  return responseJson as { message: string; packages: any }
+}
+
 export async function updatePackageStatusToDelivered({
   packageId,
   imageUrl,
@@ -273,6 +336,34 @@ export async function updatePackageStatusToDelivered({
   if (!response.ok) {
     console.log(responseJson)
     throw new Error("An error occured while updating package status")
+  }
+
+  return responseJson as { message: string; package: any }
+}
+
+export async function updateDeliveryStatusToCompleted(deliveryId: number) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while updating delivery status: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/complete`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    console.log(responseJson)
+    throw new Error("An error occured while updating delivery status")
   }
 
   return responseJson as { message: string; package: any }
