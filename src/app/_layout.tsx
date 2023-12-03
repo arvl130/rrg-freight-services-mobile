@@ -42,10 +42,6 @@ export default function RootLayout() {
     if (error) throw error
   }, [error])
 
-  useEffect(() => {
-    if (loaded) SplashScreen.hideAsync()
-  }, [loaded])
-
   if (!loaded) return null
   return <RootLayoutNav />
 }

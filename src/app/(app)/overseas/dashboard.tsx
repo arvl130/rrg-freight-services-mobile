@@ -1,4 +1,5 @@
 import auth from "@react-native-firebase/auth"
+import { SplashScreen } from "expo-router"
 import { useState } from "react"
 import { View, Text, Button } from "react-native"
 
@@ -13,7 +14,11 @@ export default function DashboardScreen() {
 
   const [isSigningOut, setIsSigningOut] = useState(false)
   return (
-    <View>
+    <View
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <Text>This is the Overseas Agent Dashboard screen</Text>
       <Button
         title={isSigningOut ? "Logging Out ..." : "Logout"}

@@ -1,5 +1,5 @@
 import auth from "@react-native-firebase/auth"
-import { router } from "expo-router"
+import { SplashScreen, router } from "expo-router"
 import { useState } from "react"
 import { Text, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
@@ -20,6 +20,9 @@ export default function DashboardPage() {
         flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
+      }}
+      onLayout={() => {
+        SplashScreen.hideAsync()
       }}
     >
       <View

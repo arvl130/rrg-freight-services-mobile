@@ -1,5 +1,5 @@
 import auth from "@react-native-firebase/auth"
-import { router } from "expo-router"
+import { SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import { View, Text, Button, TextInput, StyleSheet, Alert } from "react-native"
 
@@ -30,7 +30,12 @@ export default function LoginScreen() {
   }, [user, role])
 
   return (
-    <View style={styles.form}>
+    <View
+      style={styles.form}
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <View style={styles.formGroupContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput

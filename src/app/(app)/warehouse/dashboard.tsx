@@ -1,5 +1,5 @@
 import auth from "@react-native-firebase/auth"
-import { router } from "expo-router"
+import { SplashScreen, router } from "expo-router"
 import { useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
@@ -16,7 +16,12 @@ export default function DashboardScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <View style={styles.buttonGroup}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
