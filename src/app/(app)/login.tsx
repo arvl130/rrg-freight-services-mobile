@@ -8,6 +8,7 @@ import { getUserRoleRedirectPath, useSession } from "../../components/auth"
 const invalidCredentialsErrorCodes = [
   "auth/invalid-login",
   "auth/invalid-login-credentials",
+  "auth/invalid-credential",
   "auth/wrong-password",
   "auth/user-not-found",
 ]
