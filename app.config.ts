@@ -6,11 +6,11 @@ export default (): ExpoConfig => ({
   slug: "rrg-freight-services-mobile",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
+  icon: "./src/assets/images/icon.png",
   scheme: "myapp",
   userInterfaceStyle: "automatic",
   splash: {
-    image: "./assets/images/splash.png",
+    image: "./src/assets/images/splash.png",
     resizeMode: "contain",
     backgroundColor: "#ffffff",
   },
@@ -21,7 +21,7 @@ export default (): ExpoConfig => ({
   android: {
     googleServicesFile: process.env.GOOGLE_SERVICES_FILE,
     adaptiveIcon: {
-      foregroundImage: "./assets/images/adaptive-icon.png",
+      foregroundImage: "./src/assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
     package: "com.rrgfreightservices.mobile",
@@ -30,7 +30,7 @@ export default (): ExpoConfig => ({
   web: {
     bundler: "metro",
     output: "static",
-    favicon: "./assets/images/favicon.png",
+    favicon: "./src/assets/images/favicon.png",
   },
   plugins: ["expo-router", "@react-native-firebase/app", "expo-camera"],
   experiments: {
