@@ -1,8 +1,7 @@
 import "dotenv/config"
-import { ExpoConfig, ConfigContext } from "expo/config"
+import type { ExpoConfig } from "expo/config"
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
-  ...config,
+export default (): ExpoConfig => ({
   name: "RRG Freight Services",
   slug: "rrg-freight-services-mobile",
   version: "1.0.0",
