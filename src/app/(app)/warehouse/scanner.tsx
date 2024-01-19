@@ -4,8 +4,14 @@ import { Picker } from "@react-native-picker/picker"
 import { router } from "expo-router"
 import { useState } from "react"
 import toast from "react-hot-toast/headless"
-import { Text, View, StyleSheet, TextInput, Alert } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import {
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+  Alert,
+  TouchableOpacity,
+} from "react-native"
 
 import { ScannerView } from "../../../components/scanner-view"
 import { useBarCodePermissions } from "../../../hooks/barcode-scanner"

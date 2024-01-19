@@ -1,8 +1,7 @@
 import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
 import { useState } from "react"
-import { View, Text, StyleSheet } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 
 import { useSession } from "../../../components/auth"
 

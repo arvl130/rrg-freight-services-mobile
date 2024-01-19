@@ -9,8 +9,8 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  TextInput,
 } from "react-native"
-import { TextInput } from "react-native-gesture-handler"
 
 import { ScannerView } from "../../../components/scanner-view"
 import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
