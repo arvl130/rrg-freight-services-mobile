@@ -44,7 +44,6 @@
     "expo-task-manager": "~11.7.2",
     "expo-web-browser": "~12.8.2",
     "luxon": "^3.4.4",
-    "phosphor-react": "^1.4.1",
     "phosphor-react-native": "^2.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
