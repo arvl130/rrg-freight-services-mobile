@@ -1,10 +1,9 @@
+import { getDeliveryPackages } from "@/api/shipment"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
 import { ScrollView, Text, View } from "react-native"
-
-import { getDeliveryPackages } from "../../../../../utils/api"
 
 export default function ViewDeliveryPackagesPage() {
   const { id } = useLocalSearchParams<{ id: string }>()

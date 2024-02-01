@@ -3,15 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
 import { Button, Text, TouchableOpacity, View } from "react-native"
-
-import {
-  getDelivery,
-  getDeliveryPackages,
-  getVehicle,
-  updateDeliveryStatusToCompleted,
-} from "../../../../../utils/api"
-import { useLocationTracker } from "../../../../../utils/location-tracker"
-import { clearStorage, saveId } from "../../../../../utils/storage"
+import { useLocationTracker } from "@/utils/location-tracker"
+import { clearStorage, saveId } from "@/utils/storage"
+import { getVehicle } from "@/api/vehicle"
+import { getDeliveryPackages } from "@/api/shipment"
+import { updateDeliveryStatusToCompleted } from "@/api/package"
+import { getDelivery } from "@/api/delivery"
 
 function VehicleDetails({ id }: { id: number }) {
   const { status, data, error } = useQuery({

@@ -1,9 +1,8 @@
+import { getTransferShipmentLocations } from "@/api/transfer-shipment"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
 import { ScrollView, Text, View } from "react-native"
-
-import { getTransferShipmentLocations } from "../../../../../utils/api"
 
 export default function ViewTransferShipmentLocationsPage() {
   const { id } = useLocalSearchParams<{ id: string }>()

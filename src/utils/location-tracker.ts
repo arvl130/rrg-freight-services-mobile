@@ -10,9 +10,9 @@ import {
 } from "expo-location"
 import { TaskManagerTaskBody, defineTask } from "expo-task-manager"
 import { useEffect, useState } from "react"
-
-import { createDeliveryLocation, createTransferShipmentLocation } from "./api"
 import { getId } from "./storage"
+import { createDeliveryLocation } from "@/api/shipment-location"
+import { createTransferShipmentLocation } from "@/api/transfer-shipment"
 
 const LOCATION_TRACKER_TASK_NAME = "location-tracker"
 

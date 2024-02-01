@@ -1,6 +1,5 @@
 import { Redirect } from "expo-router"
-
-import { getUserRoleRedirectPath, useSession } from "../../components/auth"
+import { getUserRoleRedirectPath, useSession } from "@/components/auth"
 
 export default function LoginScreen() {
   const { user, role } = useSession()

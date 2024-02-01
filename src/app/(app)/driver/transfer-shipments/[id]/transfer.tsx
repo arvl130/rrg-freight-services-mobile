@@ -1,12 +1,11 @@
+import { updateTransferShipmentStatusToCompleted } from "@/api/transfer-shipment"
+import { useCameraPermissions } from "@/hooks/camera"
 import storage from "@react-native-firebase/storage"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Camera, CameraType } from "expo-camera"
 import { router, useLocalSearchParams } from "expo-router"
 import { useRef, useState } from "react"
 import { View, Text, Button, StyleSheet, Image, Alert } from "react-native"
-
-import { useCameraPermissions } from "../../../../../hooks/camera"
-import { updateTransferShipmentStatusToCompleted } from "../../../../../utils/api"
 
 export default function MarkTransferShipmentAsTransferred() {
   const { id } = useLocalSearchParams<{ id: string }>()

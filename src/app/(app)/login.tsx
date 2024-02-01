@@ -12,8 +12,7 @@ import {
 } from "react-native"
 import EvilIcons from "react-native-vector-icons/EvilIcons"
 import Icon from "react-native-vector-icons/SimpleLineIcons"
-
-import { getUserRoleRedirectPath, useSession } from "../../components/auth"
+import { getUserRoleRedirectPath, useSession } from "@/components/auth"
 
 const invalidCredentialsErrorCodes = [
   "auth/invalid-login",
@@ -44,7 +43,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.mainScreen}>
       <View style={[styles.imageContainer, styles.shadowProp]}>
-        <Image source={require("../../assets/images/logo4.png")} />
+        <Image source={require("@/assets/images/logo4.png")} />
       </View>
       <View
         style={styles.form}

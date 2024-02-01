@@ -1,9 +1,8 @@
+import { getTransferShipments } from "@/api/transfer-shipment"
 import { useQuery } from "@tanstack/react-query"
 import { router } from "expo-router"
 import { DateTime } from "luxon"
 import { Text, TouchableOpacity, View } from "react-native"
-
-import { getTransferShipments } from "../../../../utils/api"
 
 export default function TransferShipmentsPage() {
   const { status, data, error } = useQuery({

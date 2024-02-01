@@ -1,6 +1,5 @@
 import { Stack } from "expo-router"
-
-import { useSession } from "../../components/auth"
+import { useSession } from "@/components/auth"
 
 export default function RootLayout() {
   const { isLoading } = useSession()

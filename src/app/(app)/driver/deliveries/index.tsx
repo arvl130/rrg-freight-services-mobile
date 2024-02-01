@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { router } from "expo-router"
 import { DateTime } from "luxon"
 import { Text, TouchableOpacity, View } from "react-native"
-
-import { getDeliveries } from "../../../../utils/api"
+import { getDeliveries } from "@/api/delivery"
 
 export default function DeliveriesPage() {
   const { status, data, error } = useQuery({

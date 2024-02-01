@@ -1,9 +1,8 @@
+import { getDeliveryLocations } from "@/api/shipment-location"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
 import { ScrollView, Text, View } from "react-native"
-
-import { getDeliveryLocations } from "../../../../../utils/api"
 
 export default function ViewDeliveryLocationsPage() {
   const { id } = useLocalSearchParams<{ id: string }>()

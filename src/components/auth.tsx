@@ -7,8 +7,7 @@ import {
   useEffect,
   useState,
 } from "react"
-
-import { UserRole, supportedUserRoles } from "../utils/constants"
+import { UserRole, supportedUserRoles } from "@/utils/constants"
 
 const userRoleRedirectPaths = {
   ADMIN: "/admin/dashboard",

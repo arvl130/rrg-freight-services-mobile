@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query"
 import { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
 import { Text, TouchableOpacity, View } from "react-native"
-
-import { getTransferShipment, getVehicle } from "../../../../../utils/api"
-import { useLocationTracker } from "../../../../../utils/location-tracker"
-import { clearStorage, saveId } from "../../../../../utils/storage"
+import { useLocationTracker } from "@/utils/location-tracker"
+import { clearStorage, saveId } from "@/utils/storage"
+import { getVehicle } from "@/api/vehicle"
+import { getTransferShipment } from "@/api/transfer-shipment"
 
 function VehicleDetails({ id }: { id: number }) {
   const { status, data, error } = useQuery({

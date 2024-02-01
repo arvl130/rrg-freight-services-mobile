@@ -11,16 +11,16 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native"
-
-import { ScannerView } from "../../../components/scanner-view"
-import { useBarCodePermissions } from "../../../hooks/barcode-scanner"
-import { getLocations, getShipment } from "../../../utils/api"
-import { useLocationTracker } from "../../../utils/location-tracker"
+import { getShipment } from "@/api/shipment"
+import { ScannerView } from "@/components/scanner-view"
+import { getLocations } from "@/api/shipment-location"
+import { useBarCodePermissions } from "@/hooks/barcode-scanner"
+import { useLocationTracker } from "@/utils/location-tracker"
 import {
   clearSavedShipmentId,
   getSavedShipmentId,
   saveShipmentId,
-} from "../../../utils/storage"
+} from "@/utils/storage"
 
 function NotTrackingView({
   selectedShipmentId,

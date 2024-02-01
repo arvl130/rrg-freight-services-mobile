@@ -2,8 +2,7 @@ import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
 import { useState } from "react"
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-
-import { useSession } from "../../../components/auth"
+import { useSession } from "@/components/auth"
 
 export default function DashboardScreen() {
   useSession({

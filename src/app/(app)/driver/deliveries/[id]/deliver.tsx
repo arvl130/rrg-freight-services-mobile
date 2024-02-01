@@ -4,10 +4,9 @@ import { Camera, CameraType } from "expo-camera"
 import { router, useLocalSearchParams } from "expo-router"
 import { useRef, useState } from "react"
 import { View, Text, Button, StyleSheet, Image, Alert } from "react-native"
-
-import { ScannerView } from "../../../../../components/scanner-view"
-import { useBarCodePermissions } from "../../../../../hooks/barcode-scanner"
-import { updatePackageStatusToDelivered } from "../../../../../utils/api"
+import { ScannerView } from "@/components/scanner-view"
+import { useBarCodePermissions } from "@/hooks/barcode-scanner"
+import { updatePackageStatusToDelivered } from "@/api/package"
 
 export default function MarkPackageAsDelivered() {
   const { id } = useLocalSearchParams<{ id: string }>()
