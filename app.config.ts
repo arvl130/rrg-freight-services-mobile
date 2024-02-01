@@ -35,6 +35,7 @@ export default (): ExpoConfig => ({
   plugins: ["expo-router", "@react-native-firebase/app", "expo-camera"],
   experiments: {
     typedRoutes: true,
+    tsconfigPaths: true,
   },
   extra: {
     router: {
