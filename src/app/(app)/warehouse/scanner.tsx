@@ -165,7 +165,7 @@ export default function ScannerScreen() {
                         try {
                           const token = await currentUser.getIdToken()
                           const response = await fetch(
-                            `${process.env.EXPO_PUBLIC_API_URL}/package/${formData.packageId}/status`,
+                            `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${formData.packageId}/status`,
                             {
                               method: "POST",
                               headers: {
