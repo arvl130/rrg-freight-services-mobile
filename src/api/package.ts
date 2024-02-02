@@ -4,7 +4,7 @@ export async function updatePackageStatusToDelivered({
   packageId,
   imageUrl,
 }: {
-  packageId: number
+  packageId: string
   imageUrl: string
 }) {
   const { currentUser } = auth()

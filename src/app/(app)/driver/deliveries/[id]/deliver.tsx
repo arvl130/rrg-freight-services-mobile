@@ -11,7 +11,7 @@ import { updatePackageStatusToDelivered } from "@/api/package"
 export default function MarkPackageAsDelivered() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [isUploading, setIsUploading] = useState(false)
-  const [packageId, setPackageId] = useState<null | number>(null)
+  const [packageId, setPackageId] = useState<null | string>(null)
   const { isLoading, hasPermission, getPermission } = useBarCodePermissions()
 
   const [newPicture, setNewPicture] = useState<null | string>(null)
@@ -19,7 +19,7 @@ export default function MarkPackageAsDelivered() {
 
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
-    mutationFn: (props: { imageUrl: string; packageId: number }) =>
+    mutationFn: (props: { imageUrl: string; packageId: string }) =>
       updatePackageStatusToDelivered(props),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -55,7 +55,7 @@ export default function MarkPackageAsDelivered() {
             <ScannerView
               cancel={() => router.back()}
               onBarCodeScanned={({ data }) => {
-                setPackageId(Number(data))
+                setPackageId(data)
               }}
             />
           ) : (
