@@ -20,7 +20,7 @@ export async function getDeliveries() {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/deliveries`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/deliveries`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export async function getDelivery(id: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${id}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${id}`,
     {
       headers: {
         "Content-Type": "application/json",

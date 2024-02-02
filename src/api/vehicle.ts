@@ -17,7 +17,7 @@ export async function getVehicle(id: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/vehicle/${id}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/vehicle/${id}`,
     {
       headers: {
         "Content-Type": "application/json",

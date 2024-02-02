@@ -20,7 +20,7 @@ export async function getTransferShipments() {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipments`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipments`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export async function getTransferShipment(id: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipment/${id}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export async function createTransferShipmentLocation({
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipment/${transferShipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       method: "POST",
       headers: {
@@ -142,7 +142,7 @@ export async function getTransferShipmentLocations(transferShipmentId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipment/${transferShipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -172,7 +172,7 @@ export async function getTransferShipmentPackages(transferShipmentId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipment/${transferShipmentId}/packages`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -207,7 +207,7 @@ export async function updateTransferShipmentStatusToCompleted({
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/transfer-shipment/${transferShipmentId}/complete`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/complete`,
     {
       method: "POST",
       headers: {

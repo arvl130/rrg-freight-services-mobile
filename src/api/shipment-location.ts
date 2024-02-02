@@ -11,7 +11,7 @@ export async function getLocations(shipmentId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/shipment/${shipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export async function createLocation(
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/shipment/${shipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       method: "POST",
       headers: {
@@ -93,7 +93,7 @@ export async function createDeliveryLocation({
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       method: "POST",
       headers: {
@@ -127,7 +127,7 @@ export async function getDeliveryLocations(deliveryId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       headers: {
         "Content-Type": "application/json",

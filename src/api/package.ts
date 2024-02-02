@@ -16,7 +16,7 @@ export async function updatePackageStatusToDelivered({
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/package/${packageId}/deliver`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${packageId}/deliver`,
     {
       method: "POST",
       headers: {
@@ -48,7 +48,7 @@ export async function updateDeliveryStatusToCompleted(deliveryId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/complete`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/complete`,
     {
       method: "POST",
       headers: {

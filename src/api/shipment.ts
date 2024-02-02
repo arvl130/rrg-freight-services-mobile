@@ -11,7 +11,7 @@ export async function getShipment(shipmentId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/shipment/${shipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export async function getDeliveryPackages(deliveryId: number) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/delivery/${deliveryId}/packages`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
