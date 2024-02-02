@@ -16,3 +16,5 @@ export const supportedPackageStatuses = [
   "DELIVERED",
 ] as const
 export type PackageStatus = (typeof supportedPackageStatuses)[number]
+
+export const REGEX_ONE_OR_MORE_DIGITS = /^\d+$/

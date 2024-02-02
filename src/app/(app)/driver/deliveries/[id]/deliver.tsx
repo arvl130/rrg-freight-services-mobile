@@ -3,14 +3,28 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Camera, CameraType } from "expo-camera"
 import { router, useLocalSearchParams } from "expo-router"
 import { useRef, useState } from "react"
-import { View, Text, Button, StyleSheet, Image, Alert } from "react-native"
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  Image,
+  Alert,
+  TextInput,
+} from "react-native"
 import { ScannerView } from "@/components/scanner-view"
 import { useBarCodePermissions } from "@/hooks/barcode-scanner"
 import { updatePackageStatusToDelivered } from "@/api/package"
+import { checkOtp } from "@/api/shipment-package-otp"
+import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 
 export default function MarkPackageAsDelivered() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [isUploading, setIsUploading] = useState(false)
+
+  const [otp, setOtp] = useState("")
+  const [isCheckingOtp, setIsCheckingOtp] = useState(false)
+
   const [packageId, setPackageId] = useState<null | string>(null)
   const { isLoading, hasPermission, getPermission } = useBarCodePermissions()
 
@@ -131,10 +145,65 @@ export default function MarkPackageAsDelivered() {
                         setNewPicture(null)
                       }}
                     />
+                    <View
+                      style={{
+                        marginVertical: 12,
+                      }}
+                    >
+                      <TextInput
+                        style={{
+                          backgroundColor: "white",
+                          width: "100%",
+                          paddingVertical: 10,
+                          paddingLeft: 10,
+                          borderRadius: 10,
+                        }}
+                        placeholder="Enter your OTP here"
+                        value={otp}
+                        onChangeText={(text) => setOtp(text)}
+                      />
+                    </View>
                     <Button
                       title="Mark as Delivered"
-                      disabled={isUploading || isPending}
+                      disabled={!(!isCheckingOtp && !isUploading && !isPending)}
                       onPress={async () => {
+                        if (!otp.match(REGEX_ONE_OR_MORE_DIGITS)) {
+                          Alert.alert(
+                            "Invalid OTP",
+                            "Please enter numbers only.",
+                            [
+                              {
+                                text: "OK",
+                              },
+                            ],
+                          )
+                          return
+                        }
+
+                        setIsCheckingOtp(true)
+                        try {
+                          const isValid = await checkOtp({
+                            shipmentId: Number(id),
+                            packageId,
+                            code: Number(otp),
+                          })
+
+                          if (!isValid) {
+                            Alert.alert(
+                              "Invalid OTP",
+                              "You have entered an invalid OTP.",
+                              [
+                                {
+                                  text: "OK",
+                                },
+                              ],
+                            )
+                            return
+                          }
+                        } finally {
+                          setIsCheckingOtp(false)
+                        }
+
                         setIsUploading(true)
 
                         const ref = storage().ref(
