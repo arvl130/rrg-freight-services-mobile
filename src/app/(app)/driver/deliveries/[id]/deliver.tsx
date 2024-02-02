@@ -157,11 +157,48 @@ export default function MarkPackageAsDelivered() {
           )}
         </>
       ) : (
-        <Button
-          title="Request Camera Permission"
-          disabled={isLoading}
-          onPress={() => getPermission()}
-        />
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "black",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              maxWidth: 300,
+              textAlign: "center",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: 24,
+              fontWeight: "bold",
+              fontSize: 18,
+            }}
+          >
+            Scan the QR Code of the package to be Marked as Delivered.
+          </Text>
+          <Text
+            style={{
+              color: "white",
+              maxWidth: 240,
+              textAlign: "center",
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginBottom: 32,
+              fontWeight: "bold",
+              fontSize: 18,
+            }}
+          >
+            For this to work, camera permissions are required.
+          </Text>
+          <Button
+            title="Request Camera Permission"
+            disabled={isLoading}
+            onPress={() => getPermission()}
+          />
+        </View>
       )}
     </View>
   )
