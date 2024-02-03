@@ -13,4 +13,4 @@ program of Quezon City University.
 
 This project is licensed under the MIT License.
 
-Copyright © 2023 Angelo Geulin
+Copyright © 2023 Angelo Geulin, Wally Boy Gaynor
