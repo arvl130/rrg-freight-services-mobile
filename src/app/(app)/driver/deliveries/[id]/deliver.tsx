@@ -15,16 +15,12 @@ import {
 import { ScannerView } from "@/components/scanner-view"
 import { useBarCodePermissions } from "@/hooks/barcode-scanner"
 import { updatePackageStatusToDelivered } from "@/api/package"
-import { checkOtp } from "@/api/shipment-package-otp"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 
 export default function MarkPackageAsDelivered() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const [isUploading, setIsUploading] = useState(false)
-
   const [otp, setOtp] = useState("")
-  const [isCheckingOtp, setIsCheckingOtp] = useState(false)
-
   const [packageId, setPackageId] = useState<null | string>(null)
   const { isLoading, hasPermission, getPermission } = useBarCodePermissions()
 
@@ -33,8 +29,12 @@ export default function MarkPackageAsDelivered() {
 
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
-    mutationFn: (props: { imageUrl: string; packageId: string }) =>
-      updatePackageStatusToDelivered(props),
+    mutationFn: (props: {
+      shipmentId: number
+      packageId: string
+      imageUrl: string
+      code: number
+    }) => updatePackageStatusToDelivered(props),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getDeliveryPackages", id],
@@ -53,6 +53,13 @@ export default function MarkPackageAsDelivered() {
           },
         ],
       )
+    },
+    onError: ({ message }) => {
+      Alert.alert("Mark as Delivered Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
     },
     onSettled: () => setIsUploading(false),
   })
@@ -165,7 +172,7 @@ export default function MarkPackageAsDelivered() {
                     </View>
                     <Button
                       title="Mark as Delivered"
-                      disabled={!(!isCheckingOtp && !isUploading && !isPending)}
+                      disabled={isUploading || isPending}
                       onPress={async () => {
                         if (!otp.match(REGEX_ONE_OR_MORE_DIGITS)) {
                           Alert.alert(
@@ -180,32 +187,7 @@ export default function MarkPackageAsDelivered() {
                           return
                         }
 
-                        setIsCheckingOtp(true)
-                        try {
-                          const isValid = await checkOtp({
-                            shipmentId: Number(id),
-                            packageId,
-                            code: Number(otp),
-                          })
-
-                          if (!isValid) {
-                            Alert.alert(
-                              "Invalid OTP",
-                              "You have entered an invalid OTP.",
-                              [
-                                {
-                                  text: "OK",
-                                },
-                              ],
-                            )
-                            return
-                          }
-                        } finally {
-                          setIsCheckingOtp(false)
-                        }
-
                         setIsUploading(true)
-
                         const ref = storage().ref(
                           `proof-of-delivery/${packageId}`,
                         )
@@ -214,8 +196,10 @@ export default function MarkPackageAsDelivered() {
                         const downloadUrl = await ref.getDownloadURL()
 
                         mutate({
+                          shipmentId: Number(id),
                           packageId,
                           imageUrl: downloadUrl,
+                          code: Number(otp),
                         })
                       }}
                     />

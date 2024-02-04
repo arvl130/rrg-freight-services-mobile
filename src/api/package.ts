@@ -1,22 +1,24 @@
 import auth from "@react-native-firebase/auth"
 
 export async function updatePackageStatusToDelivered({
+  shipmentId,
   packageId,
   imageUrl,
+  code,
 }: {
+  shipmentId: number
   packageId: string
   imageUrl: string
+  code: number
 }) {
   const { currentUser } = auth()
   if (!currentUser) {
-    throw new Error(
-      "An error occured while updating package status: unauthenticated",
-    )
+    throw new Error("Unauthenticated.")
   }
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${packageId}/deliver`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${shipmentId}/package/${packageId}/mark-delivered`,
     {
       method: "POST",
       headers: {
@@ -25,15 +27,13 @@ export async function updatePackageStatusToDelivered({
       },
       body: JSON.stringify({
         imageUrl,
+        code,
       }),
     },
   )
 
   const responseJson = await response.json()
-  if (!response.ok) {
-    console.log(responseJson)
-    throw new Error("An error occured while updating package status")
-  }
+  if (!response.ok) throw new Error(responseJson.message)
 
   return responseJson as { message: string; package: any }
 }
