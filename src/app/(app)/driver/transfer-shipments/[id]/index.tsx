@@ -355,7 +355,7 @@ export default function ViewTransferShipmentPage() {
               <VehicleDetails id={data.transferShipment.vehicleId} />
               <StartStopTransfer
                 transferShipmentId={data.transferShipment.id}
-                isCompleted={data.transferShipment.status === "ARRIVED"}
+                isCompleted={data.transferShipment.status === "COMPLETED"}
               />
 
               <TouchableOpacity

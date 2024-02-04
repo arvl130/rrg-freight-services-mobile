@@ -435,7 +435,7 @@ export default function ViewDeliveryPage() {
             <View>
               <VehicleDetails id={data.delivery.vehicleId} />
               <DeliveryProgress
-                isCompleted={data.delivery.status === "ARRIVED"}
+                isCompleted={data.delivery.status === "COMPLETED"}
                 deliveryId={params.id}
               />
               <StartStopDelivery deliveryId={data.delivery.id} />
