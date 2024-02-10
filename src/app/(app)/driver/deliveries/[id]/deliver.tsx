@@ -16,6 +16,7 @@ import { ScannerView } from "@/components/scanner-view"
 import { useBarCodePermissions } from "@/hooks/barcode-scanner"
 import { updatePackageStatusToDelivered } from "@/api/package"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
+import { resendOtp } from "@/api/shipment-package-otp"
 
 export default function MarkPackageAsDelivered() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -62,6 +63,28 @@ export default function MarkPackageAsDelivered() {
       ])
     },
     onSettled: () => setIsUploading(false),
+  })
+
+  const resendOtpMutation = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      Alert.alert(
+        "OTP Resent",
+        "A new OTP has been sent to the receiver's email and contact number.",
+        [
+          {
+            text: "OK",
+          },
+        ],
+      )
+    },
+    onError: ({ message }) => {
+      Alert.alert("OTP Resent Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
   })
 
   return (
@@ -147,11 +170,31 @@ export default function MarkPackageAsDelivered() {
                   >
                     <Button
                       title="Try Again"
-                      disabled={isUploading}
+                      disabled={isUploading || isPending}
                       onPress={() => {
                         setNewPicture(null)
                       }}
                     />
+                    <View
+                      style={{
+                        paddingVertical: 8,
+                      }}
+                    >
+                      <Button
+                        title="Resend OTP"
+                        disabled={
+                          resendOtpMutation.isPending ||
+                          isUploading ||
+                          isPending
+                        }
+                        onPress={() => {
+                          resendOtpMutation.mutate({
+                            shipmentId: Number(id),
+                            packageId,
+                          })
+                        }}
+                      />
+                    </View>
                     <View
                       style={{
                         marginVertical: 12,

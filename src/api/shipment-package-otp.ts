@@ -1,18 +1,17 @@
 import auth from "@react-native-firebase/auth"
 
-export async function checkOtp(props: {
+export async function resendOtp(props: {
   shipmentId: number
   packageId: string
-  code: number
 }) {
   const { currentUser } = auth()
   if (!currentUser) {
-    throw new Error("Unauthenticated")
+    throw new Error("Client Error: Not authorized.")
   }
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${props.shipmentId}/package/${props.packageId}/otp/${props.code}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${props.shipmentId}/package/${props.packageId}/resend-otp`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -21,13 +20,7 @@ export async function checkOtp(props: {
     },
   )
 
-  if (response.status === 500) throw new Error("Internal Server Error")
-  if (response.status === 401) throw new Error("Unauthorized")
-  if (response.status === 404) return false
-
   if (!response.ok) {
-    throw new Error("Response not OK")
+    throw new Error("Server Error: Received unrecognized response.")
   }
-
-  return true
 }
