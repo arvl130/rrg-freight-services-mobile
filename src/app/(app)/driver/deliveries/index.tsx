@@ -31,8 +31,17 @@ export default function DeliveriesPage() {
             </Text>
           ) : (
             <>
-              {data.deliveries.map((delivery) => (
-                <View key={delivery.id}>
+              {data.deliveries.map((delivery, index) => (
+                <View
+                  key={delivery.id}
+                  style={
+                    index === data.deliveries.length - 1
+                      ? undefined
+                      : {
+                          marginBottom: 12,
+                        }
+                  }
+                >
                   <TouchableOpacity
                     onPress={() =>
                       router.push({

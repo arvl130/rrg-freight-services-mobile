@@ -31,8 +31,17 @@ export default function TransferShipmentsPage() {
             </Text>
           ) : (
             <>
-              {data.transferShipments.map((transferShipment) => (
-                <View key={transferShipment.id}>
+              {data.transferShipments.map((transferShipment, index) => (
+                <View
+                  key={transferShipment.id}
+                  style={
+                    index === data.transferShipments.length - 1
+                      ? undefined
+                      : {
+                          marginBottom: 12,
+                        }
+                  }
+                >
                   <TouchableOpacity
                     onPress={() =>
                       router.push({
