@@ -277,7 +277,13 @@ function StopDelivery({
   )
 }
 
-function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
+function StartStopDelivery({
+  isStartDeliveryAllowed,
+  deliveryId,
+}: {
+  isStartDeliveryAllowed: boolean
+  deliveryId: number
+}) {
   const {
     isTracking,
     status: permissionStatus,
@@ -304,16 +310,22 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
           }}
         />
       ) : (
-        <StartDelivery
-          deliveryId={deliveryId}
-          status={permissionStatus}
-          requestPermission={async () => {
-            await requestPermission()
-          }}
-          startTracking={async () => {
-            await startTracking()
-          }}
-        />
+        <>
+          {isStartDeliveryAllowed ? (
+            <StartDelivery
+              deliveryId={deliveryId}
+              status={permissionStatus}
+              requestPermission={async () => {
+                await requestPermission()
+              }}
+              startTracking={async () => {
+                await startTracking()
+              }}
+            />
+          ) : (
+            <></>
+          )}
+        </>
       )}
     </View>
   )
@@ -438,7 +450,10 @@ export default function ViewDeliveryPage() {
                 isCompleted={data.delivery.status === "COMPLETED"}
                 deliveryId={params.id}
               />
-              <StartStopDelivery deliveryId={data.delivery.id} />
+              <StartStopDelivery
+                isStartDeliveryAllowed={data.delivery.status === "IN_TRANSIT"}
+                deliveryId={data.delivery.id}
+              />
               <TouchableOpacity
                 activeOpacity={0.6}
                 style={{
