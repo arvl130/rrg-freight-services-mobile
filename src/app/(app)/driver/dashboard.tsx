@@ -272,7 +272,6 @@ export default function DashboardPage() {
             >
               <Text style={styles.optionBtnText}>Transfer Shipments</Text>
             </TouchableOpacity>
-          
           </View>
         </View>
       </View>
