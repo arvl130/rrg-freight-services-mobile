@@ -1,104 +1,19 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
-import { getDistance } from "geolib"
 import { useQuery } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
 import { Text, View, TouchableOpacity, StyleSheet, Alert } from "react-native"
-import * as Location from "expo-location"
 import {
   Feather,
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons"
-import { useEffect, useState } from "react"
-
-type Coordinates = {
-  lat: number
-  lon: number
-}
-
-function DistanceCompute(
-  coordinates: Coordinates[],
-  currentLocation: Location.LocationObject | undefined,
-) {
-  const KMDistance: number[] = []
-  coordinates.slice(1).map((location) => {
-    if (currentLocation !== undefined) {
-      const lat = location.lat.toFixed(6)
-      const lon = location.lon.toFixed(6)
-      KMDistance.push(
-        getDistance(
-          {
-            latitude: currentLocation?.coords.latitude,
-            longitude: currentLocation?.coords.longitude,
-          },
-          {
-            latitude: lat,
-            longitude: lon,
-          },
-          1,
-        ) / 1000,
-      )
-    }
-  })
-  if (Math.min(...KMDistance) === Infinity) {
-    return 0
-  } else {
-    return Math.min(...KMDistance)
-  }
-}
 
 export default function DashboardPage() {
   const { data: totalDeliveryData } = useQuery({
     queryKey: ["getCountOfInTransitPackagesByDriver"],
     queryFn: () => getCountOfInTransitPackagesByDriver(),
-  })
-  const [coordinates] = useState<[Coordinates]>([{ lat: 0, lon: 0 }])
-  const [resizeDistanceText, setResizeDistanceText] = useState<number>(0)
-  const [location, setLocation] = useState<Location.LocationObject>()
-  const [nearest, setNearest] = useState<number>(
-    DistanceCompute(coordinates, location),
-  )
-
-  useEffect(() => {
-    const getPermissions = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status !== "granted") {
-        return console.log("please grant location")
-      }
-      const currentLocation = await Location.getCurrentPositionAsync({})
-      setLocation(currentLocation)
-    }
-
-    if (DistanceCompute(coordinates, location) === 0) {
-      getPermissions()
-    } else {
-      setResizeDistanceText(nearest.toFixed(0).length)
-    }
-  })
-  useEffect(() => {
-    const geocode = async () => {
-      totalDeliveryData?.packageAddresses.map(async (address: string) => {
-        const geocodedLocation = await Location.geocodeAsync(address)
-
-        coordinates.push({
-          lat: geocodedLocation[0].latitude,
-          lon: geocodedLocation[0].longitude,
-        })
-        DistanceCompute(coordinates, location)
-      })
-    }
-    geocode()
-  })
-
-  useEffect(() => {
-    const distanceRefresh = async () => {
-      const distance = await DistanceCompute(coordinates, location)
-      setNearest(distance)
-    }
-    distanceRefresh()
   })
 
   return (
@@ -109,12 +24,7 @@ export default function DashboardPage() {
       }}
     >
       <View style={styles.headerSection}>
-        <TouchableOpacity
-          onPress={() => {
-            console.log(resizeDistanceText)
-            console.log(totalDeliveryData?.packageAddresses)
-          }}
-        >
+        <TouchableOpacity>
           <Ionicons
             style={styles.headerIconMenu}
             name="menu"
@@ -216,14 +126,8 @@ export default function DashboardPage() {
           </View>
           <View>
             <Text style={styles.dataText}>
-              <Text>{nearest.toFixed(0).toString()}</Text>
-              <Text
-                style={
-                  resizeDistanceText > 2 ? { fontSize: 20 } : { fontSize: 30 }
-                }
-              >
-                Km
-              </Text>
+              <Text>0</Text>
+              <Text style={{ fontSize: 30 }}>Km</Text>
             </Text>
 
             <Text style={styles.miniCardTitle}>Nearest Delivery</Text>
