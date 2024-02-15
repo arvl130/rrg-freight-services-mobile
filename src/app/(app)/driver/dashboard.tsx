@@ -260,11 +260,7 @@ export default function DashboardPage() {
               <Text style={styles.optionBtnText}>Deliveries</Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              flex: 1,
-            }}
-          >
+          <View>
             <TouchableOpacity
               activeOpacity={0.6}
               style={styles.optionBtn}
