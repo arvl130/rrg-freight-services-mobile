@@ -71,7 +71,6 @@ function RootLayoutNav() {
               }}
             />
           </Stack>
-
           <Notifications />
         </AuthProvider>
       </QueryClientProvider>
