@@ -9,8 +9,15 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons"
+import { useSession } from "@/components/auth"
 
 export default function DashboardPage() {
+  useSession({
+    required: {
+      role: "DRIVER",
+    },
+  })
+
   const { data: totalDeliveryData } = useQuery({
     queryKey: ["getCountOfInTransitPackagesByDriver"],
     queryFn: () => getCountOfInTransitPackagesByDriver(),
