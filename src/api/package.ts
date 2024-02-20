@@ -65,3 +65,36 @@ export async function updateDeliveryStatusToCompleted(deliveryId: number) {
 
   return responseJson as { message: string; package: any }
 }
+export async function getCountOfInTransitPackagesByDriver() {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while updating delivery status: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/user/statistics`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    console.log(responseJson)
+    throw new Error("An error occured while updating delivery status")
+  }
+
+  return responseJson as {
+    message: string
+    total: number
+    completePackagesCount: number
+    pendingPackagesCount: number
+    packageAddresses: []
+  }
+}
