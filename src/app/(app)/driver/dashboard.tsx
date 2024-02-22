@@ -10,6 +10,54 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons"
 import { useSession } from "@/components/auth"
+import { getDistance } from "geolib"
+import * as Location from "expo-location"
+import { useEffect, useState } from "react"
+
+type Coordinates = {
+  lat: number
+  lon: number
+}
+function CalculateDistance(
+  permission: boolean,
+  coordinatesList: Coordinates[],
+  currentLocation: Location.LocationObject | undefined,
+) {
+  const distance: number[] = []
+  if (
+    permission !== false &&
+    coordinatesList.length > 1 &&
+    currentLocation !== undefined
+  ) {
+    coordinatesList.map((coordinates) => {
+      distance.push(
+        getDistance(
+          {
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+          },
+          {
+            latitude: coordinates.lat,
+            longitude: coordinates.lon,
+          },
+          1,
+        ) / 1000,
+      )
+    })
+  }
+  const nearest = Math.min(...distance)
+  const length = nearest.toFixed(1).toString().length
+
+  if (nearest !== Infinity) {
+    if (length > 3) {
+      return nearest.toFixed(0)
+    } else {
+      return nearest.toFixed(1)
+    }
+  } else {
+    return 0
+  }
+}
 
 export default function DashboardPage() {
   useSession({
@@ -18,10 +66,35 @@ export default function DashboardPage() {
     },
   })
 
-  const { data: totalDeliveryData } = useQuery({
+  const { data: totalDeliveryData, status } = useQuery({
     queryKey: ["getCountOfInTransitPackagesByDriver"],
     queryFn: () => getCountOfInTransitPackagesByDriver(),
   })
+
+  const [location, setLocation] = useState<Location.LocationObject>()
+  const [permission, setPermission] = useState(true)
+  const coordinateList: Coordinates[] = []
+
+  useEffect(() => {
+    const getPermissions = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+
+      if (status !== "granted") {
+        setPermission(false)
+        return console.log("please grant location")
+      }
+      const currentLocation = await Location.getCurrentPositionAsync({})
+      setLocation(currentLocation)
+      setPermission(true)
+    }
+    getPermissions()
+  }, [])
+
+  if (status === "success" && location !== undefined) {
+    totalDeliveryData.packageCoordinates.map((coordinates) => {
+      coordinateList.push({ lat: coordinates.lat, lon: coordinates.lon })
+    })
+  }
 
   return (
     <View
@@ -133,8 +206,10 @@ export default function DashboardPage() {
           </View>
           <View>
             <Text style={styles.dataText}>
-              <Text>0</Text>
-              <Text style={{ fontSize: 30 }}>Km</Text>
+              <Text>
+                {CalculateDistance(permission, coordinateList, location)}
+              </Text>
+              <Text style={{ fontSize: 20 }}>Km</Text>
             </Text>
 
             <Text style={styles.miniCardTitle}>Nearest Delivery</Text>
@@ -190,6 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#FFFFFF",
+    fontFamily: "",
   },
   headerSection: {
     backgroundColor: "#79CFDC",
@@ -226,7 +302,6 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     padding: 10,
-    backgroundColor: "blue",
     width: "45%",
     height: 140,
     borderRadius: 20,
@@ -254,11 +329,10 @@ const styles = StyleSheet.create({
   },
 
   dataText: {
-    fontSize: 75,
+    fontSize: 65,
     marginLeft: 5,
     fontWeight: "bold",
     color: "#F8F8F8",
-
     height: "100%",
   },
   optionSection: {
