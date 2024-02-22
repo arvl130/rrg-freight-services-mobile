@@ -1,5 +1,10 @@
 import auth from "@react-native-firebase/auth"
 
+type Coordinates = {
+  lat: number
+  lon: number
+}
+
 export async function updatePackageStatusToDelivered({
   shipmentId,
   packageId,
@@ -95,6 +100,6 @@ export async function getCountOfInTransitPackagesByDriver() {
     total: number
     completePackagesCount: number
     pendingPackagesCount: number
-    packageAddresses: []
+    packageCoordinates: Coordinates[]
   }
 }
