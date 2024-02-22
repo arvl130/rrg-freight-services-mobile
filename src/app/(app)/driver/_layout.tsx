@@ -17,7 +17,7 @@ export default function Layout() {
       <Stack.Screen
         name="deliveries/index"
         options={{
-          title: "Deliveries",
+          headerShown: false,
         }}
       />
       <Stack.Screen
