@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
-import { SplashScreen, router } from "expo-router"
+import { Link, SplashScreen, router } from "expo-router"
 import { DateTime } from "luxon"
 import {
   Text,
@@ -11,6 +11,51 @@ import {
 } from "react-native"
 import { getDeliveries } from "@/api/delivery"
 import { Feather, Ionicons } from "@expo/vector-icons"
+
+function DeliveryItem(props: {
+  id: number
+  createdAt: string
+  packageCount: number
+}) {
+  return (
+    <View style={[styles.statsCard]}>
+      <View style={styles.packageTitle}>
+        <Text style={styles.packageNumber}>{props.id}</Text>
+        <Text style={styles.truckNumber}>TRUCK 1</Text>
+      </View>
+      <View style={[styles.miniCard]}>
+        <TouchableOpacity>
+          <Feather name="navigation" style={styles.navIcon} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.packageDetailsContainer}>
+        <Feather name="package" style={styles.packageIcon} />
+        <View style={styles.packageContainer}>
+          <View style={styles.packageDetails}>
+            <Ionicons name="newspaper-outline" style={styles.miniIcon} />
+            <Text style={styles.miniIconDescription}>{props.createdAt}</Text>
+          </View>
+          {/* TODO: Replace these with more useful info. */}
+          {/* <View style={styles.packageDetails}>
+            <Feather name="map-pin" style={styles.miniIcon} />
+            <Text style={styles.miniIconDescription}>UAE Hub - Main Hub</Text>
+          </View> */}
+          {/* <View style={styles.packageDetails}>
+            <Feather name="calendar" style={styles.miniIcon} />
+            <Text style={styles.miniIconDescription}>
+              6th April - 10th April
+            </Text>
+          </View> */}
+          <View style={styles.packageDetails}>
+            <Feather name="package" style={styles.miniIcon} />
+            <Text style={styles.miniIconDescription}>{props.packageCount}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}
+
 export default function DeliveriesPage() {
   const { status, data, error } = useQuery({
     queryKey: ["getDeliveries"],
@@ -25,239 +70,40 @@ export default function DeliveriesPage() {
       }}
     >
       <View style={styles.headerSection}>
-        <TouchableOpacity>
+        <Link
+          href="/(app)/driver/dashboard"
+          style={{
+            justifyContent: "center",
+          }}
+        >
           <Ionicons
             name="arrow-back-outline"
             size={27}
             color="#F8F8F8"
             activeOpacity={0.6}
-            onPress={() => router.push("/(app)/driver/dashboard")}
           />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Delivery Page</Text>
+        </Link>
+        <Text style={styles.headerTitle}>Deliveries</Text>
       </View>
 
-      <ScrollView style={{ overflow: "hidden" }}>
-        <View style={styles.deliveryTruckTile}>
-          <View style={[styles.statsCard]}>
-            <View style={styles.packageTitle}>
-              <Text style={styles.packageNumber}>1234566778</Text>
-              <Text style={styles.truckNumber}> DELIVERY TRUCK 1</Text>
-            </View>
-            <View style={[styles.miniCard]}>
-              <TouchableOpacity>
-                <Feather name="navigation" style={styles.navIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.packageDetailsContainer}>
-              <Feather name="package" style={styles.packageIcon} />
-              <View style={styles.packageContainer}>
-                <View style={styles.packageDetails}>
-                  <Ionicons name="newspaper-outline" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    February 3, 2024
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="map-pin" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    UAE Hub - Main Hub
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="calendar" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    6th April - 10th April
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="package" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>12</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={[styles.statsCard]}>
-            <View style={styles.packageTitle}>
-              <Text style={styles.packageNumber}>1234566778</Text>
-              <Text style={styles.truckNumber}> DELIVERY TRUCK 1</Text>
-            </View>
-            <View style={[styles.miniCard]}>
-              <TouchableOpacity>
-                <Feather name="navigation" style={styles.navIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.packageDetailsContainer}>
-              <Feather name="package" style={styles.packageIcon} />
-              <View style={styles.packageContainer}>
-                <View style={styles.packageDetails}>
-                  <Ionicons name="newspaper-outline" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    February 3, 2024
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="map-pin" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    UAE Hub - Main Hub
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="calendar" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    6th April - 10th April
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="package" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>12</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={[styles.statsCard]}>
-            <View style={styles.packageTitle}>
-              <Text style={styles.packageNumber}>1234566778</Text>
-              <Text style={styles.truckNumber}> DELIVERY TRUCK 1</Text>
-            </View>
-            <View style={[styles.miniCard]}>
-              <TouchableOpacity>
-                <Feather name="navigation" style={styles.navIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.packageDetailsContainer}>
-              <Feather name="package" style={styles.packageIcon} />
-              <View style={styles.packageContainer}>
-                <View style={styles.packageDetails}>
-                  <Ionicons name="newspaper-outline" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    February 3, 2024
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="map-pin" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    UAE Hub - Main Hub
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="calendar" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    6th April - 10th April
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="package" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>12</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={[styles.statsCard]}>
-            <View style={styles.packageTitle}>
-              <Text style={styles.packageNumber}>1234566778</Text>
-              <Text style={styles.truckNumber}> DELIVERY TRUCK 1</Text>
-            </View>
-            <View style={[styles.miniCard]}>
-              <TouchableOpacity>
-                <Feather name="navigation" style={styles.navIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.packageDetailsContainer}>
-              <Feather name="package" style={styles.packageIcon} />
-              <View style={styles.packageContainer}>
-                <View style={styles.packageDetails}>
-                  <Ionicons name="newspaper-outline" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    February 3, 2024
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="map-pin" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    UAE Hub - Main Hub
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="calendar" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    6th April - 10th April
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="package" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>12</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={[styles.statsCard]}>
-            <View style={styles.packageTitle}>
-              <Text style={styles.packageNumber}>1234566778</Text>
-              <Text style={styles.truckNumber}> DELIVERY TRUCK 1</Text>
-            </View>
-            <View style={[styles.miniCard]}>
-              <TouchableOpacity>
-                <Feather name="navigation" style={styles.navIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.packageDetailsContainer}>
-              <Feather name="package" style={styles.packageIcon} />
-              <View style={styles.packageContainer}>
-                <View style={styles.packageDetails}>
-                  <Ionicons name="newspaper-outline" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    February 3, 2024
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="map-pin" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    UAE Hub - Main Hub
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="calendar" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>
-                    6th April - 10th April
-                  </Text>
-                </View>
-                <View style={styles.packageDetails}>
-                  <Feather name="package" style={styles.miniIcon} />
-                  <Text style={styles.miniIconDescription}>12</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error {error.message}</Text>}
-      {status === "success" && (
-        <View>
-          {data.deliveries.length === 0 ? (
-            <Text
-              style={{
-                textAlign: "center",
-              }}
-            >
-              No deliveries assigned.
-            </Text>
-          ) : (
-            <>
-              {data.deliveries.map((delivery, index) => (
-                <View
-                  key={delivery.id}
-                  style={
-                    index === data.deliveries.length - 1
-                      ? undefined
-                      : {
-                          marginBottom: 12,
-                        }
-                  }
-                >
+      <ScrollView>
+        {status === "pending" && <Text>Loading ...</Text>}
+        {status === "error" && <Text>Error {error.message}</Text>}
+        {status === "success" && (
+          <View style={[styles.deliveryTruckTile]}>
+            {data.deliveries.length === 0 ? (
+              <Text
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                No deliveries assigned.
+              </Text>
+            ) : (
+              <>
+                {data.deliveries.map((delivery) => (
                   <TouchableOpacity
+                    key={delivery.id}
                     onPress={() =>
                       router.push({
                         pathname: "/(app)/driver/deliveries/[id]/",
@@ -267,42 +113,22 @@ export default function DeliveriesPage() {
                       })
                     }
                     activeOpacity={0.6}
-                    style={{
-                      backgroundColor: "black",
-                      borderRadius: 8,
-                      paddingVertical: 12,
-                      paddingHorizontal: 16,
-                    }}
                   >
-                    <View>
-                      <Text
-                        style={{
-                          color: "white",
-                          fontSize: 24,
-                        }}
-                      >
-                        {delivery.id}
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          color: "white",
-                        }}
-                      >
-                        Assigned:{" "}
-                        {DateTime.fromISO(delivery.createdAt).toLocaleString(
-                          DateTime.DATETIME_SHORT,
-                        )}
-                      </Text>
-                    </View>
+                    {/* TODO: Replace hardcoded values with correc info. */}
+                    <DeliveryItem
+                      id={delivery.id}
+                      packageCount={5}
+                      createdAt={DateTime.fromISO(
+                        delivery.createdAt,
+                      ).toLocaleString(DateTime.DATETIME_SHORT)}
+                    />
                   </TouchableOpacity>
-                </View>
-              ))}
-            </>
-          )}
-        </View>
-      )}
+                ))}
+              </>
+            )}
+          </View>
+        )}
+      </ScrollView>
     </View>
   )
 }
@@ -314,8 +140,8 @@ const styles = StyleSheet.create({
   },
   headerSection: {
     backgroundColor: "#79CFDC",
-    paddingBottom: 25,
-    paddingTop: 60,
+    paddingBottom: 12,
+    paddingTop: 45,
     elevation: 20,
     shadowColor: "#000000",
     borderBottomLeftRadius: 20,
@@ -339,14 +165,12 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingHorizontal: 10,
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "center",
     gap: 20,
   },
   statsCard: {
     padding: 10,
     backgroundColor: "#FFFFFF",
-    width: "95%",
     height: 180,
     borderRadius: 20,
     paddingLeft: 10,
@@ -413,13 +237,13 @@ const styles = StyleSheet.create({
 
   truckNumber: {
     color: "#78CFDC",
-    marginHorizontal: 80,
+    marginLeft: "auto",
+    paddingHorizontal: 12,
     fontSize: 20,
     fontWeight: "normal",
     backgroundColor: "#F0F0F0",
     borderRadius: 100,
     padding: 1,
-    width: "45%",
   },
   packageTitle: {
     flexDirection: "row",
