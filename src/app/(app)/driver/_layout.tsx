@@ -20,6 +20,12 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+        <Stack.Screen
+        name="deliveries/viewDelivery"
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="deliveries/[id]/index"
         options={{
