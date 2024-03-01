@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
-import { SplashScreen } from "expo-router";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { SplashScreen } from "expo-router"
+import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native"
+import { Ionicons } from "@expo/vector-icons"
 
 export default function DashboardPage() {
   return (
     <View
       style={styles.mainScreen}
       onLayout={() => {
-        SplashScreen.hideAsync();
+        SplashScreen.hideAsync()
       }}
     >
       <View style={styles.headerSection}>
@@ -49,10 +49,7 @@ export default function DashboardPage() {
 
       <View style={styles.bottomSection}>
         <View style={styles.optionSection}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            style={styles.viewPackageBtn}
-          >
+          <TouchableOpacity activeOpacity={0.6} style={styles.viewPackageBtn}>
             <Text style={styles.optionBtnText}>View Packages</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -64,7 +61,7 @@ export default function DashboardPage() {
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -175,13 +172,13 @@ const styles = StyleSheet.create({
   truckNumber: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop:10
+    marginTop: 10,
   },
   truckNumber1: {
-    fontWeight:"600",
+    fontWeight: "600",
     fontSize: 20,
   },
   truckNumber2: {
     fontSize: 20,
   },
-});
+})
