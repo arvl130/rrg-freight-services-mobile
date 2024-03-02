@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
 import { useQuery } from "@tanstack/react-query"
@@ -241,7 +242,9 @@ export default function DashboardPage() {
             <TouchableOpacity
               activeOpacity={0.6}
               style={styles.optionBtn}
-              onPress={() => router.push("/(app)/driver/deliveries")}
+              onPress={() =>
+                router.push("/(app)/driver/deliveries/viewDelivery")
+              }
             >
               <Text style={styles.optionBtnText}>Deliveries</Text>
             </TouchableOpacity>
