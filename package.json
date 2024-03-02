@@ -12,8 +12,8 @@
     "format:check": "prettier src --check",
     "lint": "eslint src --fix",
     "lint:check": "eslint src",
-    "build:prod:android": "dotenv -- eas build -p android --local --profile production",
-    "build:dev:android": "dotenv -- eas build -p android --local --profile development",
+    "build:prod:android": "dotenv -- eas build -p android --local --profile production --output prod.apk",
+    "build:dev:android": "dotenv -- eas build -p android --local --profile development --output dev.apk",
     "build:prod:ios": "dotenv -- eas build -p ios --local --profile production",
     "build:dev:ios": "dotenv -- eas build -p ios --local --profile development",
     "test": "jest --watchAll"
