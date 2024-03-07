@@ -32,7 +32,17 @@ export default (): ExpoConfig => ({
     output: "static",
     favicon: "./src/assets/images/favicon.png",
   },
-  plugins: ["expo-router", "@react-native-firebase/app", "expo-camera"],
+  plugins: [
+    "expo-router",
+    "@react-native-firebase/app",
+    "expo-camera",
+    [
+      "@rnmapbox/maps",
+      {
+        RNMapboxMapsDownloadToken: process.env.MAPBOX_SECRET_KEY,
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
     tsconfigPaths: true,
