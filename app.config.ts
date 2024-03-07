@@ -28,7 +28,7 @@ export default (): ExpoConfig => ({
     permissions: ["ACCESS_FINE_LOCATION"],
     config: {
       googleMaps: {
-        apiKey: process.env.GOOGLE_MAPS_API_KEY,
+        apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
       },
     },
   },
