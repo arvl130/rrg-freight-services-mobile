@@ -26,6 +26,11 @@ export default (): ExpoConfig => ({
     },
     package: "com.rrgfreightservices.mobile",
     permissions: ["ACCESS_FINE_LOCATION"],
+    config: {
+      googleMaps: {
+        apiKey: process.env.GOOGLE_MAPS_API_KEY,
+      },
+    },
   },
   web: {
     bundler: "metro",
