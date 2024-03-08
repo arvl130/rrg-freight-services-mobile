@@ -242,9 +242,7 @@ export default function DashboardPage() {
             <TouchableOpacity
               activeOpacity={0.6}
               style={styles.optionBtn}
-              onPress={() =>
-                router.push("/(app)/driver/deliveries/viewDelivery")
-              }
+              onPress={() => router.push("/(app)/driver/deliveries/")}
             >
               <Text style={styles.optionBtnText}>Deliveries</Text>
             </TouchableOpacity>

@@ -34,6 +34,10 @@ export default function Layout() {
         name="deliveries/[id]/index"
         options={{
           title: "View Delivery",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
