@@ -17,7 +17,11 @@ export default function Layout() {
       <Stack.Screen
         name="deliveries/index"
         options={{
-          headerShown: false,
+          title: "Deliveries",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
