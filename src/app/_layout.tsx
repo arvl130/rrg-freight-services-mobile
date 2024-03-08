@@ -33,6 +33,20 @@ SplashScreen.preventAutoHideAsync()
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
+    Montserrat: require("@/assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf"),
+    "Montserrat-Italic": require("@/assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf"),
+    "Roboto-Thin": require("@/assets/fonts/Roboto/Roboto-Thin.ttf"),
+    "Roboto-ThinItalic": require("@/assets/fonts/Roboto/Roboto-ThinItalic.ttf"),
+    "Roboto-Light": require("@/assets/fonts/Roboto/Roboto-Light.ttf"),
+    "Roboto-LightItalic": require("@/assets/fonts/Roboto/Roboto-LightItalic.ttf"),
+    Roboto: require("@/assets/fonts/Roboto/Roboto-Regular.ttf"),
+    "Roboto-Italic": require("@/assets/fonts/Roboto/Roboto-Italic.ttf"),
+    "Roboto-Medium": require("@/assets/fonts/Roboto/Roboto-Medium.ttf"),
+    "Roboto-MediumItalic": require("@/assets/fonts/Roboto/Roboto-MediumItalic.ttf"),
+    "Roboto-Black": require("@/assets/fonts/Roboto/Roboto-Black.ttf"),
+    "Roboto-BlackItalic": require("@/assets/fonts/Roboto/Roboto-BlackItalic.ttf"),
+    "Roboto-Bold": require("@/assets/fonts/Roboto/Roboto-Bold.ttf"),
+    "Roboto-BoldItalic": require("@/assets/fonts/Roboto/Roboto-BoldItalic.ttf"),
     ...FontAwesome.font,
   })
 
