@@ -210,7 +210,7 @@ export default function DashboardPage() {
               <Text>
                 {CalculateDistance(permission, coordinateList, location)}
               </Text>
-              <Text style={{ fontSize: 20 }}>Km</Text>
+              <Text style={{ fontSize: 20 }}>KM</Text>
             </Text>
 
             <Text style={styles.miniCardTitle}>Nearest Delivery</Text>
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     textAlign: "left",
     fontSize: 28,
-    fontWeight: "900",
+    fontFamily: "Roboto",
     letterSpacing: 1,
     color: "#F8F8F8",
   },
@@ -325,16 +325,16 @@ const styles = StyleSheet.create({
   miniCardTitle: {
     marginLeft: 10,
     color: "#F8F8F8",
-    fontWeight: "900",
+    fontFamily: "Roboto-Bold",
     fontSize: 18,
     position: "absolute",
     bottom: 15,
   },
 
   dataText: {
-    fontSize: 65,
+    fontSize: 56,
     marginLeft: 5,
-    fontWeight: "bold",
+    fontFamily: "Roboto-Bold",
     color: "#F8F8F8",
     height: "100%",
   },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     textAlign: "center",
     fontSize: 16,
-    fontWeight: "800",
+    fontFamily: "Roboto-Medium",
   },
 
   bottomSection: {
