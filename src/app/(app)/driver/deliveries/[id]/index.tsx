@@ -310,7 +310,7 @@ function DeliveryProgress({
           <View style={styles.statsSection}>
             <View style={[styles.statsCard, { backgroundColor: "#EDAD3E" }]}>
               <View style={styles.infoContainer}>
-                <Text style={styles.dataText}>Packages to Delivery</Text>
+                <Text style={styles.dataText}>Packages to Deliver</Text>
                 <Text style={styles.miniCardTitle}>{data.packages.length}</Text>
               </View>
             </View>
@@ -488,14 +488,14 @@ const styles = StyleSheet.create({
   miniCardTitle: {
     marginLeft: 10,
     color: "#000000",
-    fontFamily: "Roboto-Bold",
+    fontFamily: "Montserrat-Bold",
     fontSize: 72,
     position: "absolute",
     bottom: 10,
   },
   dataText: {
     height: "100%",
-    fontWeight: "600",
+    fontFamily: "Montserrat-SemiBold",
     fontSize: 18,
     marginTop: 10,
     textAlign: "center",
