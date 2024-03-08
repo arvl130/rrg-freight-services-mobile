@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 30,
     paddingHorizontal: 10,
-    flexDirection: "row",
     justifyContent: "center",
     gap: 20,
   },
