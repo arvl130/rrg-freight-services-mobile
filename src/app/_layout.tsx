@@ -59,10 +59,10 @@ export default function RootLayout() {
     "Roboto-Italic": require("@/assets/fonts/Roboto/Roboto-Italic.ttf"),
     "Roboto-Medium": require("@/assets/fonts/Roboto/Roboto-Medium.ttf"),
     "Roboto-MediumItalic": require("@/assets/fonts/Roboto/Roboto-MediumItalic.ttf"),
-    "Roboto-Black": require("@/assets/fonts/Roboto/Roboto-Black.ttf"),
-    "Roboto-BlackItalic": require("@/assets/fonts/Roboto/Roboto-BlackItalic.ttf"),
     "Roboto-Bold": require("@/assets/fonts/Roboto/Roboto-Bold.ttf"),
     "Roboto-BoldItalic": require("@/assets/fonts/Roboto/Roboto-BoldItalic.ttf"),
+    "Roboto-Black": require("@/assets/fonts/Roboto/Roboto-Black.ttf"),
+    "Roboto-BlackItalic": require("@/assets/fonts/Roboto/Roboto-BlackItalic.ttf"),
     ...FontAwesome.font,
   })
 
