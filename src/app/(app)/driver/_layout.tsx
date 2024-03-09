@@ -11,7 +11,11 @@ export default function Layout() {
       <Stack.Screen
         name="dashboard"
         options={{
-          headerShown: false,
+          title: "Dashboard",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen

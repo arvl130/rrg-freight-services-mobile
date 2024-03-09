@@ -1,9 +1,7 @@
-/* eslint-disable prettier/prettier */
-import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
 import { useQuery } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
-import { Text, View, TouchableOpacity, StyleSheet, Alert } from "react-native"
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native"
 import {
   Feather,
   Ionicons,
@@ -12,144 +10,75 @@ import {
 } from "@expo/vector-icons"
 import { useSession } from "@/components/auth"
 import { getDistance } from "geolib"
-import * as Location from "expo-location"
+import type { LocationObject } from "expo-location"
+import { PermissionStatus, getCurrentPositionAsync } from "expo-location"
+import {
+  RequestLocationPermissionView,
+  useLocationPermission,
+} from "@/components/location-permission"
 import { useEffect, useState } from "react"
 
 type Coordinates = {
   lat: number
   lon: number
 }
-function CalculateDistance(
-  permission: boolean,
+function calculateDistance(
   coordinatesList: Coordinates[],
-  currentLocation: Location.LocationObject | undefined,
+  currentLocation: LocationObject,
 ) {
-  const distance: number[] = []
-  if (
-    permission !== false &&
-    coordinatesList.length > 1 &&
-    currentLocation !== undefined
-  ) {
-    coordinatesList.map((coordinates) => {
-      distance.push(
-        getDistance(
-          {
-            latitude: currentLocation.coords.latitude,
-            longitude: currentLocation.coords.longitude,
-          },
-          {
-            latitude: coordinates.lat,
-            longitude: coordinates.lon,
-          },
-          1,
-        ) / 1000,
-      )
-    })
-  }
+  if (coordinatesList.length === 0) return 0
+
+  const distance = coordinatesList.map(
+    (coordinates) =>
+      getDistance(
+        {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        },
+        {
+          latitude: coordinates.lat,
+          longitude: coordinates.lon,
+        },
+        1,
+      ) / 1000,
+  )
+
   const nearest = Math.min(...distance)
   const length = nearest.toFixed(1).toString().length
 
-  if (nearest !== Infinity) {
-    if (length > 3) {
-      return nearest.toFixed(0)
-    } else {
-      return nearest.toFixed(1)
-    }
+  if (nearest === Infinity) return 0
+  if (length > 3) {
+    return nearest.toFixed(0)
   } else {
-    return 0
+    return nearest.toFixed(1)
   }
 }
 
-export default function DashboardPage() {
-  useSession({
-    required: {
-      role: "DRIVER",
-    },
-  })
-
+function MainView() {
   const { data: totalDeliveryData, status } = useQuery({
     queryKey: ["getCountOfInTransitPackagesByDriver"],
     queryFn: () => getCountOfInTransitPackagesByDriver(),
   })
-
-  const [location, setLocation] = useState<Location.LocationObject>()
-  const [permission, setPermission] = useState(true)
-  const coordinateList: Coordinates[] = []
+  const [location, setLocation] = useState<null | LocationObject>(null)
 
   useEffect(() => {
-    const getPermissions = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync()
-
-      if (status !== "granted") {
-        setPermission(false)
-        return console.log("please grant location")
-      }
-      const currentLocation = await Location.getCurrentPositionAsync({})
+    async function getCoordinates() {
+      const currentLocation = await getCurrentPositionAsync()
       setLocation(currentLocation)
-      setPermission(true)
     }
-    getPermissions()
+
+    getCoordinates()
   }, [])
 
+  const coordinateList: Coordinates[] = []
   if (status === "success" && location !== undefined) {
-    totalDeliveryData.packageCoordinates.map((coordinates) => {
+    totalDeliveryData.packageCoordinates.forEach((coordinates) => {
       coordinateList.push({ lat: coordinates.lat, lon: coordinates.lon })
     })
   }
 
   return (
-    <View
-      style={styles.mainScreen}
-      onLayout={() => {
-        SplashScreen.hideAsync()
-      }}
-    >
-      <View style={styles.headerSection}>
-        <TouchableOpacity>
-          <Ionicons
-            style={styles.headerIconMenu}
-            name="menu"
-            size={27}
-            color="#F8F8F8"
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dashboard</Text>
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert(
-              "Are you sure you want to logout?",
-              "",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Logout",
-                  onPress: async () => {
-                    try {
-                      await auth().signOut()
-                    } finally {
-                    }
-                  },
-                  style: "default",
-                },
-              ],
-              {
-                cancelable: true,
-              },
-            )
-          }}
-        >
-          <Ionicons
-            style={styles.headerIconMenu}
-            name="exit-outline"
-            size={27}
-            color="#F8F8F8"
-          />
-        </TouchableOpacity>
-      </View>
-
+    <>
       <View style={styles.statsSection}>
         <View
           style={[
@@ -208,7 +137,9 @@ export default function DashboardPage() {
           <View>
             <Text style={styles.dataText}>
               <Text>
-                {CalculateDistance(permission, coordinateList, location)}
+                {location === null
+                  ? 0
+                  : calculateDistance(coordinateList, location)}
               </Text>
               <Text style={{ fontSize: 20 }}>KM</Text>
             </Text>
@@ -258,15 +189,66 @@ export default function DashboardPage() {
           </View>
         </View>
       </View>
+    </>
+  )
+}
+
+export default function DashboardPage() {
+  useSession({
+    required: {
+      role: "DRIVER",
+    },
+  })
+
+  const { permission, requestPermission } = useLocationPermission()
+
+  return (
+    <View
+      style={styles.mainScreen}
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
+      {permission === null ? (
+        <RequestLocationPermissionView
+          header="Location permission is required."
+          message="To continue, please allow it in the Settings app."
+          requestPermission={() => {
+            requestPermission()
+          }}
+        />
+      ) : (
+        <>
+          {permission.status === PermissionStatus.UNDETERMINED && (
+            <RequestLocationPermissionView
+              header="Location permission is required."
+              message="To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.DENIED && (
+            <RequestLocationPermissionView
+              header="Location permission has been denied."
+              message="This permission is required to use this app. To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.GRANTED && <MainView />}
+        </>
+      )}
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   mainScreen: {
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#FFFFFF",
-    fontFamily: "",
   },
   headerSection: {
     backgroundColor: "#79CFDC",
