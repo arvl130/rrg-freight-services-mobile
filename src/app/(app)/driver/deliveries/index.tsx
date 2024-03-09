@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
-import { SplashScreen, router } from "expo-router"
+import { Link, SplashScreen, router } from "expo-router"
 import { DateTime } from "luxon"
 import {
   Text,
@@ -8,9 +8,11 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  RefreshControl,
 } from "react-native"
 import { getDeliveries } from "@/api/delivery"
 import { Feather, Ionicons } from "@expo/vector-icons"
+import { useState } from "react"
 
 function DeliveryItem(props: {
   id: number
@@ -61,7 +63,13 @@ export default function DeliveriesPage() {
     queryKey: ["getDeliveries"],
     queryFn: () => getDeliveries(),
   })
-
+  const [refresh, setRefresh] = useState(false)
+  const pullRefresh = () => {
+    setRefresh(true)
+    setTimeout(() => {
+      setRefresh(false)
+    }, 3000)
+  }
   return (
     <View
       style={styles.mainScreen}
@@ -69,7 +77,31 @@ export default function DeliveriesPage() {
         SplashScreen.hideAsync()
       }}
     >
-      <ScrollView>
+      <View style={styles.headerSection}>
+        <Link
+          href="/(app)/driver/dashboard"
+          style={{
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons
+            name="arrow-back-outline"
+            size={27}
+            color="#F8F8F8"
+            activeOpacity={0.6}
+          />
+        </Link>
+        <Text style={styles.headerTitle}>Deliveries</Text>
+      </View>
+
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refresh}
+            onRefresh={() => pullRefresh()}
+          />
+        }
+      >
         {status === "pending" && <Text>Loading ...</Text>}
         {status === "error" && <Text>Error {error.message}</Text>}
         {status === "success" && (

@@ -129,3 +129,34 @@ export async function getPackageById(id: string) {
 
   return responseJson as { message: string; package: Package }
 }
+export async function getPackageAddressByPackageId(packageId: string) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error(
+      "An error occured while retrieving package: unauthenticated",
+    )
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/location/${packageId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    console.log(responseJson)
+    throw new Error("An error occured retrieving package")
+  }
+
+  return responseJson as {
+    message: string
+    packageCoordinate: Coordinates
+    packageAddress: string
+  }
+}
