@@ -2,7 +2,7 @@ import { getDeliveryPackages } from "@/api/shipment"
 import type { Package } from "@/server/db/entities"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
-import { router, useLocalSearchParams } from "expo-router"
+import { Link, useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
 import { ScrollView, Text, TouchableOpacity, View } from "react-native"
 
@@ -156,22 +156,22 @@ export default function ViewPackagesPage() {
             }}
           >
             {data.packages.map((_package) => (
-              <TouchableOpacity
+              <Link
+                asChild
                 key={_package.id}
-                onPress={() =>
-                  router.push({
-                    pathname:
-                      "/(app)/driver/deliveries/[id]/package/[packageId]/details",
-                    params: {
-                      id,
-                      packageId: _package.id,
-                    },
-                  })
-                }
-                activeOpacity={0.6}
+                href={{
+                  pathname:
+                    "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+                  params: {
+                    id,
+                    packageId: _package.id,
+                  },
+                }}
               >
-                <PackageItem package={_package} />
-              </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.6}>
+                  <PackageItem package={_package} />
+                </TouchableOpacity>
+              </Link>
             ))}
           </View>
         </>
