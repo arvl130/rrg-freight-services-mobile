@@ -139,7 +139,7 @@ export async function getPackageAddressByPackageId(packageId: string) {
 
   const token = await currentUser.getIdToken()
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/location/${packageId}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${packageId}/location`,
     {
       method: "GET",
       headers: {
