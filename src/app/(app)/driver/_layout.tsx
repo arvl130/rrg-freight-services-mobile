@@ -1,13 +1,15 @@
 import { Stack } from "expo-router"
+import { TouchableOpacity } from "react-native"
+import List from "phosphor-react-native/src/icons/List"
+import SignOut from "phosphor-react-native/src/icons/SignOut"
+import auth from "@react-native-firebase/auth"
+import { useState } from "react"
+
 export default function Layout() {
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {},
-        headerShadowVisible: true,
-        headerTitleAlign: "center",
-      }}
-    >
+    <Stack>
       <Stack.Screen
         name="dashboard"
         options={{
@@ -16,6 +18,36 @@ export default function Layout() {
             backgroundColor: "#79CFDC",
           },
           headerTintColor: "white",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{
+                marginRight: 14,
+              }}
+            >
+              <List size={24} color="white" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              disabled={isSigningOut}
+              onPress={() => {
+                setIsSigningOut(true)
+                try {
+                  auth().signOut()
+                } finally {
+                  setIsSigningOut(false)
+                }
+              }}
+            >
+              <SignOut
+                size={24}
+                color="white"
+                style={{
+                  opacity: isSigningOut ? 0.2 : undefined,
+                }}
+              />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Stack.Screen
