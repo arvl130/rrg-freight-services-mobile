@@ -1,6 +1,7 @@
 import Constants from "expo-constants"
 import { useEffect, useRef } from "react"
-import { useToaster, Toast as ToastT } from "react-hot-toast/headless"
+import type { Toast as ToastT } from "react-hot-toast/headless"
+import { useToaster } from "react-hot-toast/headless"
 import { Text, View, Animated } from "react-native"
 
 function Toast({

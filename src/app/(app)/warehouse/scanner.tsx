@@ -14,7 +14,7 @@ import {
 } from "react-native"
 import { ScannerView } from "@/components/scanner-view"
 import { useBarCodePermissions } from "@/hooks/barcode-scanner"
-import { PackageStatus } from "@/utils/constants"
+import type { PackageStatus } from "@/utils/constants"
 
 export default function ScannerScreen() {
   const [isScannerVisible, setIsScannerVisible] = useState(false)

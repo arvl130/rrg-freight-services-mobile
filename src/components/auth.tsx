@@ -1,13 +1,10 @@
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
+import type { FirebaseAuthTypes } from "@react-native-firebase/auth"
+import auth from "@react-native-firebase/auth"
 import { router } from "expo-router"
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react"
-import { UserRole, supportedUserRoles } from "@/utils/constants"
+import type { ReactNode } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
+import type { UserRole } from "@/utils/constants"
+import { supportedUserRoles } from "@/utils/constants"
 
 const userRoleRedirectPaths = {
   ADMIN: "/admin/dashboard",

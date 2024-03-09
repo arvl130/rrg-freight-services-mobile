@@ -1,5 +1,5 @@
 import auth from "@react-native-firebase/auth"
-import { NewShipmentLocation, ShipmentLocation } from "@/utils/entities"
+import type { NewShipmentLocation, ShipmentLocation } from "@/utils/entities"
 
 export async function getLocations(shipmentId: number) {
   const { currentUser } = auth()

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
-import { Link, SplashScreen, router } from "expo-router"
+import { SplashScreen, router } from "expo-router"
 import { DateTime } from "luxon"
 import {
   Text,

@@ -1,4 +1,5 @@
-import { BarCodeScannedCallback, BarCodeScanner } from "expo-barcode-scanner"
+import type { BarCodeScannedCallback } from "expo-barcode-scanner"
+import { BarCodeScanner } from "expo-barcode-scanner"
 import { Button, StyleSheet, View } from "react-native"
 
 export function ScannerView({

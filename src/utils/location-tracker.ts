@@ -1,14 +1,15 @@
 import auth from "@react-native-firebase/auth"
+import type { LocationObject } from "expo-location"
 import {
   useForegroundPermissions,
   startLocationUpdatesAsync,
   stopLocationUpdatesAsync,
   Accuracy,
   ActivityType,
-  LocationObject,
   hasStartedLocationUpdatesAsync,
 } from "expo-location"
-import { TaskManagerTaskBody, defineTask } from "expo-task-manager"
+import type { TaskManagerTaskBody } from "expo-task-manager"
+import { defineTask } from "expo-task-manager"
 import { useEffect, useState } from "react"
 import { getId } from "./storage"
 import { createDeliveryLocation } from "@/api/shipment-location"

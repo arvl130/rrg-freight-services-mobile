@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
-import { LocationPermissionResponse } from "expo-location"
+import type { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
 import { Text, TouchableOpacity, View } from "react-native"
 import { useLocationTracker } from "@/utils/location-tracker"

@@ -2,7 +2,8 @@ import { useNetInfo } from "@react-native-community/netinfo"
 import { onlineManager } from "@tanstack/react-query"
 import { useFocusEffect } from "expo-router"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { AppState, AppStateStatus, Platform } from "react-native"
+import type { AppStateStatus } from "react-native"
+import { AppState, Platform } from "react-native"
 
 export function useOnlineManager() {
   const { isConnected, isInternetReachable } = useNetInfo()

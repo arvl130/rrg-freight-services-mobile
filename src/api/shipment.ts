@@ -1,5 +1,5 @@
 import auth from "@react-native-firebase/auth"
-import { Shipment } from "@/utils/entities"
+import type { Shipment } from "@/utils/entities"
 
 export async function getShipment(shipmentId: number) {
   const { currentUser } = auth()
