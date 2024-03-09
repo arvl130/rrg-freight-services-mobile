@@ -20,7 +20,7 @@ export function getUserRoleRedirectPath(role: UserRole | null) {
   return userRoleRedirectPaths[role]
 }
 
-type AuthContextType = {
+type TAuthContext = {
   reload: () => Promise<void>
 } & (
   | {
@@ -43,7 +43,7 @@ type AuthContextType = {
     }
 )
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<TAuthContext>({
   isLoading: true,
   user: null,
   role: null,
@@ -51,7 +51,7 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
-  const [session, setSession] = useState<AuthContextType>({
+  const [session, setSession] = useState<TAuthContext>({
     isLoading: true,
     user: null,
     role: null,
