@@ -16,6 +16,7 @@ import { AuthProvider } from "@/components/auth"
 import { Notifications } from "@/components/notifications"
 import { useAppState, useOnlineManager } from "@/utils/tanstack-query"
 import { REGISTERED_FONTS } from "@/utils/fonts"
+import { LocationPermissionProvider } from "@/components/location-permission"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,15 +61,17 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Stack>
-            <Stack.Screen
-              name="(app)"
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack>
-          <Notifications />
+          <LocationPermissionProvider>
+            <Stack>
+              <Stack.Screen
+                name="(app)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+            <Notifications />
+          </LocationPermissionProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
