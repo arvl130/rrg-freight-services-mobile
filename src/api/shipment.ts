@@ -1,5 +1,6 @@
 import auth from "@react-native-firebase/auth"
 import type { Shipment } from "@/utils/entities"
+import type { Package } from "@/server/db/entities"
 
 export async function getShipment(shipmentId: number) {
   const { currentUser } = auth()
@@ -54,5 +55,5 @@ export async function getDeliveryPackages(deliveryId: number) {
     throw new Error("An error occured while retrieving delivery packages")
   }
 
-  return responseJson as { message: string; packages: any }
+  return responseJson as { message: string; packages: Package[] }
 }

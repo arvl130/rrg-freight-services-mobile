@@ -1,3 +1,4 @@
+import type { Package } from "@/server/db/entities"
 import auth from "@react-native-firebase/auth"
 
 type Coordinates = {
@@ -70,6 +71,7 @@ export async function updateDeliveryStatusToCompleted(deliveryId: number) {
 
   return responseJson as { message: string; package: any }
 }
+
 export async function getCountOfInTransitPackagesByDriver() {
   const { currentUser } = auth()
   if (!currentUser) {
@@ -102,4 +104,28 @@ export async function getCountOfInTransitPackagesByDriver() {
     pendingPackagesCount: number
     packageCoordinates: Coordinates[]
   }
+}
+
+export async function getPackageById(id: string) {
+  const { currentUser } = auth()
+  if (!currentUser) {
+    throw new Error("ClientError: unauthenticated.")
+  }
+
+  const token = await currentUser.getIdToken()
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Retrieving package failed.")
+  }
+
+  return responseJson as { message: string; package: Package }
 }

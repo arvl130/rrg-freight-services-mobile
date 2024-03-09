@@ -1,13 +1,128 @@
 import { getDeliveryPackages } from "@/api/shipment"
+import type { Package } from "@/server/db/entities"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
-import { useLocalSearchParams } from "expo-router"
+import { router, useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
-import { ScrollView, Text, View } from "react-native"
+import { ScrollView, Text, TouchableOpacity, View } from "react-native"
 
-export default function ViewDeliveryPackagesPage() {
+function PackageMeter(props: { value: number; total: number }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 4,
+        marginBottom: 12,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "600",
+        }}
+      >
+        Packages Delivered:
+      </Text>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "600",
+        }}
+      >
+        {props.value}/{props.total}
+      </Text>
+    </View>
+  )
+}
+
+export function PackageItem(props: { package: Package }) {
+  return (
+    <>
+      <View
+        key={props.package.id}
+        style={{
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          borderRadius: 8,
+          backgroundColor:
+            props.package.status === "DELIVERED" ? "#A4D8D8" : "white",
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "600",
+            }}
+          >
+            ID: {props.package.id}
+          </Text>
+          {props.package.status === "DELIVERED" ? (
+            <FontAwesome5 name="check" size={32} />
+          ) : (
+            <MaterialCommunityIcons name="truck-delivery-outline" size={32} />
+          )}
+        </View>
+        <Text>
+          <Text
+            style={{
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Sender Name:
+          </Text>{" "}
+          {props.package.senderFullName}
+        </Text>
+        <Text>
+          <Text
+            style={{
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Receiver Name:
+          </Text>{" "}
+          {props.package.receiverFullName}
+        </Text>
+        <Text
+          style={{
+            fontFamily: "Roboto-Medium",
+          }}
+        >
+          Address:
+        </Text>
+        <Text>
+          {props.package.receiverStreetAddress},{" "}
+          {props.package.receiverBarangay}, {props.package.receiverCity}
+        </Text>
+        <Text>
+          {props.package.receiverStateOrProvince},{" "}
+          {props.package.receiverCountryCode}
+        </Text>
+        <Text>
+          <Text
+            style={{
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Date:
+          </Text>{" "}
+          {DateTime.fromISO(props.package.createdAt).toLocaleString(
+            DateTime.DATETIME_SHORT_WITH_SECONDS,
+          )}
+        </Text>
+      </View>
+    </>
+  )
+}
+
+export default function ViewPackagesPage() {
   const { id } = useLocalSearchParams<{ id: string }>()
-
   const { status, data, error } = useQuery({
     queryKey: ["getDeliveryPackages", id],
     queryFn: () => getDeliveryPackages(Number(id)),
@@ -19,131 +134,44 @@ export default function ViewDeliveryPackagesPage() {
         flex: 1,
         paddingVertical: 8,
         paddingHorizontal: 12,
+        backgroundColor: "#dedbdb",
       }}
     >
       {status === "pending" && <Text>Loading ...</Text>}
       {status === "error" && <Text>Error: {error.message}</Text>}
       {status === "success" && (
         <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 4,
-              marginBottom: 12,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "600",
-              }}
-            >
-              Packages Delivered:
-            </Text>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "600",
-              }}
-            >
-              {
-                data.packages.filter(
-                  (_package: any) => _package.status === "DELIVERED",
-                ).length
-              }
-              /{data.packages.length}
-            </Text>
-          </View>
+          <PackageMeter
+            value={
+              data.packages.filter(
+                (_package) => _package.status === "DELIVERED",
+              ).length
+            }
+            total={data.packages.length}
+          />
           <View
             style={{
               flex: 1,
               gap: 8,
             }}
           >
-            {data.packages.map((_package: any) => (
-              <View
+            {data.packages.map((_package) => (
+              <TouchableOpacity
                 key={_package.id}
-                style={{
-                  backgroundColor:
-                    _package.status === "DELIVERED" ? "#22c55e" : "#f97316",
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  borderRadius: 8,
-                }}
+                onPress={() =>
+                  router.push({
+                    pathname:
+                      "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+                    params: {
+                      id,
+                      packageId: _package.id,
+                    },
+                  })
+                }
+                activeOpacity={0.6}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 20,
-                      fontWeight: "600",
-                    }}
-                  >
-                    ID: {_package.id}
-                  </Text>
-                  {_package.status === "DELIVERED" ? (
-                    <FontAwesome5 name="check" size={32} color="white" />
-                  ) : (
-                    <MaterialCommunityIcons
-                      name="truck-delivery-outline"
-                      size={32}
-                      color="white"
-                    />
-                  )}
-                </View>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Sender Name: {_package.senderFullName}
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Receiver Name: {_package.receiverFullName}
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Address:
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  {_package.receiverStreetAddress}, {_package.receiverBarangay},{" "}
-                  {_package.receiverCity}
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  {_package.receiverStateOrProvince},{" "}
-                  {_package.receiverCountryCode}
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  {DateTime.fromISO(_package.createdAt).toLocaleString(
-                    DateTime.DATETIME_SHORT_WITH_SECONDS,
-                  )}
-                </Text>
-              </View>
+                <PackageItem package={_package} />
+              </TouchableOpacity>
             ))}
           </View>
         </>

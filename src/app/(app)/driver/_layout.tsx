@@ -44,6 +44,20 @@ export default function Layout() {
         name="deliveries/[id]/packages"
         options={{
           title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="deliveries/[id]/package/[packageId]/details"
+        options={{
+          title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
