@@ -1,4 +1,6 @@
 import { getPackageById } from "@/api/package"
+import { ErrorView } from "@/components/error-view"
+import { LoadingView } from "@/components/loading-view"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
@@ -20,8 +22,8 @@ export default function PackageDetailsPage() {
         flex: 1,
       }}
     >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error: {error.message}</Text>}
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
       {status === "success" && (
         <View
           style={{
