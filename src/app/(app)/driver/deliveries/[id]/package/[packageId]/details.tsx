@@ -53,12 +53,14 @@ export default function PackageDetailsPage() {
                 style={{
                   fontSize: 96,
                   marginVertical: 12,
+                  color: "white",
                 }}
               />
               <Text
                 style={{
                   fontFamily: "Roboto-Bold",
                   fontSize: 20,
+                  color: "white",
                 }}
               >
                 ID: {data.package.id}
@@ -66,7 +68,11 @@ export default function PackageDetailsPage() {
             </View>
 
             <View>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -76,7 +82,11 @@ export default function PackageDetailsPage() {
                 </Text>{" "}
                 {data.package.receiverFullName}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -90,7 +100,11 @@ export default function PackageDetailsPage() {
                 {data.package.receiverCountryCode}{" "}
                 {data.package.receiverPostalCode}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -100,7 +114,11 @@ export default function PackageDetailsPage() {
                 </Text>{" "}
                 {data.package.receiverContactNumber}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -114,12 +132,16 @@ export default function PackageDetailsPage() {
             <View
               style={{
                 height: 1,
-                backgroundColor: "black",
+                backgroundColor: "white",
                 marginVertical: 24,
               }}
             />
             <View>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -129,7 +151,11 @@ export default function PackageDetailsPage() {
                 </Text>{" "}
                 {data.package.senderFullName}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -141,7 +167,11 @@ export default function PackageDetailsPage() {
                 {data.package.senderStateOrProvince},{" "}
                 {data.package.senderCountryCode} {data.package.senderPostalCode}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
@@ -151,7 +181,11 @@ export default function PackageDetailsPage() {
                 </Text>{" "}
                 {data.package.senderContactNumber}
               </Text>
-              <Text>
+              <Text
+                style={{
+                  color: "white",
+                }}
+              >
                 <Text
                   style={{
                     fontFamily: "Roboto-Bold",
