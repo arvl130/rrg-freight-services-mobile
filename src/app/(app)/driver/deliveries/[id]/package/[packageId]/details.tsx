@@ -3,11 +3,11 @@ import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
-import { useLocalSearchParams } from "expo-router"
-import { Text, View } from "react-native"
+import { Link, useLocalSearchParams } from "expo-router"
+import { Text, TouchableOpacity, View } from "react-native"
 
 export default function PackageDetailsPage() {
-  const { packageId } = useLocalSearchParams<{
+  const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
@@ -161,6 +161,42 @@ export default function PackageDetailsPage() {
                 </Text>{" "}
                 {data.package.senderEmailAddress}
               </Text>
+            </View>
+            <View
+              style={{
+                marginTop: 12,
+              }}
+            >
+              <Link
+                asChild
+                href={{
+                  pathname:
+                    "/(app)/driver/deliveries/[id]/package/[packageId]/location",
+                  params: {
+                    id,
+                    packageId: data.package.id,
+                  },
+                }}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={{
+                    backgroundColor: "#16a34a",
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      fontFamily: "Roboto-Medium",
+                    }}
+                  >
+                    View Location on Map
+                  </Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </View>
