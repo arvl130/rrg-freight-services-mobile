@@ -77,23 +77,6 @@ export default function DeliveriesPage() {
         SplashScreen.hideAsync()
       }}
     >
-      <View style={styles.headerSection}>
-        <Link
-          href="/(app)/driver/dashboard"
-          style={{
-            justifyContent: "center",
-          }}
-        >
-          <Ionicons
-            name="arrow-back-outline"
-            size={27}
-            color="#F8F8F8"
-            activeOpacity={0.6}
-          />
-        </Link>
-        <Text style={styles.headerTitle}>Deliveries</Text>
-      </View>
-
       <ScrollView
         refreshControl={
           <RefreshControl
