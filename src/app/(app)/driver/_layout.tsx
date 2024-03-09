@@ -138,6 +138,12 @@ export default function Layout() {
           title: "View Transfer Shipment",
         }}
       />
+      <Stack.Screen
+        name="deliveries/[id]/package/[packageId]/location"
+        options={{
+          title: "View Actual Map",
+        }}
+      />
     </Stack>
   )
 }
