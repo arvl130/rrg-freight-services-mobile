@@ -34,7 +34,7 @@ export default function Layout() {
                 setIsSigningOut(true)
                 try {
                   auth().signOut()
-                } finally {
+                } catch {
                   setIsSigningOut(false)
                 }
               }}
