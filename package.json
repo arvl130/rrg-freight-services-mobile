@@ -33,6 +33,7 @@
     "@react-navigation/native": "^6.0.2",
     "@rnmapbox/maps": "^10.1.18",
     "@tanstack/react-query": "^5.8.1",
+    "drizzle-orm": "^0.30.1",
     "expo": "~50.0.11",
     "expo-barcode-scanner": "~12.9.3",
     "expo-camera": "~14.0.6",

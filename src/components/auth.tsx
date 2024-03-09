@@ -4,7 +4,7 @@ import { router } from "expo-router"
 import type { ReactNode } from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import type { UserRole } from "@/utils/constants"
-import { supportedUserRoles } from "@/utils/constants"
+import { SUPPORTED_USER_ROLES } from "@/utils/constants"
 
 const userRoleRedirectPaths = {
   ADMIN: "/admin/dashboard",
@@ -135,7 +135,7 @@ export function useSession(
         return
       }
 
-      for (const sessionRole of supportedUserRoles) {
+      for (const sessionRole of SUPPORTED_USER_ROLES) {
         if (required.role === sessionRole && session.role !== sessionRole) {
           const redirectPath = getUserRoleRedirectPath(session.role)
           router.replace(redirectPath)
