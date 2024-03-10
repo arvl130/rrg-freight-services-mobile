@@ -1,24 +1,38 @@
 import { getTransferShipments } from "@/api/transfer-shipment"
+import { ErrorView } from "@/components/error-view"
+import { LoadingView } from "@/components/loading-view"
 import { useQuery } from "@tanstack/react-query"
 import { router } from "expo-router"
 import { DateTime } from "luxon"
-import { Text, TouchableOpacity, View } from "react-native"
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 export default function TransferShipmentsPage() {
-  const { status, data, error } = useQuery({
+  const { status, data, error, fetchStatus, refetch } = useQuery({
     queryKey: ["getTransferShipments"],
     queryFn: () => getTransferShipments(),
   })
 
   return (
-    <View
+    <ScrollView
       style={{
         paddingVertical: 8,
         paddingHorizontal: 12,
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={status !== "pending" && fetchStatus === "fetching"}
+          onRefresh={() => refetch()}
+        />
+      }
     >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error {error.message}</Text>}
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
       {status === "success" && (
         <View>
           {data.transferShipments.length === 0 ? (
@@ -88,6 +102,6 @@ export default function TransferShipmentsPage() {
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }

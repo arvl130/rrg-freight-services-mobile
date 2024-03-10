@@ -1,7 +1,14 @@
-import { SplashScreen, router } from "expo-router"
+import { Link, SplashScreen } from "expo-router"
 import { useQuery } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native"
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native"
 import {
   Feather,
   Ionicons,
@@ -55,7 +62,12 @@ function calculateDistance(
 }
 
 function MainView() {
-  const { data: totalDeliveryData, status } = useQuery({
+  const {
+    data: totalDeliveryData,
+    status,
+    fetchStatus,
+    refetch,
+  } = useQuery({
     queryKey: ["getCountOfInTransitPackagesByDriver"],
     queryFn: () => getCountOfInTransitPackagesByDriver(),
   })
@@ -78,7 +90,17 @@ function MainView() {
   }
 
   return (
-    <>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1,
+      }}
+      refreshControl={
+        <RefreshControl
+          refreshing={fetchStatus === "fetching"}
+          onRefresh={() => refetch()}
+        />
+      }
+    >
       <View style={styles.statsSection}>
         <View
           style={[
@@ -170,26 +192,22 @@ function MainView() {
       <View style={styles.bottomSection}>
         <View style={styles.optionSection}>
           <View>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              style={styles.optionBtn}
-              onPress={() => router.push("/(app)/driver/deliveries/")}
-            >
-              <Text style={styles.optionBtnText}>Deliveries</Text>
-            </TouchableOpacity>
+            <Link asChild href="/(app)/driver/deliveries/">
+              <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
+                <Text style={styles.optionBtnText}>Deliveries</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
           <View>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              style={styles.optionBtn}
-              onPress={() => router.push("/(app)/driver/transfer-shipments")}
-            >
-              <Text style={styles.optionBtnText}>Transfer Shipments</Text>
-            </TouchableOpacity>
+            <Link asChild href="/(app)/driver/transfer-shipments">
+              <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
+                <Text style={styles.optionBtnText}>Transfer Shipments</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
         </View>
       </View>
-    </>
+    </ScrollView>
   )
 }
 

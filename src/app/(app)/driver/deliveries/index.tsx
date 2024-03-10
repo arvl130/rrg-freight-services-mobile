@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
-import { Link, SplashScreen, router } from "expo-router"
+import { Link, SplashScreen } from "expo-router"
 import { DateTime } from "luxon"
 import {
   Text,
@@ -12,7 +12,8 @@ import {
 } from "react-native"
 import { getDeliveries } from "@/api/delivery"
 import { Feather, Ionicons } from "@expo/vector-icons"
-import { useState } from "react"
+import { LoadingView } from "@/components/loading-view"
+import { ErrorView } from "@/components/error-view"
 
 function DeliveryItem(props: {
   id: number
@@ -59,17 +60,11 @@ function DeliveryItem(props: {
 }
 
 export default function DeliveriesPage() {
-  const { status, data, error } = useQuery({
+  const { status, data, error, fetchStatus, refetch } = useQuery({
     queryKey: ["getDeliveries"],
     queryFn: () => getDeliveries(),
   })
-  const [refresh, setRefresh] = useState(false)
-  const pullRefresh = () => {
-    setRefresh(true)
-    setTimeout(() => {
-      setRefresh(false)
-    }, 3000)
-  }
+
   return (
     <View
       style={styles.mainScreen}
@@ -80,13 +75,13 @@ export default function DeliveriesPage() {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={refresh}
-            onRefresh={() => pullRefresh()}
+            refreshing={status !== "pending" && fetchStatus === "fetching"}
+            onRefresh={() => refetch()}
           />
         }
       >
-        {status === "pending" && <Text>Loading ...</Text>}
-        {status === "error" && <Text>Error {error.message}</Text>}
+        {status === "pending" && <LoadingView />}
+        {status === "error" && <ErrorView message={error.message} />}
         {status === "success" && (
           <View style={[styles.deliveryTruckTile]}>
             {data.deliveries.length === 0 ? (
@@ -100,27 +95,27 @@ export default function DeliveriesPage() {
             ) : (
               <>
                 {data.deliveries.map((delivery) => (
-                  <TouchableOpacity
+                  <Link
+                    asChild
                     key={delivery.id}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/(app)/driver/deliveries/[id]/",
-                        params: {
-                          id: delivery.id,
-                        },
-                      })
-                    }
-                    activeOpacity={0.6}
+                    href={{
+                      pathname: "/(app)/driver/deliveries/[id]/",
+                      params: {
+                        id: delivery.id,
+                      },
+                    }}
                   >
-                    {/* TODO: Replace hardcoded values with correc info. */}
-                    <DeliveryItem
-                      id={delivery.id}
-                      packageCount={5}
-                      createdAt={DateTime.fromISO(
-                        delivery.createdAt,
-                      ).toLocaleString(DateTime.DATETIME_SHORT)}
-                    />
-                  </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.6}>
+                      {/* TODO: Replace hardcoded values with correc info. */}
+                      <DeliveryItem
+                        id={delivery.id}
+                        packageCount={5}
+                        createdAt={DateTime.fromISO(
+                          delivery.createdAt,
+                        ).toLocaleString(DateTime.DATETIME_SHORT)}
+                      />
+                    </TouchableOpacity>
+                  </Link>
                 ))}
               </>
             )}
