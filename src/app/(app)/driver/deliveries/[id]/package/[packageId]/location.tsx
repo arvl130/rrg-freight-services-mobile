@@ -1,26 +1,33 @@
-import { Text, View, StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
 import { useLocalSearchParams } from "expo-router"
 import { getPackageAddressByPackageId } from "@/api/package"
 import { useQuery } from "@tanstack/react-query"
 import MapboxGL from "@rnmapbox/maps"
-import { useEffect, useState } from "react"
 import { MaterialIcons } from "@expo/vector-icons"
+import { LoadingView } from "@/components/loading-view"
+import { ErrorView } from "@/components/error-view"
+
 MapboxGL.setAccessToken(`${process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_KEY}`)
-export default function PackageLocation() {
+
+export default function ViewPackageLocationPage() {
   const { packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
 
-  const { status, data, error, refetch } = useQuery({
+  const { status, data, error } = useQuery({
     queryKey: ["getPackageAddressByPackageId", packageId],
     queryFn: () => getPackageAddressByPackageId(packageId),
   })
 
   return (
-    <View>
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error: {error.message}</Text>}
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
       {status === "success" && (
         <View style={styles.container}>
           <MapboxGL.MapView style={styles.map}>

@@ -399,8 +399,8 @@ function VehicleDetails({ id }: { id: number }) {
         alignItems: "center",
       }}
     >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error: {error.message}</Text>}
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
       {status === "success" && (
         <>
           {data === null ? (
