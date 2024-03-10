@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { LocationPermissionResponse } from "expo-location"
-import { SplashScreen, router, useLocalSearchParams } from "expo-router"
+import { Link, SplashScreen, useLocalSearchParams } from "expo-router"
 import {
   Button,
   Image,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,6 +17,8 @@ import { getVehicle } from "@/api/vehicle"
 import { getDeliveryPackages } from "@/api/shipment"
 import { updateDeliveryStatusToCompleted } from "@/api/package"
 import { getDelivery } from "@/api/delivery"
+import { LoadingView } from "@/components/loading-view"
+import { ErrorView } from "@/components/error-view"
 
 function StartDelivery({
   deliveryId,
@@ -84,21 +88,33 @@ function StartDelivery({
     )
 
   return (
-    <View>
-      <TouchableOpacity
-        style={styles.deliveryPackageBtn}
-        activeOpacity={0.6}
-        onPress={async () => {
-          await saveId({
-            id: deliveryId,
-            type: "DELIVERY",
-          })
-          await startTracking()
+    <TouchableOpacity
+      style={{
+        flex: 1,
+        borderRadius: 6,
+        paddingVertical: 12,
+        backgroundColor: "#22c55e",
+      }}
+      activeOpacity={0.6}
+      onPress={async () => {
+        await saveId({
+          id: deliveryId,
+          type: "DELIVERY",
+        })
+        await startTracking()
+      }}
+    >
+      <Text
+        style={{
+          color: "black",
+          textAlign: "center",
+          fontFamily: "Roboto-Medium",
+          fontSize: 16,
         }}
       >
-        <Text style={styles.optionBtnText}>Start Delivery</Text>
-      </TouchableOpacity>
-    </View>
+        Start Delivery
+      </Text>
+    </TouchableOpacity>
   )
 }
 
@@ -170,12 +186,15 @@ function StopDelivery({
     )
 
   return (
-    <View>
+    <>
       <TouchableOpacity
         style={{
+          flex: 1,
           backgroundColor: "#ef4444",
           borderRadius: 8,
-          marginBottom: 8,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingVertical: 12,
         }}
         activeOpacity={0.6}
         onPress={async () => {
@@ -185,43 +204,49 @@ function StopDelivery({
       >
         <Text
           style={{
+            fontFamily: "Roboto-Medium",
             color: "white",
-            textAlign: "center",
-            paddingVertical: 12,
             fontSize: 16,
+            paddingHorizontal: 6,
+            textAlign: "center",
           }}
         >
           Stop Delivery
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#3b82f6",
-          paddingVertical: 12,
-          borderRadius: 8,
-        }}
-        activeOpacity={0.6}
-        onPress={() => {
-          router.push({
-            pathname: "/(app)/driver/deliveries/[id]/deliver",
-            params: {
-              id: deliveryId,
-            },
-          })
+      <Link
+        asChild
+        href={{
+          pathname: "/(app)/driver/deliveries/[id]/deliver",
+          params: {
+            id: deliveryId,
+          },
         }}
       >
-        <Text
+        <TouchableOpacity
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 16,
+            flex: 1,
+            backgroundColor: "#3b82f6",
+            paddingVertical: 12,
+            borderRadius: 8,
           }}
+          activeOpacity={0.6}
         >
-          Deliver Package
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <Text
+            style={{
+              fontFamily: "Roboto-Medium",
+              color: "white",
+              fontSize: 16,
+              paddingHorizontal: 6,
+              textAlign: "center",
+            }}
+          >
+            Deliver Package
+          </Text>
+        </TouchableOpacity>
+      </Link>
+    </>
   )
 }
 
@@ -307,7 +332,13 @@ function DeliveryProgress({
       {status === "error" && <Text>Error {error.message}</Text>}
       {status === "success" && (
         <View>
-          <View style={styles.statsSection}>
+          <View
+            style={{
+              flexDirection: "row",
+              padding: 12,
+              columnGap: 12,
+            }}
+          >
             <View style={[styles.statsCard, { backgroundColor: "#EDAD3E" }]}>
               <View style={styles.infoContainer}>
                 <Text style={styles.dataText}>Packages to Deliver</Text>
@@ -366,7 +397,12 @@ function VehicleDetails({ id }: { id: number }) {
   if (data === null) return <Text>No such vehicle.</Text>
 
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+      }}
+    >
       <View style={styles.truckLogo}>
         <Image
           source={require("@/assets/images/truckLogo.png")}
@@ -377,26 +413,32 @@ function VehicleDetails({ id }: { id: number }) {
         <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
         <Text style={styles.truckNumber1}>{data.vehicle.displayName}</Text>
       </View>
-    </>
+    </View>
   )
 }
 
 export default function ViewDeliveryPage() {
   const params = useLocalSearchParams<{ id: string }>()
-  const { status, data, error } = useQuery({
+  const { status, data, error, fetchStatus, refetch } = useQuery({
     queryKey: ["getDelivery", params.id],
     queryFn: () => getDelivery(Number(params.id)),
   })
 
   return (
-    <View
-      style={styles.mainScreen}
+    <ScrollView
+      contentContainerStyle={styles.mainScreen}
       onLayout={() => {
         SplashScreen.hideAsync()
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={status !== "pending" && fetchStatus === "fetching"}
+          onRefresh={() => refetch()}
+        />
+      }
     >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error: {error.message}</Text>}
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
       {status === "success" && (
         <>
           {data === null ? (
@@ -409,35 +451,62 @@ export default function ViewDeliveryPage() {
                 deliveryId={params.id}
               />
 
-              <View style={styles.bottomSection}>
-                <View style={styles.optionSection}>
+              <View
+                style={{
+                  backgroundColor: "#79CFDC",
+                  borderTopLeftRadius: 12,
+                  borderTopRightRadius: 12,
+                  flexDirection: "row",
+                  gap: 12,
+                  paddingTop: 16,
+                  paddingBottom: 24,
+                  paddingHorizontal: 12,
+                }}
+              >
+                <Link
+                  asChild
+                  href={{
+                    pathname: "/(app)/driver/deliveries/[id]/packages",
+                    params: {
+                      id: data.delivery.id,
+                    },
+                  }}
+                >
                   <TouchableOpacity
                     activeOpacity={0.6}
-                    style={styles.viewPackageBtn}
-                    onPress={() => {
-                      router.push({
-                        pathname: "/(app)/driver/deliveries/[id]/packages",
-                        params: {
-                          id: data.delivery.id,
-                        },
-                      })
+                    style={{
+                      flex: 1,
+                      borderRadius: 6,
+                      backgroundColor: "#EEAE3F",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingVertical: 12,
                     }}
                   >
-                    <Text style={styles.optionBtnText}>View Packages</Text>
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Medium",
+                        color: "black",
+                        fontSize: 16,
+                        paddingHorizontal: 6,
+                        textAlign: "center",
+                      }}
+                    >
+                      View Packages
+                    </Text>
                   </TouchableOpacity>
-                  <StartStopDelivery
-                    isStartDeliveryAllowed={
-                      data.delivery.status === "IN_TRANSIT"
-                    }
-                    deliveryId={data.delivery.id}
-                  />
-                </View>
+                </Link>
+
+                <StartStopDelivery
+                  isStartDeliveryAllowed={data.delivery.status === "IN_TRANSIT"}
+                  deliveryId={data.delivery.id}
+                />
               </View>
             </>
           )}
         </>
       )}
-    </View>
+    </ScrollView>
   )
 }
 
@@ -469,79 +538,25 @@ const styles = StyleSheet.create({
   headerIconMenu: {
     marginRight: 15,
   },
-  statsSection: {
-    padding: 10,
-    marginTop: 30,
-    paddingHorizontal: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 20,
-  },
   statsCard: {
+    flex: 1,
     padding: 10,
-    width: "45%",
-    height: 150,
     borderRadius: 10,
     paddingLeft: 10,
   },
   miniCardTitle: {
-    marginLeft: 10,
-    color: "#000000",
     fontFamily: "Montserrat-Bold",
     fontSize: 72,
-    position: "absolute",
-    bottom: 10,
+    lineHeight: 72,
   },
   dataText: {
-    height: "100%",
     fontFamily: "Montserrat-SemiBold",
-    fontSize: 18,
-    marginTop: 10,
+    fontSize: 16,
     textAlign: "center",
-  },
-  optionSection: {
-    paddingHorizontal: 10,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-    marginTop: 15,
-  },
-  viewPackageBtn: {
-    borderRadius: 5,
-    paddingVertical: 5,
-    backgroundColor: "#EEAE3F",
-    width: 180,
-  },
-  deliveryPackageBtn: {
-    borderRadius: 5,
-    paddingVertical: 5,
-    backgroundColor: "#65DB7F",
-    width: 180,
-  },
-  optionBtnText: {
-    color: "#000000",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "600",
-    padding: 10,
-  },
-  bottomSection: {
-    backgroundColor: "#79CFDC",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    height: 150,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   truckLogo: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 50,
   },
   infoContainer: {
     justifyContent: "center",

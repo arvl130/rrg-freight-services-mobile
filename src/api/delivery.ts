@@ -1,14 +1,5 @@
+import type { Shipment, DeliveryShipment } from "@/server/db/entities"
 import auth from "@react-native-firebase/auth"
-
-export type Delivery = {
-  status: string
-  id: number
-  createdAt: string
-  isArchived: number
-  driverId: string
-  vehicleId: number
-  isExpress: number
-}
 
 export async function getDeliveries() {
   const { currentUser } = auth()
@@ -34,7 +25,10 @@ export async function getDeliveries() {
     throw new Error("An error occured while retrieving deliveries")
   }
 
-  return responseJson as { message: string; deliveries: Delivery[] }
+  return responseJson as {
+    message: string
+    deliveries: (Shipment & DeliveryShipment)[]
+  }
 }
 
 export async function getDelivery(id: number) {
@@ -63,5 +57,8 @@ export async function getDelivery(id: number) {
     throw new Error("An error occured while retrieving delivery")
   }
 
-  return responseJson as { message: string; delivery: Delivery }
+  return responseJson as {
+    message: string
+    delivery: Shipment & DeliveryShipment
+  }
 }
