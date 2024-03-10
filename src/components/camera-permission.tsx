@@ -37,6 +37,7 @@ export function RequestCameraPermissionView(props: {
   header: string
   message: string
   requestPermission?: () => void
+  cancelRequestPermission?: () => void
 }) {
   return (
     <View
@@ -74,6 +75,15 @@ export function RequestCameraPermissionView(props: {
       {props.requestPermission && (
         <Button title="Request Permission" onPress={props.requestPermission} />
       )}
+      <View
+        style={{
+          marginTop: 24,
+        }}
+      >
+        {props.cancelRequestPermission && (
+          <Button title="Cancel" onPress={props.cancelRequestPermission} />
+        )}
+      </View>
     </View>
   )
 }

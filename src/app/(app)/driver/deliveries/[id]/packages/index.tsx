@@ -163,6 +163,41 @@ export default function ViewPackagesPage() {
           />
           <View
             style={{
+              marginBottom: 12,
+            }}
+          >
+            <Link
+              asChild
+              href={{
+                pathname: "/(app)/driver/deliveries/[id]/packages/search",
+                params: {
+                  id,
+                },
+              }}
+            >
+              <TouchableOpacity
+                activeOpacity={0.6}
+                style={{
+                  backgroundColor: "#3b82f6",
+                  paddingVertical: 12,
+                  borderRadius: 6,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    textAlign: "center",
+                    fontFamily: "Roboto-Medium",
+                    fontSize: 16,
+                  }}
+                >
+                  Search Packages
+                </Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+          <View
+            style={{
               flex: 1,
               gap: 8,
             }}
