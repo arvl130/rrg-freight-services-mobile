@@ -112,6 +112,10 @@ export default function Layout() {
         name="transfer-shipments/index"
         options={{
           title: "Transfer Shipments",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
@@ -141,7 +145,11 @@ export default function Layout() {
       <Stack.Screen
         name="deliveries/[id]/package/[packageId]/location"
         options={{
-          title: "View Actual Map",
+          title: "View Map",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
         }}
       />
     </Stack>
