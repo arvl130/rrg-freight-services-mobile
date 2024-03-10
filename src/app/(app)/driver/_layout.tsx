@@ -77,7 +77,7 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="deliveries/[id]/packages"
+        name="deliveries/[id]/packages/index"
         options={{
           title: "View Packages",
           headerStyle: {
