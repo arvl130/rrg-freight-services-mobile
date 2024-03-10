@@ -307,7 +307,7 @@ function DeliveryProgress({
   deliveryId: string
   isCompleted: boolean
 }) {
-  const { status, data, error } = useQuery({
+  const { status, data } = useQuery({
     queryKey: ["getDeliveryPackages", deliveryId],
     queryFn: () => getDeliveryPackages(Number(deliveryId)),
   })
@@ -328,60 +328,59 @@ function DeliveryProgress({
 
   return (
     <View>
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error {error.message}</Text>}
-      {status === "success" && (
-        <View>
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 12,
+          columnGap: 12,
+        }}
+      >
+        <View style={[styles.statsCard, { backgroundColor: "#EDAD3E" }]}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.dataText}>Packages to Deliver</Text>
+            <Text style={styles.miniCardTitle}>
+              {status === "pending" && "..."}
+              {status === "error" && "!"}
+              {status === "success" && data.packages.length}
+            </Text>
+          </View>
+        </View>
+        <View style={[styles.statsCard, { backgroundColor: "#79CFDC" }]}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.dataText}>Delivered Packages</Text>
+            <Text style={styles.miniCardTitle}>
+              {status === "pending" && "..."}
+              {status === "error" && "!"}
+              {status === "success" &&
+                data.packages.filter(
+                  (_package: any) => _package.status === "DELIVERED",
+                ).length}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {status === "success" &&
+        data.packages.filter((_package) => _package.status === "DELIVERED")
+          .length === data.packages.length &&
+        !isCompleted && (
           <View
             style={{
-              flexDirection: "row",
-              padding: 12,
-              columnGap: 12,
+              marginBottom: 8,
+              backgroundColor: "#22c55e",
+              paddingHorizontal: 8,
+              paddingVertical: 12,
+              borderRadius: 8,
+              marginTop: 8,
             }}
           >
-            <View style={[styles.statsCard, { backgroundColor: "#EDAD3E" }]}>
-              <View style={styles.infoContainer}>
-                <Text style={styles.dataText}>Packages to Deliver</Text>
-                <Text style={styles.miniCardTitle}>{data.packages.length}</Text>
-              </View>
-            </View>
-            <View style={[styles.statsCard, { backgroundColor: "#79CFDC" }]}>
-              <View style={styles.infoContainer}>
-                <Text style={styles.dataText}>Delivered Packages</Text>
-                <Text style={styles.miniCardTitle}>
-                  {
-                    data.packages.filter(
-                      (_package: any) => _package.status === "DELIVERED",
-                    ).length
-                  }
-                </Text>
-              </View>
-            </View>
+            <Button
+              title="Mark as Completed"
+              disabled={isPending}
+              onPress={() => mutate()}
+            />
           </View>
-
-          {data.packages.filter(
-            (_package: any) => _package.status === "DELIVERED",
-          ).length === data.packages.length &&
-            !isCompleted && (
-              <View
-                style={{
-                  marginBottom: 8,
-                  backgroundColor: "#22c55e",
-                  paddingHorizontal: 8,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  marginTop: 8,
-                }}
-              >
-                <Button
-                  title="Mark as Completed"
-                  disabled={isPending}
-                  onPress={() => mutate()}
-                />
-              </View>
-            )}
-        </View>
-      )}
+        )}
     </View>
   )
 }
@@ -392,27 +391,38 @@ function VehicleDetails({ id }: { id: number }) {
     queryFn: () => getVehicle(Number(id)),
   })
 
-  if (status === "pending") return <Text>Loading ...</Text>
-  if (status === "error") return <Text>Error: {error.message}</Text>
-  if (data === null) return <Text>No such vehicle.</Text>
-
   return (
     <View
       style={{
         flex: 1,
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <View style={styles.truckLogo}>
-        <Image
-          source={require("@/assets/images/truckLogo.png")}
-          style={{ width: 300, height: 200 }}
-        />
-      </View>
-      <View style={styles.truckNumber}>
-        <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
-        <Text style={styles.truckNumber1}>{data.vehicle.displayName}</Text>
-      </View>
+      {status === "pending" && <Text>Loading ...</Text>}
+      {status === "error" && <Text>Error: {error.message}</Text>}
+      {status === "success" && (
+        <>
+          {data === null ? (
+            <Text>No such vehicle.</Text>
+          ) : (
+            <>
+              <View style={styles.truckLogo}>
+                <Image
+                  source={require("@/assets/images/truckLogo.png")}
+                  style={{ width: 300, height: 200 }}
+                />
+              </View>
+              <View style={styles.truckNumber}>
+                <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
+                <Text style={styles.truckNumber1}>
+                  {data.vehicle.displayName}
+                </Text>
+              </View>
+            </>
+          )}
+        </>
+      )}
     </View>
   )
 }
