@@ -4,7 +4,13 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
-import { ScrollView, Text, TouchableOpacity, View } from "react-native"
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 function PackageMeter(props: { value: number; total: number }) {
   return (
@@ -123,7 +129,7 @@ export function PackageItem(props: { package: Package }) {
 
 export default function ViewPackagesPage() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const { status, data, error } = useQuery({
+  const { status, data, error, fetchStatus, refetch } = useQuery({
     queryKey: ["getDeliveryPackages", id],
     queryFn: () => getDeliveryPackages(Number(id)),
   })
@@ -136,6 +142,12 @@ export default function ViewPackagesPage() {
         paddingHorizontal: 12,
         backgroundColor: "#dedbdb",
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={status !== "pending" && fetchStatus === "fetching"}
+          onRefresh={() => refetch()}
+        />
+      }
     >
       {status === "pending" && <Text>Loading ...</Text>}
       {status === "error" && <Text>Error: {error.message}</Text>}
