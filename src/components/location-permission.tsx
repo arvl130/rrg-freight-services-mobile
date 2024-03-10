@@ -7,12 +7,10 @@ import {
 import { Button, Text, View } from "react-native"
 import MapPin from "phosphor-react-native/src/icons/MapPin"
 
-type TLocationPermission = {
+const LocationPermissionContext = createContext<{
   permission: LocationPermissionResponse | null
   requestPermission: () => Promise<void>
-}
-
-const LocationPermissionContext = createContext<TLocationPermission>({
+}>({
   permission: null,
   requestPermission: Promise.resolve,
 })
