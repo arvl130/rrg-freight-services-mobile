@@ -476,7 +476,7 @@ export default function ViewDeliveryPage() {
                 <Link
                   asChild
                   href={{
-                    pathname: "/(app)/driver/deliveries/[id]/packages",
+                    pathname: "/(app)/driver/deliveries/[id]/packages/",
                     params: {
                       id: data.delivery.id,
                     },
