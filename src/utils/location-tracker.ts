@@ -1,7 +1,6 @@
 import auth from "@react-native-firebase/auth"
 import type { LocationObject } from "expo-location"
 import {
-  useForegroundPermissions,
   startLocationUpdatesAsync,
   stopLocationUpdatesAsync,
   Accuracy,
@@ -14,6 +13,7 @@ import { useEffect, useState } from "react"
 import { getId } from "./storage"
 import { createDeliveryLocation } from "@/api/shipment-location"
 import { createTransferShipmentLocation } from "@/api/transfer-shipment"
+import { useLocationPermission } from "@/components/location-permission"
 
 const LOCATION_TRACKER_TASK_NAME = "location-tracker"
 
@@ -79,12 +79,12 @@ defineTask(
 )
 
 export function useLocationTracker() {
-  const [status, requestPermission] = useForegroundPermissions()
+  const { permission, requestPermission } = useLocationPermission()
   const [isTracking, setIsTracking] = useState(false)
 
   useEffect(() => {
     async function getTrackingStatus() {
-      if (status !== null && status.granted) {
+      if (permission !== null && permission.granted) {
         const isTracking = await hasStartedLocationUpdatesAsync(
           LOCATION_TRACKER_TASK_NAME,
         )
@@ -94,7 +94,7 @@ export function useLocationTracker() {
     }
 
     getTrackingStatus()
-  }, [status])
+  }, [permission])
 
   async function startTracking() {
     await startLocationUpdatesAsync(LOCATION_TRACKER_TASK_NAME, {
@@ -119,7 +119,7 @@ export function useLocationTracker() {
   }
 
   return {
-    status,
+    status: permission,
     isTracking,
     requestPermission,
     startTracking,
