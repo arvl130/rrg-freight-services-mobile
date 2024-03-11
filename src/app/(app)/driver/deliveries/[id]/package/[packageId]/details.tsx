@@ -1,10 +1,85 @@
 import { getPackageById } from "@/api/package"
+import { resendOtp } from "@/api/shipment-package-otp"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { Feather } from "@expo/vector-icons"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
-import { Text, TouchableOpacity, View } from "react-native"
+import { Alert, Text, TouchableOpacity, View } from "react-native"
+
+function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
+  const resendOtpMutation = useMutation({
+    mutationFn: resendOtp,
+    onSuccess: () => {
+      Alert.alert(
+        "OTP Resent",
+        "A new OTP has been sent to the receiver's email and contact number.",
+        [
+          {
+            text: "OK",
+          },
+        ],
+      )
+    },
+    onError: ({ message }) => {
+      Alert.alert("OTP Resent Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
+
+  return (
+    <View
+      style={{
+        marginTop: 12,
+      }}
+    >
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={{
+          backgroundColor: "#3b82f6",
+          paddingVertical: 12,
+          borderRadius: 8,
+          opacity: resendOtpMutation.isPending ? 0.6 : 1,
+        }}
+        disabled={resendOtpMutation.isPending}
+        onPress={() => {
+          Alert.alert(
+            "Confirm Resend",
+            "Are you sure you want to resend the OTP to the receiver?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "OK",
+                onPress: () => {
+                  resendOtpMutation.mutate({
+                    shipmentId: props.shipmentId,
+                    packageId: props.packageId,
+                  })
+                },
+              },
+            ],
+          )
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontFamily: "Roboto-Medium",
+          }}
+        >
+          Resend OTP
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
 
 export default function PackageDetailsPage() {
   const { id, packageId } = useLocalSearchParams<{
@@ -232,6 +307,9 @@ export default function PackageDetailsPage() {
                 </TouchableOpacity>
               </Link>
             </View>
+            {data.package.status !== "DELIVERED" && (
+              <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
+            )}
           </View>
         </View>
       )}
