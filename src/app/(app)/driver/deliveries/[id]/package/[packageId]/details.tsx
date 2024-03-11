@@ -1,82 +1,51 @@
 import { getPackageById } from "@/api/package"
-import { resendOtp } from "@/api/shipment-package-otp"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { Feather } from "@expo/vector-icons"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
-import { Alert, Text, TouchableOpacity, View } from "react-native"
+import { Text, TouchableOpacity, View } from "react-native"
 
-function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
-  const resendOtpMutation = useMutation({
-    mutationFn: resendOtp,
-    onSuccess: () => {
-      Alert.alert(
-        "OTP Resent",
-        "A new OTP has been sent to the receiver's email and contact number.",
-        [
-          {
-            text: "OK",
-          },
-        ],
-      )
-    },
-    onError: ({ message }) => {
-      Alert.alert("OTP Resent Failed", message, [
-        {
-          text: "OK",
-        },
-      ])
-    },
-  })
-
+function GotoDeliverPackagePageButton(props: {
+  shipmentId: number
+  packageId: string
+}) {
   return (
     <View
       style={{
         marginTop: 12,
       }}
     >
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={{
-          backgroundColor: "#3b82f6",
-          paddingVertical: 12,
-          borderRadius: 8,
-          opacity: resendOtpMutation.isPending ? 0.6 : 1,
-        }}
-        disabled={resendOtpMutation.isPending}
-        onPress={() => {
-          Alert.alert(
-            "Confirm Resend",
-            "Are you sure you want to resend the OTP to the receiver?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel",
-              },
-              {
-                text: "OK",
-                onPress: () => {
-                  resendOtpMutation.mutate({
-                    shipmentId: props.shipmentId,
-                    packageId: props.packageId,
-                  })
-                },
-              },
-            ],
-          )
+      <Link
+        asChild
+        href={{
+          pathname:
+            "/(app)/driver/deliveries/[id]/package/[packageId]/mark-as-delivered",
+          params: {
+            id: props.shipmentId,
+            packageId: props.packageId,
+          },
         }}
       >
-        <Text
+        <TouchableOpacity
+          activeOpacity={0.6}
           style={{
-            color: "white",
-            textAlign: "center",
-            fontFamily: "Roboto-Medium",
+            backgroundColor: "#f97316",
+            paddingVertical: 12,
+            borderRadius: 8,
           }}
         >
-          Resend OTP
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Mark as Delivered
+          </Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   )
 }
@@ -308,7 +277,10 @@ export default function PackageDetailsPage() {
               </Link>
             </View>
             {data.package.status !== "DELIVERED" && (
-              <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
+              <GotoDeliverPackagePageButton
+                shipmentId={Number(id)}
+                packageId={packageId}
+              />
             )}
           </View>
         </View>
