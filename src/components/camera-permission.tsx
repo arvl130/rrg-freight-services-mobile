@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { createContext, useContext } from "react"
 import type { PermissionResponse } from "expo-camera/next"
-import { useCameraPermissions } from "expo-camera/next"
+import { PermissionStatus, useCameraPermissions } from "expo-camera/next"
 import { Button, Text, View } from "react-native"
 import Camera from "phosphor-react-native/src/icons/Camera"
 
@@ -84,6 +84,52 @@ export function RequestCameraPermissionView(props: {
           <Button title="Cancel" onPress={props.cancelRequestPermission} />
         )}
       </View>
+    </View>
+  )
+}
+
+export function CameraPermissionRequiredView(props: { children: ReactNode }) {
+  const { permission, requestPermission } = useCameraPermission()
+
+  return (
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {permission === null ? (
+        <RequestCameraPermissionView
+          header="Camera permission is required."
+          message="To continue, please allow it in the Settings app."
+          requestPermission={() => {
+            requestPermission()
+          }}
+        />
+      ) : (
+        <>
+          {permission.status === PermissionStatus.UNDETERMINED && (
+            <RequestCameraPermissionView
+              header="Camera permission is required."
+              message="To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.DENIED && (
+            <RequestCameraPermissionView
+              header="Camera permission has been denied."
+              message="This permission is required to use this app. To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.GRANTED && (
+            <>{props.children}</>
+          )}
+        </>
+      )}
     </View>
   )
 }
