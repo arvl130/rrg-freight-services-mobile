@@ -37,7 +37,7 @@ function GotoDeliverPackagePageButton(props: {
         >
           <Text
             style={{
-              color: "white",
+              color: "black",
               textAlign: "center",
               fontFamily: "Roboto-Medium",
             }}
@@ -78,11 +78,15 @@ export default function PackageDetailsPage() {
         >
           <View
             style={{
-              flex: 1,
-              backgroundColor: "#79CFDC",
+              backgroundColor: "white",
               borderRadius: 12,
               paddingVertical: 8,
               paddingHorizontal: 12,
+              shadowColor: "#171717",
+              shadowOffset: { width: -2, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 3,
+              elevation: 3,
             }}
           >
             <View
@@ -97,14 +101,14 @@ export default function PackageDetailsPage() {
                 style={{
                   fontSize: 96,
                   marginVertical: 12,
-                  color: "white",
+                  color: "black",
                 }}
               />
               <Text
                 style={{
                   fontFamily: "Roboto-Bold",
                   fontSize: 20,
-                  color: "white",
+                  color: "black",
                 }}
               >
                 ID: {data.package.id}
@@ -114,7 +118,7 @@ export default function PackageDetailsPage() {
             <View>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -128,7 +132,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -146,7 +150,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -160,7 +164,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -176,14 +180,14 @@ export default function PackageDetailsPage() {
             <View
               style={{
                 height: 1,
-                backgroundColor: "white",
+                backgroundColor: "black",
                 marginVertical: 24,
               }}
             />
             <View>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -197,7 +201,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -213,7 +217,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
@@ -227,7 +231,7 @@ export default function PackageDetailsPage() {
               </Text>
               <Text
                 style={{
-                  color: "white",
+                  color: "black",
                 }}
               >
                 <Text
