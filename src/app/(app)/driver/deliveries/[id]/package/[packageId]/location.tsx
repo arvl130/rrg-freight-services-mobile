@@ -1,4 +1,10 @@
-import { View, StyleSheet } from "react-native"
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  Linking,
+} from "react-native"
 import { useLocalSearchParams } from "expo-router"
 import { getPackageAddressByPackageId } from "@/api/package"
 import { useQuery } from "@tanstack/react-query"
@@ -6,8 +12,16 @@ import MapboxGL from "@rnmapbox/maps"
 import { MaterialIcons } from "@expo/vector-icons"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
+import NavigationArrow from "phosphor-react-native/src/icons/NavigationArrow"
 
 MapboxGL.setAccessToken(`${process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_KEY}`)
+
+function generateMapUrl(options: { lat: number; long: number }) {
+  return Platform.select({
+    android: `google.navigation:q=${options.lat}+${options.long}`,
+    ios: `maps://app?daddr=${options.lat}+${options.long}`,
+  })
+}
 
 export default function ViewPackageLocationPage() {
   const { packageId } = useLocalSearchParams<{
@@ -53,6 +67,30 @@ export default function ViewPackageLocationPage() {
               </View>
             </MapboxGL.PointAnnotation>
           </MapboxGL.MapView>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={{
+              position: "absolute",
+              bottom: 32,
+              right: 32,
+              backgroundColor: "#3b82f6",
+              height: 56,
+              width: 56,
+              borderRadius: 56,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => {
+              const url = generateMapUrl({
+                long: data.packageCoordinate.lon,
+                lat: data.packageCoordinate.lat,
+              })
+
+              if (url) Linking.openURL(url)
+            }}
+          >
+            <NavigationArrow size={24} color="white" />
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -66,6 +104,7 @@ const styles = StyleSheet.create({
   },
   container: {
     height: "100%",
+    position: "relative",
   },
   map: {
     flex: 1,
