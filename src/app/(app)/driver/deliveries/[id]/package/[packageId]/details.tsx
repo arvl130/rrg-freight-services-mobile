@@ -11,6 +11,7 @@ function GotoDeliverPackagePageButton(props: {
   shipmentId: number
   packageId: string
 }) {
+  const { isTracking } = useLocationTracker()
   return (
     <View
       style={{
@@ -29,11 +30,13 @@ function GotoDeliverPackagePageButton(props: {
         }}
       >
         <TouchableOpacity
+          disabled={isTracking}
           activeOpacity={0.6}
           style={{
             backgroundColor: "#f97316",
             paddingVertical: 12,
             borderRadius: 8,
+            opacity: isTracking ? 0.6 : undefined,
           }}
         >
           <Text
@@ -52,7 +55,7 @@ function GotoDeliverPackagePageButton(props: {
 }
 
 export default function PackageDetailsPage() {
-  const { isLoading, isTracking } = useLocationTracker()
+  const { isLoading } = useLocationTracker()
   const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
@@ -292,7 +295,7 @@ export default function PackageDetailsPage() {
                     </TouchableOpacity>
                   </Link>
                 </View>
-                {data.package.status !== "DELIVERED" && isTracking && (
+                {data.package.status !== "DELIVERED" && (
                   <GotoDeliverPackagePageButton
                     shipmentId={Number(id)}
                     packageId={packageId}
