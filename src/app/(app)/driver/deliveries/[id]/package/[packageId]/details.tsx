@@ -5,7 +5,7 @@ import { useLocationTracker } from "@/components/location-tracker"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
-import { Text, TouchableOpacity, View } from "react-native"
+import { Linking, Text, TouchableOpacity, View } from "react-native"
 
 function GotoDeliverPackagePageButton(props: {
   shipmentId: number
@@ -301,6 +301,35 @@ export default function PackageDetailsPage() {
                     packageId={packageId}
                   />
                 )}
+                <View
+                  style={{
+                    marginTop: 12,
+                  }}
+                >
+                  <TouchableOpacity
+                    activeOpacity={0.6}
+                    style={{
+                      backgroundColor: "#ef4444",
+                      paddingVertical: 12,
+                      borderRadius: 8,
+                    }}
+                    onPress={() => {
+                      Linking.openURL(
+                        `tel:${data.package.receiverContactNumber}`,
+                      )
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        textAlign: "center",
+                        fontFamily: "Roboto-Medium",
+                      }}
+                    >
+                      Call Receiver
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
