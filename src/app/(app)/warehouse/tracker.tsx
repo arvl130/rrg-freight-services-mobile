@@ -15,12 +15,13 @@ import { getShipment } from "@/api/shipment"
 import { ScannerView } from "@/components/scanner-view"
 import { getLocations } from "@/api/shipment-location"
 import { useBarCodePermissions } from "@/hooks/barcode-scanner"
-import { useLocationTracker } from "@/utils/location-tracker"
+import { useLocationTracker } from "@/components/location-tracker"
 import {
   clearSavedShipmentId,
   getSavedShipmentId,
   saveShipmentId,
 } from "@/utils/storage"
+import { LocationPermissionRequiredView } from "@/components/location-permission"
 
 function NotTrackingView({
   selectedShipmentId,
@@ -374,23 +375,11 @@ function LocationTracker() {
 }
 
 export default function LocationTrackerScreen() {
-  const { status, requestPermission } = useLocationTracker()
-
   return (
     <View style={styles.container}>
-      {status?.granted === true ? (
+      <LocationPermissionRequiredView>
         <LocationTracker />
-      ) : (
-        <View>
-          <Text style={{ paddingVertical: 8 }}>
-            To monitor the package delivery, we need access to your location.
-          </Text>
-          <Button
-            title="Grant permission"
-            onPress={() => requestPermission()}
-          />
-        </View>
-      )}
+      </LocationPermissionRequiredView>
     </View>
   )
 }

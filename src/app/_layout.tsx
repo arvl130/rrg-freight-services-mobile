@@ -18,6 +18,7 @@ import { useAppState, useOnlineManager } from "@/utils/tanstack-query"
 import { REGISTERED_FONTS } from "@/utils/fonts"
 import { LocationPermissionProvider } from "@/components/location-permission"
 import { CameraPermissionProvider } from "@/components/camera-permission"
+import { LocationTrackerProvider } from "@/components/location-tracker"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -63,17 +64,19 @@ function RootLayoutNav() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <LocationPermissionProvider>
-            <CameraPermissionProvider>
-              <Stack>
-                <Stack.Screen
-                  name="(app)"
-                  options={{
-                    headerShown: false,
-                  }}
-                />
-              </Stack>
-              <Notifications />
-            </CameraPermissionProvider>
+            <LocationTrackerProvider>
+              <CameraPermissionProvider>
+                <Stack>
+                  <Stack.Screen
+                    name="(app)"
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+                </Stack>
+                <Notifications />
+              </CameraPermissionProvider>
+            </LocationTrackerProvider>
           </LocationPermissionProvider>
         </AuthProvider>
       </QueryClientProvider>

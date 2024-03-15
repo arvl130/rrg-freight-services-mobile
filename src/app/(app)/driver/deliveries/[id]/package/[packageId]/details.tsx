@@ -1,6 +1,7 @@
 import { getPackageById } from "@/api/package"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
+import { useLocationTracker } from "@/components/location-tracker"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
@@ -37,7 +38,7 @@ function GotoDeliverPackagePageButton(props: {
         >
           <Text
             style={{
-              color: "black",
+              color: "white",
               textAlign: "center",
               fontFamily: "Roboto-Medium",
             }}
@@ -51,6 +52,7 @@ function GotoDeliverPackagePageButton(props: {
 }
 
 export default function PackageDetailsPage() {
+  const { isLoading, isTracking } = useLocationTracker()
   const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
@@ -66,227 +68,239 @@ export default function PackageDetailsPage() {
         flex: 1,
       }}
     >
-      {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
-      {status === "success" && (
+      {isLoading ? (
+        <Text>Loading ...</Text>
+      ) : (
         <View
           style={{
             flex: 1,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
           }}
         >
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: 12,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              shadowColor: "#171717",
-              shadowOffset: { width: -2, height: 4 },
-              shadowOpacity: 0.2,
-              shadowRadius: 3,
-              elevation: 3,
-            }}
-          >
+          {status === "pending" && <LoadingView />}
+          {status === "error" && <ErrorView message={error.message} />}
+          {status === "success" && (
             <View
               style={{
-                justifyContent: "center",
-                alignItems: "center",
-                paddingBottom: 12,
+                flex: 1,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
               }}
             >
-              <Feather
-                name="package"
+              <View
                 style={{
-                  fontSize: 96,
-                  marginVertical: 12,
-                  color: "black",
-                }}
-              />
-              <Text
-                style={{
-                  fontFamily: "Roboto-Bold",
-                  fontSize: 20,
-                  color: "black",
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  shadowColor: "#171717",
+                  shadowOffset: { width: -2, height: 4 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 3,
                 }}
               >
-                ID: {data.package.id}
-              </Text>
-            </View>
-
-            <View>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Roboto-Bold",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingBottom: 12,
                   }}
                 >
-                  Receiver Name:
-                </Text>{" "}
-                {data.package.receiverFullName}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Address:
-                </Text>{" "}
-                {data.package.receiverStreetAddress},{" "}
-                {data.package.receiverBarangay}, {data.package.receiverCity},{" "}
-                {data.package.receiverStateOrProvince},{" "}
-                {data.package.receiverCountryCode}{" "}
-                {data.package.receiverPostalCode}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Contact Number:
-                </Text>{" "}
-                {data.package.receiverContactNumber}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Email:
-                </Text>{" "}
-                {data.package.receiverEmailAddress}
-              </Text>
-            </View>
-            <View
-              style={{
-                height: 1,
-                backgroundColor: "black",
-                marginVertical: 24,
-              }}
-            />
-            <View>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Sender Name:
-                </Text>{" "}
-                {data.package.senderFullName}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Address:
-                </Text>{" "}
-                {data.package.senderStreetAddress}, {data.package.senderCity},{" "}
-                {data.package.senderStateOrProvince},{" "}
-                {data.package.senderCountryCode} {data.package.senderPostalCode}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Contact Number:
-                </Text>{" "}
-                {data.package.senderContactNumber}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Roboto-Bold",
-                  }}
-                >
-                  Email:
-                </Text>{" "}
-                {data.package.senderEmailAddress}
-              </Text>
-            </View>
-            <View
-              style={{
-                marginTop: 12,
-              }}
-            >
-              <Link
-                asChild
-                href={{
-                  pathname:
-                    "/(app)/driver/deliveries/[id]/package/[packageId]/location",
-                  params: {
-                    id,
-                    packageId: data.package.id,
-                  },
-                }}
-              >
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  style={{
-                    backgroundColor: "#16a34a",
-                    paddingVertical: 12,
-                    borderRadius: 8,
-                  }}
-                >
+                  <Feather
+                    name="package"
+                    style={{
+                      fontSize: 96,
+                      marginVertical: 12,
+                      color: "black",
+                    }}
+                  />
                   <Text
                     style={{
-                      color: "white",
-                      textAlign: "center",
-                      fontFamily: "Roboto-Medium",
+                      fontFamily: "Roboto-Bold",
+                      fontSize: 20,
+                      color: "black",
                     }}
                   >
-                    View Location on Map
+                    ID: {data.package.id}
                   </Text>
-                </TouchableOpacity>
-              </Link>
+                </View>
+
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Receiver Name:
+                    </Text>{" "}
+                    {data.package.receiverFullName}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Address:
+                    </Text>{" "}
+                    {data.package.receiverStreetAddress},{" "}
+                    {data.package.receiverBarangay}, {data.package.receiverCity}
+                    , {data.package.receiverStateOrProvince},{" "}
+                    {data.package.receiverCountryCode}{" "}
+                    {data.package.receiverPostalCode}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Contact Number:
+                    </Text>{" "}
+                    {data.package.receiverContactNumber}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Email:
+                    </Text>{" "}
+                    {data.package.receiverEmailAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "black",
+                    marginVertical: 24,
+                  }}
+                />
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Sender Name:
+                    </Text>{" "}
+                    {data.package.senderFullName}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Address:
+                    </Text>{" "}
+                    {data.package.senderStreetAddress},{" "}
+                    {data.package.senderCity},{" "}
+                    {data.package.senderStateOrProvince},{" "}
+                    {data.package.senderCountryCode}{" "}
+                    {data.package.senderPostalCode}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Contact Number:
+                    </Text>{" "}
+                    {data.package.senderContactNumber}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Email:
+                    </Text>{" "}
+                    {data.package.senderEmailAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    marginTop: 12,
+                  }}
+                >
+                  <Link
+                    asChild
+                    href={{
+                      pathname:
+                        "/(app)/driver/deliveries/[id]/package/[packageId]/location",
+                      params: {
+                        id,
+                        packageId: data.package.id,
+                      },
+                    }}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      style={{
+                        backgroundColor: "#16a34a",
+                        paddingVertical: 12,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "white",
+                          textAlign: "center",
+                          fontFamily: "Roboto-Medium",
+                        }}
+                      >
+                        View Location on Map
+                      </Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+                {data.package.status !== "DELIVERED" && isTracking && (
+                  <GotoDeliverPackagePageButton
+                    shipmentId={Number(id)}
+                    packageId={packageId}
+                  />
+                )}
+              </View>
             </View>
-            {data.package.status !== "DELIVERED" && (
-              <GotoDeliverPackagePageButton
-                shipmentId={Number(id)}
-                packageId={packageId}
-              />
-            )}
-          </View>
+          )}
         </View>
       )}
     </View>

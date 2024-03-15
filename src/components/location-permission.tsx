@@ -3,6 +3,7 @@ import { createContext, useContext } from "react"
 import {
   useForegroundPermissions,
   type LocationPermissionResponse,
+  PermissionStatus,
 } from "expo-location"
 import { Button, Text, View } from "react-native"
 import MapPin from "phosphor-react-native/src/icons/MapPin"
@@ -75,6 +76,52 @@ export function RequestLocationPermissionView(props: {
       </Text>
       {props.requestPermission && (
         <Button title="Request Permission" onPress={props.requestPermission} />
+      )}
+    </View>
+  )
+}
+
+export function LocationPermissionRequiredView(props: { children: ReactNode }) {
+  const { permission, requestPermission } = useLocationPermission()
+
+  return (
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {permission === null ? (
+        <RequestLocationPermissionView
+          header="Location permission is required."
+          message="To continue, please allow it in the Settings app."
+          requestPermission={() => {
+            requestPermission()
+          }}
+        />
+      ) : (
+        <>
+          {permission.status === PermissionStatus.UNDETERMINED && (
+            <RequestLocationPermissionView
+              header="Location permission is required."
+              message="To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.DENIED && (
+            <RequestLocationPermissionView
+              header="Location permission has been denied."
+              message="This permission is required to use this app. To continue, please allow it in the Settings app."
+              requestPermission={() => {
+                requestPermission()
+              }}
+            />
+          )}
+          {permission.status === PermissionStatus.GRANTED && (
+            <>{props.children}</>
+          )}
+        </>
       )}
     </View>
   )

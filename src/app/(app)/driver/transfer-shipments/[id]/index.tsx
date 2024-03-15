@@ -1,12 +1,12 @@
 import { FontAwesome5 } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
-import type { LocationPermissionResponse } from "expo-location"
 import { router, useLocalSearchParams } from "expo-router"
 import { Text, TouchableOpacity, View } from "react-native"
-import { useLocationTracker } from "@/utils/location-tracker"
+import { useLocationTracker } from "@/components/location-tracker"
 import { clearStorage, saveId } from "@/utils/storage"
 import { getVehicle } from "@/api/vehicle"
 import { getTransferShipment } from "@/api/transfer-shipment"
+import { LoadingView } from "@/components/loading-view"
 
 function VehicleDetails({ id }: { id: number }) {
   const { status, data, error } = useQuery({
@@ -56,72 +56,11 @@ function VehicleDetails({ id }: { id: number }) {
 
 function StartTransfer({
   transferShipmentId,
-  status,
-  requestPermission,
   startTracking,
 }: {
   transferShipmentId: number
-  status: null | LocationPermissionResponse
-  requestPermission: () => Promise<void>
   startTracking: () => Promise<void>
 }) {
-  if (status === null)
-    return (
-      <View>
-        <Text>
-          Before we can start the shipment transfer, please allow access to
-          location.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
-  if (!status.granted)
-    return (
-      <View>
-        <Text>
-          Shipment transfer cannot be started if location access is not enabled.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
   return (
     <View>
       <TouchableOpacity
@@ -155,74 +94,13 @@ function StartTransfer({
 
 function StopTransfer({
   transferShipmentId,
-  status,
-  requestPermission,
   stopTracking,
   isCompleted,
 }: {
   transferShipmentId: number
-  status: null | LocationPermissionResponse
-  requestPermission: () => Promise<void>
   stopTracking: () => Promise<void>
   isCompleted: boolean
 }) {
-  if (status === null)
-    return (
-      <View>
-        <Text>
-          Before we can stop the shipment transfer, please allow access to
-          location.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
-  if (!status.granted)
-    return (
-      <View>
-        <Text>
-          Shipment transfer cannot be stopped if location access is not enabled.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
   return (
     <View>
       <TouchableOpacity
@@ -288,13 +166,8 @@ function StartStopTransfer({
   transferShipmentId: number
   isCompleted: boolean
 }) {
-  const {
-    isTracking,
-    status: permissionStatus,
-    requestPermission,
-    startTracking,
-    stopTracking,
-  } = useLocationTracker()
+  const { isLoading, isTracking, startTracking, stopTracking } =
+    useLocationTracker()
 
   return (
     <View
@@ -302,29 +175,27 @@ function StartStopTransfer({
         marginBottom: 8,
       }}
     >
-      {isTracking ? (
-        <StopTransfer
-          transferShipmentId={transferShipmentId}
-          status={permissionStatus}
-          requestPermission={async () => {
-            await requestPermission()
-          }}
-          stopTracking={async () => {
-            await stopTracking()
-          }}
-          isCompleted={isCompleted}
-        />
+      {isLoading ? (
+        <LoadingView />
       ) : (
-        <StartTransfer
-          transferShipmentId={transferShipmentId}
-          status={permissionStatus}
-          requestPermission={async () => {
-            await requestPermission()
-          }}
-          startTracking={async () => {
-            await startTracking()
-          }}
-        />
+        <>
+          {isTracking ? (
+            <StopTransfer
+              transferShipmentId={transferShipmentId}
+              stopTracking={async () => {
+                await stopTracking()
+              }}
+              isCompleted={isCompleted}
+            />
+          ) : (
+            <StartTransfer
+              transferShipmentId={transferShipmentId}
+              startTracking={async () => {
+                await startTracking()
+              }}
+            />
+          )}
+        </>
       )}
     </View>
   )

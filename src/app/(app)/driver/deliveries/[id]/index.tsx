@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import type { LocationPermissionResponse } from "expo-location"
 import { Link, SplashScreen, useLocalSearchParams } from "expo-router"
 import {
   Button,
@@ -11,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { useLocationTracker } from "@/utils/location-tracker"
+import { useLocationTracker } from "@/components/location-tracker"
 import { clearStorage, saveId } from "@/utils/storage"
 import { getVehicle } from "@/api/vehicle"
 import { getDeliveryPackages } from "@/api/shipment"
@@ -19,74 +18,15 @@ import { updateDeliveryStatusToCompleted } from "@/api/package"
 import { getDelivery } from "@/api/delivery"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
+import { LocationPermissionRequiredView } from "@/components/location-permission"
 
 function StartDelivery({
   deliveryId,
-  status,
-  requestPermission,
   startTracking,
 }: {
   deliveryId: number
-  status: null | LocationPermissionResponse
-  requestPermission: () => Promise<void>
   startTracking: () => Promise<void>
 }) {
-  if (status === null)
-    return (
-      <View>
-        <Text>
-          Before we can start the delivery, please allow access to location.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
-  if (!status.granted)
-    return (
-      <View>
-        <Text>
-          Deliveries cannot be started if location access is not enabled.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
   return (
     <TouchableOpacity
       style={{
@@ -120,133 +60,39 @@ function StartDelivery({
 
 function StopDelivery({
   deliveryId,
-  status,
-  requestPermission,
   stopTracking,
 }: {
   deliveryId: number
-  status: null | LocationPermissionResponse
-  requestPermission: () => Promise<void>
   stopTracking: () => Promise<void>
 }) {
-  if (status === null)
-    return (
-      <View>
-        <Text>
-          Before we can stop the delivery, please allow access to location.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
-  if (!status.granted)
-    return (
-      <View>
-        <Text>
-          Deliveries cannot be stopped if location access is not enabled.
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#f59e0b",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-          onPress={() => requestPermission()}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingVertical: 12,
-              fontSize: 16,
-            }}
-          >
-            Grant Permission
-          </Text>
-        </TouchableOpacity>
-      </View>
-    )
-
   return (
-    <>
-      <TouchableOpacity
+    <TouchableOpacity
+      style={{
+        flex: 1,
+        backgroundColor: "#ef4444",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingVertical: 12,
+      }}
+      activeOpacity={0.6}
+      onPress={async () => {
+        await clearStorage()
+        await stopTracking()
+      }}
+    >
+      <Text
         style={{
-          flex: 1,
-          backgroundColor: "#ef4444",
-          borderRadius: 8,
-          justifyContent: "center",
-          alignItems: "center",
-          paddingVertical: 12,
-        }}
-        activeOpacity={0.6}
-        onPress={async () => {
-          await clearStorage()
-          await stopTracking()
+          fontFamily: "Roboto-Medium",
+          color: "white",
+          fontSize: 16,
+          paddingHorizontal: 6,
+          textAlign: "center",
         }}
       >
-        <Text
-          style={{
-            fontFamily: "Roboto-Medium",
-            color: "white",
-            fontSize: 16,
-            paddingHorizontal: 6,
-            textAlign: "center",
-          }}
-        >
-          Stop Delivery
-        </Text>
-      </TouchableOpacity>
-
-      <Link
-        asChild
-        href={{
-          pathname: "/(app)/driver/deliveries/[id]/deliver",
-          params: {
-            id: deliveryId,
-          },
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: "#3b82f6",
-            paddingVertical: 12,
-            borderRadius: 8,
-          }}
-          activeOpacity={0.6}
-        >
-          <Text
-            style={{
-              fontFamily: "Roboto-Medium",
-              color: "white",
-              fontSize: 16,
-              paddingHorizontal: 6,
-              textAlign: "center",
-            }}
-          >
-            Deliver Package
-          </Text>
-        </TouchableOpacity>
-      </Link>
-    </>
+        Stop Delivery
+      </Text>
+    </TouchableOpacity>
   )
 }
 
@@ -257,23 +103,13 @@ function StartStopDelivery({
   isStartDeliveryAllowed: boolean
   deliveryId: number
 }) {
-  const {
-    isTracking,
-    status: permissionStatus,
-    requestPermission,
-    startTracking,
-    stopTracking,
-  } = useLocationTracker()
+  const { isTracking, startTracking, stopTracking } = useLocationTracker()
 
   return (
     <>
       {isTracking ? (
         <StopDelivery
           deliveryId={deliveryId}
-          status={permissionStatus}
-          requestPermission={async () => {
-            await requestPermission()
-          }}
           stopTracking={async () => {
             await stopTracking()
           }}
@@ -283,10 +119,6 @@ function StartStopDelivery({
           {isStartDeliveryAllowed ? (
             <StartDelivery
               deliveryId={deliveryId}
-              status={permissionStatus}
-              requestPermission={async () => {
-                await requestPermission()
-              }}
               startTracking={async () => {
                 await startTracking()
               }}
@@ -406,7 +238,7 @@ function VehicleDetails({ id }: { id: number }) {
           {data === null ? (
             <Text>No such vehicle.</Text>
           ) : (
-            <>
+            <LocationPermissionRequiredView>
               <View style={styles.truckLogo}>
                 <Image
                   source={require("@/assets/images/truckLogo.png")}
@@ -419,7 +251,7 @@ function VehicleDetails({ id }: { id: number }) {
                   {data.vehicle.displayName}
                 </Text>
               </View>
-            </>
+            </LocationPermissionRequiredView>
           )}
         </>
       )}
