@@ -239,17 +239,24 @@ function VehicleDetails({ id }: { id: number }) {
             <Text>No such vehicle.</Text>
           ) : (
             <LocationPermissionRequiredView>
-              <View style={styles.truckLogo}>
-                <Image
-                  source={require("@/assets/images/truckLogo.png")}
-                  style={{ width: 300, height: 200 }}
-                />
-              </View>
-              <View style={styles.truckNumber}>
-                <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
-                <Text style={styles.truckNumber1}>
-                  {data.vehicle.displayName}
-                </Text>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                }}
+              >
+                <View style={styles.truckLogo}>
+                  <Image
+                    source={require("@/assets/images/truckLogo.png")}
+                    style={{ width: 300, height: 200 }}
+                  />
+                </View>
+                <View style={styles.truckNumber}>
+                  <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
+                  <Text style={styles.truckNumber1}>
+                    {data.vehicle.displayName}
+                  </Text>
+                </View>
               </View>
             </LocationPermissionRequiredView>
           )}
