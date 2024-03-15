@@ -30,13 +30,13 @@ function GotoDeliverPackagePageButton(props: {
         }}
       >
         <TouchableOpacity
-          disabled={isTracking}
+          disabled={!isTracking}
           activeOpacity={0.6}
           style={{
             backgroundColor: "#f97316",
             paddingVertical: 12,
             borderRadius: 8,
-            opacity: isTracking ? 0.6 : undefined,
+            opacity: isTracking ? undefined : 0.6,
           }}
         >
           <Text
