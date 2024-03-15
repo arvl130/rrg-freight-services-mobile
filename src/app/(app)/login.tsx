@@ -109,6 +109,7 @@ export default function LoginScreen() {
                   userCredentials.password,
                 )
               } catch (e) {
+                setIsSigningIn(false)
                 console.log("Error occured while signing in", e)
 
                 // RN Firebase doesn't export types for error handling,
@@ -143,12 +144,8 @@ export default function LoginScreen() {
                       "Too many requests",
                       "Please try again in a few minutes.",
                     )
-
-                    return
                   }
                 }
-              } finally {
-                setIsSigningIn(false)
               }
             }}
           >
