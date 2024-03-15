@@ -46,7 +46,7 @@ function StartDelivery({
     >
       <Text
         style={{
-          color: "black",
+          color: "white",
           textAlign: "center",
           fontFamily: "Roboto-Medium",
           fontSize: 16,
@@ -335,7 +335,7 @@ export default function ViewDeliveryPage() {
                     <Text
                       style={{
                         fontFamily: "Roboto-Medium",
-                        color: "black",
+                        color: "white",
                         fontSize: 16,
                         paddingHorizontal: 6,
                         textAlign: "center",
