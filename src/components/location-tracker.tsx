@@ -99,13 +99,11 @@ export function LocationTrackerProvider(props: { children: ReactNode }) {
   useEffect(() => {
     async function getTrackingStatus() {
       if (permission?.granted === true) {
-        console.log("reached here")
         try {
           const isTracking = await hasStartedLocationUpdatesAsync(
             LOCATION_TRACKER_TASK_NAME,
           )
 
-          console.log("isTracking?", isTracking)
           setIsTracking(isTracking)
         } catch {
           setIsTracking(false)
