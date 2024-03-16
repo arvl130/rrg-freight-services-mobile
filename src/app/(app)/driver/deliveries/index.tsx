@@ -94,7 +94,7 @@ export default function DeliveriesPage() {
               </Text>
             ) : (
               <>
-                {data.deliveries.map((delivery) => (
+                {[...data.deliveries].reverse().map((delivery) => (
                   <Link
                     asChild
                     key={delivery.id}
