@@ -20,13 +20,40 @@ import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
 
-function StartDelivery({
-  deliveryId,
-  startTracking,
-}: {
-  deliveryId: number
-  startTracking: () => Promise<void>
-}) {
+function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
+  const { isTracking, startTracking, stopTracking } = useLocationTracker()
+
+  if (isTracking)
+    return (
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          backgroundColor: "#ef4444",
+          borderRadius: 8,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingVertical: 12,
+        }}
+        activeOpacity={0.6}
+        onPress={async () => {
+          await clearStorage()
+          await stopTracking()
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "Roboto-Medium",
+            color: "white",
+            fontSize: 16,
+            paddingHorizontal: 6,
+            textAlign: "center",
+          }}
+        >
+          Stop Delivery
+        </Text>
+      </TouchableOpacity>
+    )
+
   return (
     <TouchableOpacity
       style={{
@@ -55,80 +82,6 @@ function StartDelivery({
         Start Delivery
       </Text>
     </TouchableOpacity>
-  )
-}
-
-function StopDelivery({
-  deliveryId,
-  stopTracking,
-}: {
-  deliveryId: number
-  stopTracking: () => Promise<void>
-}) {
-  return (
-    <TouchableOpacity
-      style={{
-        flex: 1,
-        backgroundColor: "#ef4444",
-        borderRadius: 8,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingVertical: 12,
-      }}
-      activeOpacity={0.6}
-      onPress={async () => {
-        await clearStorage()
-        await stopTracking()
-      }}
-    >
-      <Text
-        style={{
-          fontFamily: "Roboto-Medium",
-          color: "white",
-          fontSize: 16,
-          paddingHorizontal: 6,
-          textAlign: "center",
-        }}
-      >
-        Stop Delivery
-      </Text>
-    </TouchableOpacity>
-  )
-}
-
-function StartStopDelivery({
-  isStartDeliveryAllowed,
-  deliveryId,
-}: {
-  isStartDeliveryAllowed: boolean
-  deliveryId: number
-}) {
-  const { isTracking, startTracking, stopTracking } = useLocationTracker()
-
-  return (
-    <>
-      {isTracking ? (
-        <StopDelivery
-          deliveryId={deliveryId}
-          stopTracking={async () => {
-            await stopTracking()
-          }}
-        />
-      ) : (
-        <>
-          {isStartDeliveryAllowed ? (
-            <StartDelivery
-              deliveryId={deliveryId}
-              startTracking={async () => {
-                await startTracking()
-              }}
-            />
-          ) : (
-            <></>
-          )}
-        </>
-      )}
-    </>
   )
 }
 
@@ -346,10 +299,11 @@ export default function ViewDeliveryPage() {
                   </TouchableOpacity>
                 </Link>
 
-                <StartStopDelivery
-                  isStartDeliveryAllowed={data.delivery.status === "IN_TRANSIT"}
-                  deliveryId={data.delivery.id}
-                />
+                {/* TODO: Only show these buttons on the shipment
+                    that is currently being tracked. */}
+                {data.delivery.status === "IN_TRANSIT" && (
+                  <StartStopDelivery deliveryId={data.delivery.id} />
+                )}
               </View>
             </>
           )}
