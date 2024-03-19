@@ -1,10 +1,10 @@
-import type { FirebaseAuthTypes } from "@react-native-firebase/auth"
-import auth from "@react-native-firebase/auth"
 import { router } from "expo-router"
 import type { ReactNode } from "react"
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect } from "react"
 import type { UserRole } from "@/utils/constants"
 import { SUPPORTED_USER_ROLES } from "@/utils/constants"
+import { useQuery } from "@tanstack/react-query"
+import { getCurrentUser } from "@/api/auth"
 
 const userRoleRedirectPaths = {
   ADMIN: "/admin/dashboard",
@@ -20,85 +20,121 @@ export function getUserRoleRedirectPath(role: UserRole | null) {
   return userRoleRedirectPaths[role]
 }
 
+export type User = {
+  id: string
+  role: UserRole
+}
+
+export type Session = {
+  sessionId: string
+  user: User
+}
+
 type TAuthContext = {
+  error: Error | null
   reload: () => Promise<void>
 } & (
   | {
       // Initial state
       isLoading: true
+      sessionId: null
       user: null
-      role: null
     }
   // Unauthenticated state
   | {
       isLoading: false
+      sessionId: null
       user: null
-      role: null
     }
   // Authenticated state
   | {
       isLoading: false
-      user: FirebaseAuthTypes.User
-      role: UserRole | null
+      sessionId: string
+      user: User
     }
 )
 
 const AuthContext = createContext<TAuthContext>({
   isLoading: true,
+  sessionId: null,
   user: null,
-  role: null,
+  error: null,
   reload: Promise.resolve,
 })
 
 export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
-  const [session, setSession] = useState<TAuthContext>({
-    isLoading: true,
-    user: null,
-    role: null,
-    reload: Promise.resolve,
+  const { status, data, error, refetch } = useQuery({
+    queryKey: ["getCurrentUser"],
+    queryFn: () => getCurrentUser(),
+    retry: 1,
+    staleTime: Infinity,
   })
 
-  async function reload() {
-    const { currentUser } = auth()
-    await currentUser?.reload()
-
-    setSession((currSession) => ({
-      ...currSession,
-    }))
+  if (status === "pending") {
+    return (
+      <AuthContext.Provider
+        value={{
+          isLoading: true,
+          sessionId: null,
+          user: null,
+          error,
+          reload: async () => {
+            await refetch()
+          },
+        }}
+        {...props}
+      />
+    )
   }
 
-  useEffect(() => {
-    return auth().onAuthStateChanged(async (user) => {
-      if (user === null) {
-        setSession({
+  if (status === "error") {
+    return (
+      <AuthContext.Provider
+        value={{
           isLoading: false,
+          sessionId: null,
           user: null,
-          role: null,
-          reload,
-        })
-        return
-      }
+          error,
+          reload: async () => {
+            await refetch()
+          },
+        }}
+        {...props}
+      />
+    )
+  }
 
-      try {
-        const idTokenResult = await user.getIdTokenResult()
-        setSession({
+  if (data === null) {
+    return (
+      <AuthContext.Provider
+        value={{
           isLoading: false,
-          user,
-          role: (idTokenResult.claims.role as UserRole) ?? null,
-          reload,
-        })
-      } catch {
-        setSession({
-          isLoading: false,
+          sessionId: null,
           user: null,
-          role: null,
-          reload,
-        })
-      }
-    })
-  }, [])
-
-  return <AuthContext.Provider value={session} {...props} />
+          error,
+          reload: async () => {
+            await refetch()
+          },
+        }}
+        {...props}
+      />
+    )
+  } else {
+    return (
+      <AuthContext.Provider
+        value={{
+          isLoading: false,
+          sessionId: data.sessionId,
+          user: data.user,
+          error,
+          reload: async () => {
+            await refetch()
+          },
+        }}
+        {...props}
+      />
+    )
+  }
 }
 
 export function useSession(
@@ -136,8 +172,11 @@ export function useSession(
       }
 
       for (const sessionRole of SUPPORTED_USER_ROLES) {
-        if (required.role === sessionRole && session.role !== sessionRole) {
-          const redirectPath = getUserRoleRedirectPath(session.role)
+        if (
+          required.role === sessionRole &&
+          session.user.role !== sessionRole
+        ) {
+          const redirectPath = getUserRoleRedirectPath(session.user.role)
           router.replace(redirectPath)
 
           return

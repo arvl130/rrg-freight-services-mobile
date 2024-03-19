@@ -1,4 +1,5 @@
-import auth from "@react-native-firebase/auth"
+import type { Session } from "@/components/auth"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export type Vehicle = {
   id: number
@@ -8,20 +9,18 @@ export type Vehicle = {
 }
 
 export async function getVehicle(id: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving delivery: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/vehicle/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session}`,
       },
     },
   )

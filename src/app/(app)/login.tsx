@@ -1,4 +1,3 @@
-import auth from "@react-native-firebase/auth"
 import { SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
@@ -13,20 +12,32 @@ import {
 import EvilIcons from "react-native-vector-icons/EvilIcons"
 import Icon from "react-native-vector-icons/SimpleLineIcons"
 import { getUserRoleRedirectPath, useSession } from "@/components/auth"
-
-const invalidCredentialsErrorCodes = [
-  "auth/invalid-login",
-  "auth/invalid-login-credentials",
-  "auth/invalid-credential",
-  "auth/wrong-password",
-  "auth/user-not-found",
-]
-
-const FIREBASE_AUTH_ERROR_TOO_MANY_REQUESTS = "auth/too-many-requests"
+import { useMutation } from "@tanstack/react-query"
+import { signInWithEmailAndPassword } from "@/api/auth"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export default function LoginScreen() {
-  const { user, role } = useSession()
-  const [isSigningIn, setIsSigningIn] = useState(false)
+  const { user, reload } = useSession()
+  const signInMutation = useMutation({
+    mutationFn: signInWithEmailAndPassword,
+    onSuccess: async ({ sessionId, user }) => {
+      await AsyncStorage.setItem(
+        "session",
+        JSON.stringify({
+          sessionId,
+          user,
+        }),
+      )
+      await reload()
+    },
+    onError: ({ message }) => {
+      Alert.alert("Sign In Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
 
   const [userCredentials, setUserCredentials] = useState({
     email: "",
@@ -35,22 +46,22 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (user) {
-      const redirectPath = getUserRoleRedirectPath(role)
+      const redirectPath = getUserRoleRedirectPath(user.role)
       router.replace(redirectPath)
     }
-  }, [user, role])
+  }, [user])
 
   return (
-    <View style={styles.mainScreen}>
+    <View
+      style={styles.mainScreen}
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <View style={[styles.imageContainer, styles.shadowProp]}>
         <Image source={require("@/assets/images/logo4.png")} />
       </View>
-      <View
-        style={styles.form}
-        onLayout={() => {
-          SplashScreen.hideAsync()
-        }}
-      >
+      <View style={styles.form}>
         <Text style={styles.loginText}>Login</Text>
         <View style={styles.formGroupContainer}>
           <Text>
@@ -88,69 +99,16 @@ export default function LoginScreen() {
         <View style={styles.buttonContainer}>
           <Pressable
             style={styles.loginBtn}
-            disabled={isSigningIn}
-            onPress={async () => {
-              if (
-                userCredentials.email === "" ||
-                userCredentials.password === ""
-              ) {
-                Alert.alert(
-                  "Invalid email or password",
-                  "Please enter your email and password.",
-                )
-
-                return
-              }
-
-              setIsSigningIn(true)
-              try {
-                await auth().signInWithEmailAndPassword(
-                  userCredentials.email,
-                  userCredentials.password,
-                )
-              } catch (e) {
-                setIsSigningIn(false)
-                console.log("Error occured while signing in", e)
-
-                // RN Firebase doesn't export types for error handling,
-                // so we have to manually check if the error is of an
-                // expected type.
-                if (
-                  typeof e === "object" &&
-                  e !== null &&
-                  "code" in e &&
-                  typeof e.code === "string"
-                ) {
-                  if (invalidCredentialsErrorCodes.includes(e.code)) {
-                    setUserCredentials((currUserCredentials) => ({
-                      ...currUserCredentials,
-                      password: "",
-                    }))
-
-                    Alert.alert(
-                      "Invalid email or password",
-                      "Please try again.",
-                    )
-                    return
-                  }
-
-                  if (e.code === FIREBASE_AUTH_ERROR_TOO_MANY_REQUESTS) {
-                    setUserCredentials((currUserCredentials) => ({
-                      ...currUserCredentials,
-                      password: "",
-                    }))
-
-                    Alert.alert(
-                      "Too many requests",
-                      "Please try again in a few minutes.",
-                    )
-                  }
-                }
-              }
+            disabled={signInMutation.isPending}
+            onPress={() => {
+              signInMutation.mutate({
+                email: userCredentials.email,
+                password: userCredentials.password,
+              })
             }}
           >
             <Text style={styles.btnText}>
-              {isSigningIn ? (
+              {signInMutation.isPending ? (
                 <EvilIcons name="spinner-3" size={25} color="#78CFDC" />
               ) : (
                 "Login"

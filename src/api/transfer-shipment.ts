@@ -1,4 +1,5 @@
-import auth from "@react-native-firebase/auth"
+import type { Session } from "@/components/auth"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type TransferShipment = {
   id: number
@@ -11,20 +12,18 @@ type TransferShipment = {
 }
 
 export async function getTransferShipments() {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving transfer shipments: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipments`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -41,20 +40,18 @@ export async function getTransferShipments() {
 }
 
 export async function getTransferShipment(id: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving transfer shipment: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -96,21 +93,19 @@ export async function createTransferShipmentLocation({
   long: number
   lat: number
 }) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
       body: JSON.stringify({
         transferShipmentId,
@@ -133,20 +128,18 @@ export async function createTransferShipmentLocation({
 }
 
 export async function getTransferShipmentLocations(transferShipmentId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -163,20 +156,18 @@ export async function getTransferShipmentLocations(transferShipmentId: number) {
 }
 
 export async function getTransferShipmentPackages(transferShipmentId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving transfer shipment packages: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -198,21 +189,19 @@ export async function updateTransferShipmentStatusToCompleted({
   transferShipmentId: number
   imageUrl: string
 }) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while updating transfer shipment status: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/complete`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
       body: JSON.stringify({
         imageUrl,

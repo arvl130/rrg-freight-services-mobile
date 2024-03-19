@@ -1,21 +1,20 @@
-import auth from "@react-native-firebase/auth"
 import type { NewShipmentLocation, ShipmentLocation } from "@/utils/entities"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import type { Session } from "@/components/auth"
 
 export async function getLocations(shipmentId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -33,21 +32,19 @@ export async function createLocation(
   long: number,
   lat: number,
 ) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
       body: JSON.stringify({
         shipmentId,
@@ -84,21 +81,19 @@ export async function createDeliveryLocation({
   long: number
   lat: number
 }) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
       body: JSON.stringify({
         deliveryId,
@@ -118,20 +113,18 @@ export async function createDeliveryLocation({
 }
 
 export async function getDeliveryLocations(deliveryId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving locations: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )

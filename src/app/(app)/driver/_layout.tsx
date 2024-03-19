@@ -1,12 +1,31 @@
 import { Stack } from "expo-router"
-import { TouchableOpacity } from "react-native"
+import { Alert, TouchableOpacity } from "react-native"
 import List from "phosphor-react-native/src/icons/List"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
-import auth from "@react-native-firebase/auth"
-import { useState } from "react"
+import { useSession } from "@/components/auth"
+import { useMutation } from "@tanstack/react-query"
+import { signOut } from "@/api/auth"
 
 export default function Layout() {
-  const [isSigningOut, setIsSigningOut] = useState(false)
+  const { reload } = useSession({
+    required: {
+      role: "DRIVER",
+    },
+  })
+
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
+    onSuccess: async () => {
+      await reload()
+    },
+    onError: ({ message }) => {
+      Alert.alert("Sign Out Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
 
   return (
     <Stack>
@@ -29,21 +48,16 @@ export default function Layout() {
           ),
           headerRight: () => (
             <TouchableOpacity
-              disabled={isSigningOut}
+              disabled={signOutMutation.isPending}
               onPress={() => {
-                setIsSigningOut(true)
-                try {
-                  auth().signOut()
-                } catch {
-                  setIsSigningOut(false)
-                }
+                signOutMutation.mutate()
               }}
             >
               <SignOut
                 size={24}
                 color="white"
                 style={{
-                  opacity: isSigningOut ? 0.2 : undefined,
+                  opacity: signOutMutation.isPending ? 0.2 : undefined,
                 }}
               />
             </TouchableOpacity>

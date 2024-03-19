@@ -1,4 +1,3 @@
-import auth from "@react-native-firebase/auth"
 import type { ReactNode } from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import {
@@ -15,6 +14,7 @@ import { defineTask } from "expo-task-manager"
 import { getId } from "@/utils/storage"
 import { createDeliveryLocation } from "@/api/shipment-location"
 import { createTransferShipmentLocation } from "@/api/transfer-shipment"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const LOCATION_TRACKER_TASK_NAME = "driver-location-tracker"
 
@@ -40,11 +40,9 @@ defineTask(
       return
     }
 
-    const { currentUser } = auth()
-    if (currentUser === null) {
+    const sessionStr = await AsyncStorage.getItem("session")
+    if (sessionStr === null) {
       console.error(`[${LOCATION_TRACKER_TASK_NAME}]:`, "Not logged in.")
-
-      return
     }
 
     const saved = await getId()

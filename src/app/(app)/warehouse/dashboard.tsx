@@ -1,99 +1,44 @@
-import auth from "@react-native-firebase/auth"
-import { SplashScreen, router } from "expo-router"
-import { useState } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
+import { SplashScreen } from "expo-router"
+import { View, Text, Alert, Button } from "react-native"
 import { useSession } from "@/components/auth"
+import { useMutation } from "@tanstack/react-query"
+import { signOut } from "@/api/auth"
 
 export default function DashboardScreen() {
-  useSession({
+  const { reload } = useSession({
     required: {
       role: "WAREHOUSE",
     },
   })
 
-  const [isSigningOut, setIsSigningOut] = useState(false)
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
+    onSuccess: async () => {
+      await reload()
+    },
+    onError: ({ message }) => {
+      Alert.alert("Sign Out Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
 
   return (
     <View
-      style={styles.container}
       onLayout={() => {
         SplashScreen.hideAsync()
       }}
     >
-      <View style={styles.buttonGroup}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.7}
-            onPress={() => router.push("/(app)/warehouse/scanner")}
-          >
-            <Text style={styles.buttonText}>Package Scanner</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.7}
-            onPress={() => router.push("/(app)/warehouse/tracker")}
-          >
-            <Text style={styles.buttonText}>Location Tracker</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.logoutButtonContainer}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.logoutButton}
-          disabled={isSigningOut}
-          onPress={async () => {
-            setIsSigningOut(true)
-            try {
-              await auth().signOut()
-            } finally {
-              setIsSigningOut(false)
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>
-            {isSigningOut ? "Logging Out ..." : "Logout"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <Text>This is the Overseas Agent Dashboard screen</Text>
+      <Button
+        title={signOutMutation.isPending ? "Logging Out ..." : "Logout"}
+        disabled={signOutMutation.isPending}
+        onPress={() => {
+          signOutMutation.mutate()
+        }}
+      />
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  button: {
-    backgroundColor: "black",
-    borderRadius: 8,
-    paddingVertical: 24,
-  },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "500",
-    fontSize: 16,
-  },
-  buttonGroup: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  buttonContainer: {
-    flex: 1,
-  },
-  logoutButton: {
-    backgroundColor: "#ef4444",
-    borderRadius: 8,
-    paddingVertical: 12,
-  },
-  logoutButtonContainer: {
-    flex: 1,
-    marginTop: 8,
-  },
-})

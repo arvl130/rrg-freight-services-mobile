@@ -1,22 +1,21 @@
-import auth from "@react-native-firebase/auth"
 import type { Shipment } from "@/utils/entities"
 import type { Package } from "@/server/db/entities"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import type { Session } from "@/components/auth"
 
 export async function getShipment(shipmentId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving shipment: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
@@ -32,20 +31,18 @@ export async function getShipment(shipmentId: number) {
 }
 
 export async function getDeliveryPackages(deliveryId: number) {
-  const { currentUser } = auth()
-  if (!currentUser) {
-    throw new Error(
-      "An error occured while retrieving delivery packages: unauthenticated",
-    )
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
   }
 
-  const token = await currentUser.getIdToken()
+  const session = JSON.parse(sessionStr) as Session
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session.sessionId}`,
       },
     },
   )
