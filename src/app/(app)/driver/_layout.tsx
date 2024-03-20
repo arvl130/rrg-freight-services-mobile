@@ -1,12 +1,31 @@
-import { Stack } from "expo-router" // Import Alert
+import { Stack } from "expo-router"
 import { TouchableOpacity, Alert } from "react-native"
 import List from "phosphor-react-native/src/icons/List"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
-import auth from "@react-native-firebase/auth"
-import { useState } from "react"
+import { useSession } from "@/components/auth"
+import { signOut } from "@/api/auth"
+import { useMutation } from "@tanstack/react-query"
 
 export default function Layout() {
-  const [isSigningOut, setIsSigningOut] = useState(false)
+  const { reload } = useSession({
+    required: {
+      role: "DRIVER",
+    },
+  })
+
+  const signOutMutation = useMutation({
+    mutationFn: signOut,
+    onSuccess: async () => {
+      await reload()
+    },
+    onError: ({ message }) => {
+      Alert.alert("Sign Out Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
 
   return (
     <Stack>
@@ -29,8 +48,8 @@ export default function Layout() {
           ),
           headerRight: () => (
             <TouchableOpacity
-              disabled={isSigningOut}
-              onPress={() => {
+              disabled={signOutMutation.isPending || signOutMutation.isSuccess}
+              onPress={async () => {
                 // Use Alert to confirm signing out
                 Alert.alert(
                   "Confirm Sign Out",
@@ -44,12 +63,9 @@ export default function Layout() {
                     {
                       text: "Sign Out",
                       onPress: async () => {
-                        setIsSigningOut(true)
                         try {
-                          await auth().signOut()
-                        } catch {
-                          setIsSigningOut(false)
-                        }
+                          await signOutMutation.mutate()
+                        } catch {}
                       },
                     },
                   ],
@@ -61,7 +77,10 @@ export default function Layout() {
                 size={24}
                 color="white"
                 style={{
-                  opacity: isSigningOut ? 0.2 : undefined,
+                  opacity:
+                    signOutMutation.isPending || signOutMutation.isSuccess
+                      ? 0.2
+                      : undefined,
                 }}
               />
             </TouchableOpacity>
