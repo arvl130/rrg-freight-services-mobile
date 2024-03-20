@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 35,
     marginBottom: 40,
-    fontWeight: "900",
+    fontFamily: "Roboto-Medium",
     letterSpacing: 3,
     color: "#78CFDC",
     textAlign: "center",
