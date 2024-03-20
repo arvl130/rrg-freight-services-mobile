@@ -3,20 +3,21 @@ import { Alert, TouchableOpacity } from "react-native"
 import List from "phosphor-react-native/src/icons/List"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
 import { useSession } from "@/components/auth"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { signOut } from "@/api/auth"
 
 export default function Layout() {
-  const { reload } = useSession({
+  useSession({
     required: {
       role: "DRIVER",
     },
   })
 
+  const queryClient = useQueryClient()
   const signOutMutation = useMutation({
     mutationFn: signOut,
-    onSuccess: async () => {
-      await reload()
+    onSuccess: () => {
+      queryClient.setQueryData(["getCurrentUser"], () => null)
     },
     onError: ({ message }) => {
       Alert.alert("Sign Out Failed", message, [
