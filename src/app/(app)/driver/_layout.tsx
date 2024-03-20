@@ -1,33 +1,12 @@
-import { Stack } from "expo-router"
-import { Alert, TouchableOpacity } from "react-native"
+import { Stack } from "expo-router" // Import Alert
+import { TouchableOpacity, Alert } from "react-native"
 import List from "phosphor-react-native/src/icons/List"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
-import { useSession } from "@/components/auth"
-import { useMutation } from "@tanstack/react-query"
-import { signOut } from "@/api/auth"
+import auth from "@react-native-firebase/auth"
+import { useState } from "react"
 
 export default function Layout() {
-  const { reload } = useSession({
-    required: {
-      role: "DRIVER",
-    },
-  })
-
-  const signOutMutation = useMutation({
-    mutationFn: signOut,
-    onSuccess: async () => {
-      await reload()
-    },
-    onError: ({ message }) => {
-      Alert.alert("Sign Out Failed", message, [
-        {
-          text: "OK",
-        },
-      ])
-    },
-  })
-
-  const isDisabled = signOutMutation.isPending || signOutMutation.isSuccess
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   return (
     <Stack>
@@ -50,16 +29,39 @@ export default function Layout() {
           ),
           headerRight: () => (
             <TouchableOpacity
-              disabled={isDisabled}
+              disabled={isSigningOut}
               onPress={() => {
-                signOutMutation.mutate()
+                // Use Alert to confirm signing out
+                Alert.alert(
+                  "Confirm Sign Out",
+                  "Are you sure you want to sign out?",
+                  [
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Cancel Pressed"),
+                      style: "cancel",
+                    },
+                    {
+                      text: "Sign Out",
+                      onPress: async () => {
+                        setIsSigningOut(true)
+                        try {
+                          await auth().signOut()
+                        } catch {
+                          setIsSigningOut(false)
+                        }
+                      },
+                    },
+                  ],
+                  { cancelable: false },
+                )
               }}
             >
               <SignOut
                 size={24}
                 color="white"
                 style={{
-                  opacity: isDisabled ? 0.2 : undefined,
+                  opacity: isSigningOut ? 0.2 : undefined,
                 }}
               />
             </TouchableOpacity>
