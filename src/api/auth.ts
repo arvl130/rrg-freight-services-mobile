@@ -1,4 +1,9 @@
-import type { Session, SessionAndUserJSON, User } from "@/components/auth"
+import {
+  type Session,
+  type SessionAndUserJSON,
+  type User,
+} from "@/components/auth"
+import { SignInError } from "@/utils/errors"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function signInWithEmailAndPassword(options: {
@@ -14,11 +19,23 @@ export async function signInWithEmailAndPassword(options: {
     body: JSON.stringify(options),
   })
 
-  const responseJson = await response.json()
-  if (!response.ok) {
-    throw new Error("Response not OK.")
+  if (response.status === 400 || response.status === 404) {
+    throw new SignInError({
+      message: "Incorrect username or password.",
+      statusCode: response.status,
+    })
   }
 
+  if (response.status === 412 || response.status === 500)
+    throw new SignInError({
+      message: "Internal server error.",
+      statusCode: response.status,
+      canTryAgain: false,
+    })
+
+  if (!response.ok) throw new Error("Response not OK.")
+
+  const responseJson = await response.json()
   return responseJson as {
     message: string
     session: Session

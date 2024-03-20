@@ -15,6 +15,7 @@ import { getUserRoleRedirectPath, useSession } from "@/components/auth"
 import { useMutation } from "@tanstack/react-query"
 import { signInWithEmailAndPassword } from "@/api/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { SignInError } from "@/utils/errors"
 
 export default function LoginScreen() {
   const { user, reload } = useSession()
@@ -30,12 +31,24 @@ export default function LoginScreen() {
       )
       await reload()
     },
-    onError: ({ message }) => {
-      Alert.alert("Sign In Failed", message, [
-        {
-          text: "OK",
-        },
-      ])
+    onError: (error) => {
+      if (error instanceof SignInError) {
+        Alert.alert(
+          `Login Failed`,
+          `${error.message}${error.canTryAgain ? " Please try again." : ""} (Code: ${error.statusCode})`,
+          [
+            {
+              text: "OK",
+            },
+          ],
+        )
+      } else {
+        Alert.alert("Login Failed", error.message, [
+          {
+            text: "OK",
+          },
+        ])
+      }
     },
   })
 
