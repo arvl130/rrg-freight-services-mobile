@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
-import { Link, SplashScreen } from "expo-router"
+import { Link } from "expo-router"
 import { DateTime } from "luxon"
 import {
   Text,
@@ -66,12 +66,7 @@ export default function DeliveriesPage() {
   })
 
   return (
-    <View
-      style={styles.mainScreen}
-      onLayout={() => {
-        SplashScreen.hideAsync()
-      }}
-    >
+    <View style={styles.mainScreen}>
       <ScrollView
         refreshControl={
           <RefreshControl

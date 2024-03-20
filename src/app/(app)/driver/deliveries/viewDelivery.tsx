@@ -1,16 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { SplashScreen } from "expo-router"
 import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
 export default function DashboardPage() {
   return (
-    <View
-      style={styles.mainScreen}
-      onLayout={() => {
-        SplashScreen.hideAsync()
-      }}
-    >
+    <View style={styles.mainScreen}>
       <View style={styles.headerSection}>
         <TouchableOpacity>
           <Ionicons

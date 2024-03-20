@@ -1,4 +1,4 @@
-import { Link, SplashScreen } from "expo-router"
+import { Link } from "expo-router"
 import { useQuery } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
 import {
@@ -221,12 +221,7 @@ export default function DashboardPage() {
   const { permission, requestPermission } = useLocationPermission()
 
   return (
-    <View
-      style={styles.mainScreen}
-      onLayout={() => {
-        SplashScreen.hideAsync()
-      }}
-    >
+    <View style={styles.mainScreen}>
       {permission === null ? (
         <RequestLocationPermissionView
           header="Location permission is required."

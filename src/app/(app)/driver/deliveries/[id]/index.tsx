@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link, SplashScreen, useLocalSearchParams } from "expo-router"
+import { Link, useLocalSearchParams } from "expo-router"
 import {
   Button,
   Image,
@@ -233,9 +233,6 @@ export default function ViewDeliveryPage() {
   return (
     <ScrollView
       contentContainerStyle={styles.mainScreen}
-      onLayout={() => {
-        SplashScreen.hideAsync()
-      }}
       refreshControl={
         <RefreshControl
           refreshing={status !== "pending" && fetchStatus === "fetching"}
