@@ -1,3 +1,4 @@
+import { SplashScreen } from "expo-router"
 import { View, Text, Button, Alert } from "react-native"
 import { useSession } from "@/components/auth"
 import { useMutation } from "@tanstack/react-query"
@@ -25,7 +26,11 @@ export default function DashboardScreen() {
   })
 
   return (
-    <View>
+    <View
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <Text>This is the Domestic Agent Dashboard screen</Text>
       <Button
         title={signOutMutation.isPending ? "Logging Out ..." : "Logout"}
