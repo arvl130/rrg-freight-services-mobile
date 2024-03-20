@@ -51,8 +51,8 @@ dependencies:
     specifier: ~14.1.1
     version: 14.1.1(expo@50.0.13)
   expo-dev-client:
-    specifier: ~3.3.10
-    version: 3.3.10(expo@50.0.13)
+    specifier: ~3.3.11
+    version: 3.3.11(expo@50.0.13)
   expo-font:
     specifier: ~11.10.2
     version: 11.10.3(expo@50.0.13)
@@ -5703,14 +5703,14 @@ packages:
       - supports-color
     dev: false
 
-  /expo-dev-client@3.3.10(expo@50.0.13):
-    resolution: {integrity: sha512-UhZOJ+O90dRo7S/rmFmVIWwa/HxOqoQ4ySCqvWh87O3pFQuluPfVI9PdKicF4djYrNHZZmE8UXqBDN41hiYtAA==}
+  /expo-dev-client@3.3.11(expo@50.0.13):
+    resolution: {integrity: sha512-9nhhbfbskfmjp/tlRS5KvDpCoW0BREJBxpu2GyjKu7nDB33W8fJLL0wXgNhP+QEb93r37o3uezKmUm2kibOvTw==}
     peerDependencies:
       expo: '*'
     dependencies:
       expo: 50.0.13(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
-      expo-dev-launcher: 3.6.8(expo@50.0.13)
-      expo-dev-menu: 4.5.7(expo@50.0.13)
+      expo-dev-launcher: 3.6.9(expo@50.0.13)
+      expo-dev-menu: 4.5.8(expo@50.0.13)
       expo-dev-menu-interface: 1.7.2(expo@50.0.13)
       expo-manifests: 0.13.2(expo@50.0.13)
       expo-updates-interface: 0.15.3(expo@50.0.13)
@@ -5718,14 +5718,14 @@ packages:
       - supports-color
     dev: false
 
-  /expo-dev-launcher@3.6.8(expo@50.0.13):
-    resolution: {integrity: sha512-lFyxRXpUk0z7V7BDd1tFg/M9eFPzo+WRq7kQBA4F8bFPX6drYuTjPqs/bEF/6A5S38oA1wcA34bY9TNgkiKf5w==}
+  /expo-dev-launcher@3.6.9(expo@50.0.13):
+    resolution: {integrity: sha512-MBDMAqjCMVYt1Zv47u2dJTp4d8gCZMfM4GWAFhfQy3G6XzkUlFtewaQefAqy93FcYOv6BYdC9yZOLOb06tqTfA==}
     peerDependencies:
       expo: '*'
     dependencies:
       ajv: 8.11.0
       expo: 50.0.13(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
-      expo-dev-menu: 4.5.7(expo@50.0.13)
+      expo-dev-menu: 4.5.8(expo@50.0.13)
       expo-manifests: 0.13.2(expo@50.0.13)
       resolve-from: 5.0.0
       semver: 7.6.0
@@ -5741,8 +5741,8 @@ packages:
       expo: 50.0.13(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
     dev: false
 
-  /expo-dev-menu@4.5.7(expo@50.0.13):
-    resolution: {integrity: sha512-yIAsiKIhxvAmzd6x25HTvANeengGg2Uax6JnKy7+YfxgynKtqmWUlGCyc9EECoQI4+ItxbfjU4fSTxTiQYGFug==}
+  /expo-dev-menu@4.5.8(expo@50.0.13):
+    resolution: {integrity: sha512-GXfI0CmYlqjOqyFjtplXO9PSoJQoy89+50lbUSNZykDsGyvzCPzl4txdQcdHHSglKYr7lWV7aeMVeehuSct60w==}
     peerDependencies:
       expo: '*'
     dependencies:

@@ -37,7 +37,7 @@
     "expo": "~50.0.13",
     "expo-barcode-scanner": "~12.9.3",
     "expo-camera": "~14.1.1",
-    "expo-dev-client": "~3.3.10",
+    "expo-dev-client": "~3.3.11",
     "expo-font": "~11.10.2",
     "expo-linking": "~6.2.2",
     "expo-location": "~16.5.5",
