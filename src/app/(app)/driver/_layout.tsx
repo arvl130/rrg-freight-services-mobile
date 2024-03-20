@@ -27,6 +27,8 @@ export default function Layout() {
     },
   })
 
+  const isDisabled = signOutMutation.isPending || signOutMutation.isSuccess
+
   return (
     <Stack>
       <Stack.Screen
@@ -48,7 +50,7 @@ export default function Layout() {
           ),
           headerRight: () => (
             <TouchableOpacity
-              disabled={signOutMutation.isPending}
+              disabled={isDisabled}
               onPress={() => {
                 signOutMutation.mutate()
               }}
@@ -57,7 +59,7 @@ export default function Layout() {
                 size={24}
                 color="white"
                 style={{
-                  opacity: signOutMutation.isPending ? 0.2 : undefined,
+                  opacity: isDisabled ? 0.2 : undefined,
                 }}
               />
             </TouchableOpacity>

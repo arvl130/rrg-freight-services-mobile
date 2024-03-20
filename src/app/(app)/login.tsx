@@ -64,6 +64,8 @@ export default function LoginScreen() {
     }
   }, [user])
 
+  const isDisabled = signInMutation.isPending || signInMutation.isSuccess
+
   return (
     <View
       style={styles.mainScreen}
@@ -112,7 +114,7 @@ export default function LoginScreen() {
         <View style={styles.buttonContainer}>
           <Pressable
             style={styles.loginBtn}
-            disabled={signInMutation.isPending}
+            disabled={isDisabled}
             onPress={() => {
               signInMutation.mutate({
                 email: userCredentials.email,
@@ -121,7 +123,7 @@ export default function LoginScreen() {
             }}
           >
             <Text style={styles.btnText}>
-              {signInMutation.isPending ? (
+              {isDisabled ? (
                 <EvilIcons name="spinner-3" size={25} color="#78CFDC" />
               ) : (
                 "Login"
