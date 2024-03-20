@@ -1,4 +1,4 @@
-import type { Session } from "@/components/auth"
+import type { Session, SessionAndUserJSON } from "@/components/auth"
 import type { Package } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
@@ -23,14 +23,14 @@ export async function updatePackageStatusToDelivered({
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${shipmentId}/package/${packageId}/mark-delivered`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
       body: JSON.stringify({
         imageUrl,
@@ -57,7 +57,7 @@ export async function updateDeliveryStatusToCompleted(deliveryId: number) {
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -77,13 +77,13 @@ export async function getCountOfInTransitPackagesByDriver() {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/user/statistics`,
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -109,12 +109,12 @@ export async function getPackageById(id: string) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${id}`,
     {
       headers: {
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -132,13 +132,13 @@ export async function getPackageAddressByPackageId(packageId: string) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/package/${packageId}/location`,
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

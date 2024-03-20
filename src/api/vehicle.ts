@@ -1,4 +1,4 @@
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export type Vehicle = {
@@ -14,13 +14,13 @@ export async function getVehicle(id: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/vehicle/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

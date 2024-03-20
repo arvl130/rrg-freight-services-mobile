@@ -20,11 +20,11 @@ export default function LoginScreen() {
   const { user, reload } = useSession()
   const signInMutation = useMutation({
     mutationFn: signInWithEmailAndPassword,
-    onSuccess: async ({ sessionId, user }) => {
+    onSuccess: async ({ session, user }) => {
       await AsyncStorage.setItem(
         "session",
         JSON.stringify({
-          sessionId,
+          session,
           user,
         }),
       )

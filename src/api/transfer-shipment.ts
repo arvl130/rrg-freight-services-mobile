@@ -1,4 +1,4 @@
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type TransferShipment = {
@@ -17,13 +17,13 @@ export async function getTransferShipments() {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipments`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -45,13 +45,13 @@ export async function getTransferShipment(id: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -98,14 +98,14 @@ export async function createTransferShipmentLocation({
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
       body: JSON.stringify({
         transferShipmentId,
@@ -133,13 +133,13 @@ export async function getTransferShipmentLocations(transferShipmentId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -161,13 +161,13 @@ export async function getTransferShipmentPackages(transferShipmentId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -194,14 +194,14 @@ export async function updateTransferShipmentStatusToCompleted({
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/complete`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
       body: JSON.stringify({
         imageUrl,

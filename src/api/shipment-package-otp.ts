@@ -1,4 +1,4 @@
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function resendOtp(props: {
@@ -10,13 +10,13 @@ export async function resendOtp(props: {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${props.shipmentId}/package/${props.packageId}/resend-otp`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

@@ -1,4 +1,4 @@
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 import type { Shipment, DeliveryShipment } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
@@ -8,13 +8,13 @@ export async function getDeliveries() {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/deliveries`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -36,13 +36,13 @@ export async function getDelivery(id: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

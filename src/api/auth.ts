@@ -1,5 +1,4 @@
-import type { Session } from "@/components/auth"
-import type { UserRole } from "@/utils/constants"
+import type { Session, SessionAndUserJSON, User } from "@/components/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function signInWithEmailAndPassword(options: {
@@ -22,28 +21,25 @@ export async function signInWithEmailAndPassword(options: {
 
   return responseJson as {
     message: string
-    sessionId: string
-    user: {
-      id: string
-      role: UserRole
-    }
+    session: Session
+    user: User
   }
 }
 
 export async function getCurrentUser() {
   const sessionStr = await AsyncStorage.getItem("session")
-  if (sessionStr === null) {
-    return null
-  }
+  if (sessionStr === null) return null
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const url = `${process.env.EXPO_PUBLIC_API_URL}/v1/user`
   const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session.sessionId}`,
+      Authorization: `Bearer ${session.id}`,
     },
   })
+
+  if (response.status === 401) return null
 
   const responseJson = await response.json()
   if (!response.ok) {
@@ -52,11 +48,8 @@ export async function getCurrentUser() {
 
   return responseJson as {
     message: string
-    sessionId: string
-    user: {
-      id: string
-      role: UserRole
-    }
+    session: Session
+    user: User
   }
 }
 
@@ -66,12 +59,12 @@ export async function signOut() {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const url = `${process.env.EXPO_PUBLIC_API_URL}/v1/user`
   const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session.sessionId}`,
+      Authorization: `Bearer ${session.id}`,
     },
   })
 

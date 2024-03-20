@@ -1,6 +1,6 @@
 import type { NewShipmentLocation, ShipmentLocation } from "@/utils/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 
 export async function getLocations(shipmentId: number) {
   const sessionStr = await AsyncStorage.getItem("session")
@@ -8,13 +8,13 @@ export async function getLocations(shipmentId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -37,14 +37,14 @@ export async function createLocation(
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
       body: JSON.stringify({
         shipmentId,
@@ -86,14 +86,14 @@ export async function createDeliveryLocation({
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
       body: JSON.stringify({
         deliveryId,
@@ -118,13 +118,13 @@ export async function getDeliveryLocations(deliveryId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

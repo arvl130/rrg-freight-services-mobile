@@ -1,7 +1,7 @@
 import type { Shipment } from "@/utils/entities"
 import type { Package } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import type { Session } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 
 export async function getShipment(shipmentId: number) {
   const sessionStr = await AsyncStorage.getItem("session")
@@ -9,13 +9,13 @@ export async function getShipment(shipmentId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/shipment/${shipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )
@@ -36,13 +36,13 @@ export async function getDeliveryPackages(deliveryId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.sessionId}`,
+        Authorization: `Bearer ${session.id}`,
       },
     },
   )

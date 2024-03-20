@@ -23,11 +23,20 @@ export function getUserRoleRedirectPath(role: UserRole | null) {
 export type User = {
   id: string
   role: UserRole
+  displayName: string
+  photoUrl: string | null
 }
 
 export type Session = {
-  sessionId: string
+  id: string
+  userId: string
+  fresh: boolean
+  expiresAt: string
+}
+
+export type SessionAndUserJSON = {
   user: User
+  session: Session
 }
 
 type TAuthContext = {
@@ -37,26 +46,26 @@ type TAuthContext = {
   | {
       // Initial state
       isLoading: true
-      sessionId: null
+      session: null
       user: null
     }
   // Unauthenticated state
   | {
       isLoading: false
-      sessionId: null
+      session: null
       user: null
     }
   // Authenticated state
   | {
       isLoading: false
-      sessionId: string
+      session: Session
       user: User
     }
 )
 
 const AuthContext = createContext<TAuthContext>({
   isLoading: true,
-  sessionId: null,
+  session: null,
   user: null,
   error: null,
   reload: Promise.resolve,
@@ -75,7 +84,7 @@ export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
       <AuthContext.Provider
         value={{
           isLoading: true,
-          sessionId: null,
+          session: null,
           user: null,
           error,
           reload: async () => {
@@ -92,7 +101,7 @@ export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
       <AuthContext.Provider
         value={{
           isLoading: false,
-          sessionId: null,
+          session: null,
           user: null,
           error,
           reload: async () => {
@@ -109,7 +118,7 @@ export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
       <AuthContext.Provider
         value={{
           isLoading: false,
-          sessionId: null,
+          session: null,
           user: null,
           error,
           reload: async () => {
@@ -124,7 +133,7 @@ export function AuthProvider(props: { children: ReactNode; [x: string]: any }) {
       <AuthContext.Provider
         value={{
           isLoading: false,
-          sessionId: data.sessionId,
+          session: data.session,
           user: data.user,
           error,
           reload: async () => {
