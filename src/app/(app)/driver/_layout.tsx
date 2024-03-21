@@ -5,7 +5,6 @@ import SignOut from "phosphor-react-native/src/icons/SignOut"
 import { useSession } from "@/components/auth"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { signOut } from "@/api/auth"
-
 export default function Layout() {
   useSession({
     required: {
@@ -27,9 +26,7 @@ export default function Layout() {
       ])
     },
   })
-
   const isDisabled = signOutMutation.isPending || signOutMutation.isSuccess
-
   return (
     <Stack>
       <Stack.Screen
@@ -52,8 +49,28 @@ export default function Layout() {
           headerRight: () => (
             <TouchableOpacity
               disabled={isDisabled}
-              onPress={() => {
-                signOutMutation.mutate()
+              onPress={async () => {
+                // Use Alert to confirm signing out
+                Alert.alert(
+                  "Confirm Sign Out",
+                  "Are you sure you want to sign out?",
+                  [
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Cancel Pressed"),
+                      style: "cancel",
+                    },
+                    {
+                      text: "Sign Out",
+                      onPress: async () => {
+                        try {
+                          await signOutMutation.mutate()
+                        } catch {}
+                      },
+                    },
+                  ],
+                  { cancelable: false },
+                )
               }}
             >
               <SignOut
