@@ -17,7 +17,7 @@ import { Notifications } from "@/components/notifications"
 import { useAppState, useOnlineManager } from "@/utils/tanstack-query"
 import { REGISTERED_FONTS } from "@/utils/fonts"
 import { LocationPermissionProvider } from "@/components/location-permission"
-import { CameraPermissionProvider } from "@/components/camera-permission"
+import { CameraPermissionProvider } from "@/components/camera-permission/main-component"
 import { LocationTrackerProvider } from "@/components/location-tracker"
 
 export {
