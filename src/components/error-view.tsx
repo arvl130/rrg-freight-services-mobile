@@ -1,32 +1,78 @@
-import { Text, View } from "react-native"
+ import { Text, View, Image, TouchableOpacity } from "react-native"
 
 export function ErrorView(props: { message: string }) {
   return (
     <View
+    style={{
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',  
+    }}
+  >
+    <View
       style={{
-        flex: 1,
-        justifyContent: "center",
-        alignContent: "center",
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 5, 
+        shadowColor: '#000',  
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        alignItems: 'center',
       }}
     >
+      <Image
+        source={require("@/assets/images/error-logo.png")}
+        style={{
+          width: 40,
+          height: 40,
+          marginBottom: 10,
+        }}
+      />
       <Text
         style={{
           textAlign: "center",
           fontFamily: "Roboto-Bold",
           fontSize: 24,
+          marginBottom: 5,
         }}
       >
-        Error:
+        Error!
       </Text>
       <Text
         style={{
           textAlign: "center",
           fontFamily: "Roboto",
           fontSize: 16,
+          color: "red",
+          marginBottom: 20,
         }}
       >
-        {props.message}
+       {props.message}
       </Text>
+      <TouchableOpacity
+        onPress={() => { 
+        }}
+        style={{
+          backgroundColor: '#FF6347',
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 5,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "Roboto-Bold",
+            fontSize: 18,
+            color: 'white',
+          }}
+        >
+          OK
+        </Text>
+      </TouchableOpacity>
     </View>
-  )
+  </View>
+);
 }
