@@ -142,12 +142,6 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="deliveries/[id]/deliver"
-        options={{
-          title: "Deliver Package",
-        }}
-      />
-      <Stack.Screen
         name="transfer-shipments/index"
         options={{
           title: "Transfer Shipments",
