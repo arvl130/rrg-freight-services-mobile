@@ -1,11 +1,10 @@
 import { Stack } from "expo-router"
-import { TouchableOpacity, Alert } from "react-native"
+import { Alert, TouchableOpacity } from "react-native"
 import List from "phosphor-react-native/src/icons/List"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
 import { useSession } from "@/components/auth"
-import { signOut } from "@/api/auth"
 import { useMutation } from "@tanstack/react-query"
-
+import { signOut } from "@/api/auth"
 export default function Layout() {
   const { reload } = useSession({
     required: {
@@ -26,7 +25,7 @@ export default function Layout() {
       ])
     },
   })
-
+  const isDisabled = signOutMutation.isPending || signOutMutation.isSuccess
   return (
     <Stack>
       <Stack.Screen
@@ -48,7 +47,7 @@ export default function Layout() {
           ),
           headerRight: () => (
             <TouchableOpacity
-              disabled={signOutMutation.isPending || signOutMutation.isSuccess}
+              disabled={isDisabled}
               onPress={async () => {
                 // Use Alert to confirm signing out
                 Alert.alert(
@@ -77,10 +76,7 @@ export default function Layout() {
                 size={24}
                 color="white"
                 style={{
-                  opacity:
-                    signOutMutation.isPending || signOutMutation.isSuccess
-                      ? 0.2
-                      : undefined,
+                  opacity: isDisabled ? 0.2 : undefined,
                 }}
               />
             </TouchableOpacity>
