@@ -1,4 +1,4 @@
-import { router } from "expo-router"
+import { SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
   View,
@@ -67,7 +67,12 @@ export default function LoginScreen() {
   const isDisabled = signInMutation.isPending || signInMutation.isSuccess
 
   return (
-    <View style={styles.mainScreen}>
+    <View
+      style={styles.mainScreen}
+      onLayout={() => {
+        SplashScreen.hideAsync()
+      }}
+    >
       <View style={[styles.imageContainer, styles.shadowProp]}>
         <Image source={require("@/assets/images/logo4.png")} />
       </View>
