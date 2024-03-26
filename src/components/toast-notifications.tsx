@@ -1,15 +1,15 @@
 import Constants from "expo-constants"
 import { useEffect, useRef } from "react"
-import type { Toast as ToastT } from "react-hot-toast/headless"
+import type { Toast } from "react-hot-toast/headless"
 import { useToaster } from "react-hot-toast/headless"
 import { Text, View, Animated } from "react-native"
 
-function Toast({
+function ToastNotification({
   t,
   updateHeight,
   offset,
 }: {
-  t: ToastT
+  t: Toast
   offset: number
   updateHeight: (height: number) => void
 }) {
@@ -77,7 +77,7 @@ function Toast({
   )
 }
 
-export function Notifications() {
+export function ToastNotifications() {
   const { toasts, handlers } = useToaster()
   return (
     <View
@@ -89,7 +89,7 @@ export function Notifications() {
       }}
     >
       {toasts.map((t) => (
-        <Toast
+        <ToastNotification
           key={t.id}
           t={t}
           updateHeight={(height) => handlers.updateHeight(t.id, height)}

@@ -13,7 +13,7 @@ import { SplashScreen, Stack } from "expo-router"
 import { useEffect } from "react"
 import { Platform, useColorScheme } from "react-native"
 import { AuthProvider } from "@/components/auth"
-import { Notifications } from "@/components/notifications"
+import { ToastNotifications } from "@/components/toast-notifications"
 import { useAppState, useOnlineManager } from "@/utils/tanstack-query"
 import { REGISTERED_FONTS } from "@/utils/fonts"
 import { LocationPermissionProvider } from "@/components/location-permission"
@@ -78,7 +78,7 @@ function RootLayoutNav() {
                         }}
                       />
                     </Stack>
-                    <Notifications />
+                    <ToastNotifications />
                   </ExpoPushTokenProvider>
                 </NotificationPermissionProvider>
               </CameraPermissionProvider>
