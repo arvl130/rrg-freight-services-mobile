@@ -19,6 +19,8 @@ import { REGISTERED_FONTS } from "@/utils/fonts"
 import { LocationPermissionProvider } from "@/components/location-permission"
 import { CameraPermissionProvider } from "@/components/camera-permission/main-component"
 import { LocationTrackerProvider } from "@/components/location-tracker"
+import { NotificationPermissionProvider } from "@/components/notification-permission"
+import { ExpoPushTokenProvider } from "@/components/expo-push-token"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -66,15 +68,19 @@ function RootLayoutNav() {
           <LocationPermissionProvider>
             <LocationTrackerProvider>
               <CameraPermissionProvider>
-                <Stack>
-                  <Stack.Screen
-                    name="(app)"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
-                </Stack>
-                <Notifications />
+                <NotificationPermissionProvider>
+                  <ExpoPushTokenProvider>
+                    <Stack>
+                      <Stack.Screen
+                        name="(app)"
+                        options={{
+                          headerShown: false,
+                        }}
+                      />
+                    </Stack>
+                    <Notifications />
+                  </ExpoPushTokenProvider>
+                </NotificationPermissionProvider>
               </CameraPermissionProvider>
             </LocationTrackerProvider>
           </LocationPermissionProvider>
