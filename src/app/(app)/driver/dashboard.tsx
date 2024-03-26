@@ -18,11 +18,8 @@ import {
 import { useSession } from "@/components/auth"
 import { getDistance } from "geolib"
 import type { LocationObject } from "expo-location"
-import { PermissionStatus, getCurrentPositionAsync } from "expo-location"
-import {
-  RequestLocationPermissionView,
-  useLocationPermission,
-} from "@/components/location-permission"
+import { getCurrentPositionAsync } from "expo-location"
+import { LocationPermissionRequiredView } from "@/components/location-permission"
 import { useEffect, useState } from "react"
 
 type Coordinates = {
@@ -218,8 +215,6 @@ export default function DashboardPage() {
     },
   })
 
-  const { permission, requestPermission } = useLocationPermission()
-
   return (
     <View
       style={styles.mainScreen}
@@ -227,37 +222,9 @@ export default function DashboardPage() {
         SplashScreen.hideAsync()
       }}
     >
-      {permission === null ? (
-        <RequestLocationPermissionView
-          header="Location permission is required."
-          message="To continue, please allow it in the Settings app."
-          requestPermission={() => {
-            requestPermission()
-          }}
-        />
-      ) : (
-        <>
-          {permission.status === PermissionStatus.UNDETERMINED && (
-            <RequestLocationPermissionView
-              header="Location permission is required."
-              message="To continue, please allow it in the Settings app."
-              requestPermission={() => {
-                requestPermission()
-              }}
-            />
-          )}
-          {permission.status === PermissionStatus.DENIED && (
-            <RequestLocationPermissionView
-              header="Location permission has been denied."
-              message="This permission is required to use this app. To continue, please allow it in the Settings app."
-              requestPermission={() => {
-                requestPermission()
-              }}
-            />
-          )}
-          {permission.status === PermissionStatus.GRANTED && <MainView />}
-        </>
-      )}
+      <LocationPermissionRequiredView>
+        <MainView />
+      </LocationPermissionRequiredView>
     </View>
   )
 }
