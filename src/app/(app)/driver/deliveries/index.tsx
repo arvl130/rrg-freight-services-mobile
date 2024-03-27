@@ -66,17 +66,17 @@ export default function DeliveriesPage() {
 
   return (
     <View style={styles.mainScreen}>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={status !== "pending" && fetchStatus === "fetching"}
-            onRefresh={() => refetch()}
-          />
-        }
-      >
-        {status === "pending" && <LoadingView />}
-        {status === "error" && <ErrorView message={error.message} />}
-        {status === "success" && (
+      {status === "pending" && <LoadingView />}
+      {status === "error" && <ErrorView message={error.message} />}
+      {status === "success" && (
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={fetchStatus === "fetching"}
+              onRefresh={() => refetch()}
+            />
+          }
+        >
           <View style={[styles.deliveryTruckTile]}>
             {data.deliveries.length === 0 ? (
               <Text
@@ -113,15 +113,14 @@ export default function DeliveriesPage() {
               </>
             )}
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      )}
     </View>
   )
 }
 const styles = StyleSheet.create({
   mainScreen: {
     flex: 1,
-    flexDirection: "column",
     backgroundColor: "#DEDBDB",
   },
   headerSection: {
