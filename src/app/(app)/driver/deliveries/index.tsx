@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "expo-router"
 import { DateTime } from "luxon"
@@ -101,10 +100,9 @@ export default function DeliveriesPage() {
                     }}
                   >
                     <TouchableOpacity activeOpacity={0.6}>
-                      {/* TODO: Replace hardcoded values with correc info. */}
                       <DeliveryItem
                         id={delivery.id}
-                        packageCount={5}
+                        packageCount={delivery.packageCount}
                         createdAt={DateTime.fromISO(
                           delivery.createdAt,
                         ).toLocaleString(DateTime.DATETIME_SHORT)}

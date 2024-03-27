@@ -26,7 +26,7 @@ export async function getDeliveries() {
 
   return responseJson as {
     message: string
-    deliveries: (Shipment & DeliveryShipment)[]
+    deliveries: (Shipment & DeliveryShipment & { packageCount: number })[]
   }
 }
 
