@@ -136,12 +136,8 @@ export function LocationTrackerProvider(props: { children: ReactNode }) {
   }
 
   async function stopTracking() {
-    try {
-      await stopLocationUpdatesAsync(LOCATION_TRACKER_TASK_NAME)
-      setIsTracking(false)
-    } catch {
-      setIsTracking(true)
-    }
+    await stopLocationUpdatesAsync(LOCATION_TRACKER_TASK_NAME)
+    setIsTracking(false)
   }
 
   return (
