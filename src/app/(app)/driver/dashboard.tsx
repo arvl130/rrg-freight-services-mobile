@@ -1,5 +1,5 @@
 import { Link, SplashScreen } from "expo-router"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
 import {
   Text,
@@ -21,6 +21,11 @@ import type { LocationObject } from "expo-location"
 import { getCurrentPositionAsync } from "expo-location"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
 import { useEffect, useState } from "react"
+import { useExpoPushToken } from "@/components/expo-push-token"
+import {
+  getExpoPushTokens,
+  registerNewExpoPushToken,
+} from "@/api/expo-push-token"
 
 type Coordinates = {
   lat: number
@@ -58,6 +63,86 @@ function calculateDistance(
   }
 }
 
+function EnableNotificationsButtonWithRegisteredTokens(props: {
+  registeredTokens: string[]
+}) {
+  const queryClient = useQueryClient()
+  const { token, requestToken } = useExpoPushToken()
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      if (token) {
+        await registerNewExpoPushToken(token)
+      } else {
+        const newToken = await requestToken()
+        if (newToken) await registerNewExpoPushToken(newToken)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getExpoPushTokens"],
+      })
+    },
+  })
+
+  if (!token)
+    return (
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={[styles.optionBtn, { opacity: isPending ? 0.6 : 1 }]}
+        disabled={isPending}
+        onPress={() => {
+          mutate()
+        }}
+      >
+        <Text style={styles.optionBtnText}>Enable Notifications</Text>
+      </TouchableOpacity>
+    )
+
+  const tokenIsRegistered = props.registeredTokens.includes(token.data)
+  if (!tokenIsRegistered)
+    return (
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={[styles.optionBtn, { opacity: isPending ? 0.6 : 1 }]}
+        disabled={isPending}
+        onPress={() => {
+          mutate()
+        }}
+      >
+        <Text style={styles.optionBtnText}>Enable Notifications</Text>
+      </TouchableOpacity>
+    )
+
+  return <></>
+}
+
+function EnableNotificationsButton() {
+  const { status, data, error } = useQuery({
+    queryKey: ["getExpoPushTokens"],
+    queryFn: () => getExpoPushTokens(),
+  })
+
+  if (status === "pending")
+    return (
+      <View>
+        <Text>...</Text>
+      </View>
+    )
+
+  if (status === "error")
+    return (
+      <View>
+        <Text>Error: {error.message}</Text>
+      </View>
+    )
+
+  return (
+    <EnableNotificationsButtonWithRegisteredTokens
+      registeredTokens={data.tokens}
+    />
+  )
+}
+
 function MainView() {
   const {
     data: totalDeliveryData,
@@ -69,6 +154,7 @@ function MainView() {
     queryFn: () => getCountOfInTransitPackagesByDriver(),
   })
   const [location, setLocation] = useState<null | LocationObject>(null)
+  const { isLoading } = useExpoPushToken()
 
   useEffect(() => {
     async function getCoordinates() {
@@ -188,6 +274,7 @@ function MainView() {
 
       <View style={styles.bottomSection}>
         <View style={styles.optionSection}>
+          {!isLoading && <EnableNotificationsButton />}
           <View>
             <Link asChild href="/(app)/driver/deliveries/">
               <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
@@ -326,7 +413,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 200,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

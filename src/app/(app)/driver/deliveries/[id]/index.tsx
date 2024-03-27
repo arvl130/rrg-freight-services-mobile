@@ -96,14 +96,14 @@ function DeliveryProgress({
     queryKey: ["getDeliveryPackages", deliveryId],
     queryFn: () => getDeliveryPackages(Number(deliveryId)),
   })
-  const { stopTracking } = useLocationTracker()
+  const { isTracking, stopTracking } = useLocationTracker()
 
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationKey: ["updateDeliveryStatusToCompleted", deliveryId],
     mutationFn: async () => {
-      await stopTracking()
-      updateDeliveryStatusToCompleted(Number(deliveryId))
+      if (isTracking) await stopTracking()
+      await updateDeliveryStatusToCompleted(Number(deliveryId))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
