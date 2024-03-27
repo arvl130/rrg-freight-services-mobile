@@ -9,7 +9,7 @@ export async function getExpoPushTokens() {
   }
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
-  const url = `${process.env.EXPO_PUBLIC_API_URL}/v1/user`
+  const url = `${process.env.EXPO_PUBLIC_API_URL}/v1/user/expo-push-tokens`
   const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
