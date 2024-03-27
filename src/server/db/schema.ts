@@ -11,7 +11,7 @@ import {
   SUPPORTED_SHIPMENT_PACKAGE_STATUSES,
   SUPPORTED_ACTIVITY_VERB,
   SUPPORTED_ACTIVITY_ENTITY,
-} from "@/utils/constants"
+} from "../../utils/constants"
 import {
   bigint,
   mysqlTable,
@@ -23,6 +23,7 @@ import {
   int,
   double,
   primaryKey,
+  datetime,
 } from "drizzle-orm/mysql-core"
 
 export const users = mysqlTable("users", {
@@ -30,12 +31,70 @@ export const users = mysqlTable("users", {
   displayName: varchar("display_name", { length: 100 }).notNull(),
   photoUrl: text("photo_url"),
   emailAddress: varchar("email_address", { length: 100 }).notNull(),
+  hashedPassword: varchar("hashed_password", { length: 255 }).notNull(),
   contactNumber: varchar("contact_number", { length: 15 }).notNull(),
-  gender: mysqlEnum("gender", SUPPORTED_GENDERS),
+  gender: mysqlEnum("gender", SUPPORTED_GENDERS).notNull(),
   role: mysqlEnum("role", SUPPORTED_USER_ROLES).notNull(),
   isEnabled: tinyint("is_enabled").notNull().default(1),
   createdAt: varchar("created_at", {
     length: 255,
+  }).notNull(),
+})
+
+export const sessions = mysqlTable("sessions", {
+  id: varchar("id", {
+    length: 255,
+  }).primaryKey(),
+  userId: varchar("user_id", {
+    length: 28,
+  }).notNull(),
+  expiresAt: datetime("expires_at").notNull(),
+})
+
+export const warehouseStaffs = mysqlTable("warehouse_staffs", {
+  userId: varchar("user_id", {
+    length: 28,
+  })
+    .notNull()
+    .primaryKey(),
+  warehouseId: bigint("warehouse_id", {
+    mode: "number",
+  }).notNull(),
+})
+
+export const drivers = mysqlTable("drivers", {
+  userId: varchar("user_id", {
+    length: 28,
+  })
+    .notNull()
+    .primaryKey(),
+  licenseNumber: varchar("license_number", {
+    length: 100,
+  }).notNull(),
+  licenseRegistrationDate: varchar("license_registration_date", {
+    length: 10,
+  }).notNull(),
+})
+
+export const overseasAgents = mysqlTable("overseas_agents", {
+  userId: varchar("user_id", {
+    length: 28,
+  })
+    .notNull()
+    .primaryKey(),
+  companyName: varchar("company_name", {
+    length: 100,
+  }).notNull(),
+})
+
+export const domesticAgents = mysqlTable("domestic_agents", {
+  userId: varchar("user_id", {
+    length: 28,
+  })
+    .notNull()
+    .primaryKey(),
+  companyName: varchar("company_name", {
+    length: 100,
   }).notNull(),
 })
 
@@ -179,6 +238,9 @@ export const deliveryShipments = mysqlTable("delivery_shipments", {
     mode: "number",
   }).notNull(),
   isExpress: tinyint("is_express").notNull(),
+  departureAt: varchar("departure_at", {
+    length: 100,
+  }).notNull(),
   createdAt: varchar("created_at", {
     length: 255,
   }).notNull(),
@@ -208,6 +270,11 @@ export const vehicles = mysqlTable("vehicles", {
   displayName: varchar("display_name", {
     length: 100,
   }).notNull(),
+  plateNumber: varchar("plate_number", {
+    length: 15,
+  })
+    .notNull()
+    .unique(),
   isExpressAllowed: tinyint("is_express_allowed").notNull(),
   isArchived: tinyint("is_archived").notNull().default(0),
   createdAt: varchar("created_at", {
@@ -231,6 +298,7 @@ export const packageCategories = mysqlTable("package_categories", {
 
 export const packages = mysqlTable("packages", {
   id: varchar("id", { length: 36 }).primaryKey(),
+  preassignedId: varchar("preassigned_id", { length: 100 }).primaryKey(),
   shippingMode: mysqlEnum(
     "shipping_mode",
     SUPPORTED_PACKAGE_SHIPPING_MODES,
@@ -307,10 +375,10 @@ export const packages = mysqlTable("packages", {
   lastWarehouseId: bigint("last_warehouse_id", {
     mode: "number",
   }),
-  isFragile: tinyint("is_fragile").notNull(),
-  categoryId: bigint("category_id", {
-    mode: "number",
+  expectedDeliveryAt: varchar("expected_delivery_at", {
+    length: 255,
   }),
+  isFragile: tinyint("is_fragile").notNull(),
   status: mysqlEnum("status", SUPPORTED_PACKAGE_STATUSES).notNull(),
   failedAttempts: tinyint("failed_attempts").notNull().default(0),
   declaredValue: double("declared_value"),
@@ -344,18 +412,31 @@ export const activities = mysqlTable("activities", {
   isArchived: tinyint("is_archived").notNull().default(0),
 })
 
-export const webpushSubscriptions = mysqlTable("webpush_subscriptions", {
-  id: varchar("id", {
-    length: 64,
-  }).primaryKey(),
-  endpoint: text("endpoint").notNull(),
-  expirationTime: int("expiration_time"),
-  keyAuth: text("key_auth").notNull(),
-  keyP256dh: text("key_p256dh").notNull(),
-  createdAt: varchar("created_at", {
-    length: 255,
-  }).notNull(),
-})
+export const webpushSubscriptions = mysqlTable(
+  "webpush_subscriptions",
+  {
+    userId: varchar("user_id", {
+      length: 28,
+    }).notNull(),
+    endpointHashed: varchar("endpoint_hashed", {
+      length: 64,
+    }).notNull(),
+    endpoint: text("endpoint").notNull(),
+    expirationTime: int("expiration_time"),
+    keyAuth: text("key_auth").notNull(),
+    keyP256dh: text("key_p256dh").notNull(),
+    createdAt: varchar("created_at", {
+      length: 255,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({
+        columns: [table.userId, table.endpointHashed],
+      }),
+    }
+  },
+)
 
 export const webauthnChallenges = mysqlTable("webauthn_challenges", {
   userId: varchar("user_id", { length: 28 }).primaryKey(),
@@ -380,3 +461,22 @@ export const webauthnCredentials = mysqlTable("webauthn_credentials", {
     length: 255,
   }).notNull(),
 })
+
+export const expopushTokens = mysqlTable(
+  "expopush_tokens",
+  {
+    userId: varchar("user_id", {
+      length: 28,
+    }).notNull(),
+    data: varchar("data", {
+      length: 100,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({
+        columns: [table.userId, table.data],
+      }),
+    }
+  },
+)
