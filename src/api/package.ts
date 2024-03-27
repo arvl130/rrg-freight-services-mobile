@@ -1,4 +1,4 @@
-import type { Session, SessionAndUserJSON } from "@/components/auth"
+import type { SessionAndUserJSON } from "@/components/auth"
 import type { Package } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
@@ -51,7 +51,7 @@ export async function updateDeliveryStatusToCompleted(deliveryId: number) {
     throw new Error("Unauthorized.")
   }
 
-  const session = JSON.parse(sessionStr) as Session
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${deliveryId}/complete`,
     {
