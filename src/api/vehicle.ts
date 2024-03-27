@@ -1,12 +1,6 @@
 import type { SessionAndUserJSON } from "@/components/auth"
+import type { Vehicle } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-
-export type Vehicle = {
-  id: number
-  type: "TRUCK" | "VAN" | "MOTORCYCLE"
-  displayName: string
-  isExpressAllowed: number
-}
 
 export async function getVehicle(id: number) {
   const sessionStr = await AsyncStorage.getItem("session")

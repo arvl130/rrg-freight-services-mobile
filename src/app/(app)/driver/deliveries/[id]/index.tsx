@@ -213,6 +213,19 @@ function VehicleDetails({ id }: { id: number }) {
                   <Text style={styles.truckNumber1}>
                     {data.vehicle.displayName}
                   </Text>
+                  <Text
+                    style={{
+                      color: "white",
+                      backgroundColor: "#16a34a",
+                      marginTop: 3,
+                      paddingHorizontal: 12,
+                      fontSize: 24,
+                      borderRadius: 8,
+                      fontFamily: "Roboto-Medium",
+                    }}
+                  >
+                    {data.vehicle.plateNumber}
+                  </Text>
                 </View>
               </View>
             </LocationPermissionRequiredView>
