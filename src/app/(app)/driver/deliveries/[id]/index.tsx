@@ -272,52 +272,105 @@ export default function ViewDeliveryPage() {
                   backgroundColor: "#79CFDC",
                   borderTopLeftRadius: 12,
                   borderTopRightRadius: 12,
-                  flexDirection: "row",
-                  gap: 12,
                   paddingTop: 16,
                   paddingBottom: 24,
                   paddingHorizontal: 12,
                 }}
               >
-                <Link
-                  asChild
-                  href={{
-                    pathname: "/(app)/driver/deliveries/[id]/packages/",
-                    params: {
-                      id: data.delivery.id,
-                    },
-                  }}
-                >
-                  <TouchableOpacity
-                    activeOpacity={0.6}
+                {data.delivery.status === "COMPLETED" && (
+                  <View
                     style={{
-                      flex: 1,
                       borderRadius: 6,
-                      backgroundColor: "#EEAE3F",
+                      backgroundColor: "#dcfce7",
                       justifyContent: "center",
                       alignItems: "center",
                       paddingVertical: 12,
+                      marginBottom: 12,
                     }}
                   >
                     <Text
                       style={{
                         fontFamily: "Roboto-Medium",
-                        color: "white",
-                        fontSize: 16,
+                        color: "#14532d",
                         paddingHorizontal: 6,
                         textAlign: "center",
                       }}
                     >
-                      View Packages
+                      This shipment has been completed.
                     </Text>
-                  </TouchableOpacity>
-                </Link>
-
-                {/* TODO: Only show these buttons on the shipment
-                    that is currently being tracked. */}
-                {data.delivery.status === "IN_TRANSIT" && (
-                  <StartStopDelivery deliveryId={data.delivery.id} />
+                  </View>
                 )}
+
+                {data.delivery.status === "PREPARING" && (
+                  <View
+                    style={{
+                      borderRadius: 6,
+                      backgroundColor: "#fee2e2",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingVertical: 12,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Medium",
+                        color: "#7f1d1d",
+                        paddingHorizontal: 6,
+                        textAlign: "center",
+                      }}
+                    >
+                      This shipment is still being prepared.
+                    </Text>
+                  </View>
+                )}
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 12,
+                  }}
+                >
+                  <Link
+                    asChild
+                    href={{
+                      pathname: "/(app)/driver/deliveries/[id]/packages/",
+                      params: {
+                        id: data.delivery.id,
+                      },
+                    }}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      style={{
+                        flex: 1,
+                        borderRadius: 6,
+                        backgroundColor: "#EEAE3F",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingVertical: 12,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "Roboto-Medium",
+                          color: "white",
+                          fontSize: 16,
+                          paddingHorizontal: 6,
+                          textAlign: "center",
+                        }}
+                      >
+                        View Packages
+                      </Text>
+                    </TouchableOpacity>
+                  </Link>
+
+                  {/* TODO: Only show these buttons on the shipment
+                    that is currently being tracked. */}
+                  {data.delivery.status === "IN_TRANSIT" && (
+                    <StartStopDelivery deliveryId={data.delivery.id} />
+                  )}
+                </View>
               </View>
             </>
           )}
