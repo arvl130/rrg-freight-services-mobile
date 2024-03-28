@@ -1,6 +1,7 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
 import { CameraView } from "expo-camera/next"
-import { useRef, useState } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { useEffect, useRef, useState, useCallback } from "react"
 import {
   Alert,
   Image,
@@ -20,6 +21,9 @@ import { updatePackageStatusToDelivered } from "@/api/package"
 import storage from "@react-native-firebase/storage"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 import { ProgressDialog } from "react-native-simple-dialogs"
+import { time } from "drizzle-orm/mysql-core"
+import { useCountTimer } from "@/store/store"
+
 function TakePictureView(props: {
   onPictureTaken: (newPictureUri: string) => void
 }) {
@@ -158,6 +162,13 @@ function ReviewPictureView(props: {
 }
 
 function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
+  const resendBtn = useCountTimer((state) => state.disbaleBtn)
+  const disableResendBtn = useCountTimer((state) => state.setDisable)
+  const enableResendBtn = useCountTimer((state) => state.setEnable)
+  const seconds = useCountTimer((state) => state.timer)
+  const countDown = useCountTimer((state) => state.decrement)
+  const resetTimer = useCountTimer((state) => state.reset)
+  // const seconds=useRef(180)
   const resendOtpMutation = useMutation({
     mutationFn: resendOtp,
     onSuccess: () => {
@@ -180,6 +191,19 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
     },
   })
 
+  useEffect(() => {
+    if (resendBtn) {
+      setTimeout(() => {
+        countDown()
+      }, 1000)
+
+      if (seconds === 0) {
+        resetTimer()
+        enableResendBtn()
+      }
+    }
+  })
+
   return (
     <View
       style={{
@@ -192,9 +216,9 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
           backgroundColor: "#6b7280",
           paddingVertical: 12,
           borderRadius: 8,
-          opacity: resendOtpMutation.isPending ? 0.6 : 1,
+          opacity: resendOtpMutation.isPending || resendBtn ? 0.6 : 1,
         }}
-        disabled={resendOtpMutation.isPending}
+        disabled={resendOtpMutation.isPending || resendBtn}
         onPress={() => {
           Alert.alert(
             "Confirm Resend",
@@ -207,6 +231,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
               {
                 text: "OK",
                 onPress: () => {
+                  disableResendBtn()
                   resendOtpMutation.mutate({
                     shipmentId: props.shipmentId,
                     packageId: props.packageId,
@@ -224,7 +249,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
             fontFamily: "Roboto-Medium",
           }}
         >
-          Resend OTP
+          Resend OTP {resendBtn ? <>in {seconds} seconds</> : <></>}
         </Text>
       </TouchableOpacity>
     </View>

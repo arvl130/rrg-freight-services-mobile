@@ -63,7 +63,8 @@
     "react-native-simple-dialogs": "^2.0.3",
     "react-native-svg": "^14.1.0",
     "react-native-vector-icons": "^10.0.3",
-    "react-native-web": "~0.19.6"
+    "react-native-web": "~0.19.6",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
