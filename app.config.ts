@@ -4,7 +4,7 @@ import type { ExpoConfig } from "expo/config"
 export default (): ExpoConfig => ({
   name: "RRG Freight Services",
   slug: "rrg-freight-services-mobile",
-  version: "1.0.0",
+  version: `1.0.0-build${Date.now()}`,
   orientation: "portrait",
   icon: "./src/assets/images/icon.png",
   scheme: "myapp",
