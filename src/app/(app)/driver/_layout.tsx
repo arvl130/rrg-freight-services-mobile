@@ -85,7 +85,7 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="deliveries/index"
+        name="deliveries/(tabs)"
         options={{
           title: "Deliveries",
           headerStyle: {

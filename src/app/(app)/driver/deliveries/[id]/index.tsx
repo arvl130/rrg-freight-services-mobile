@@ -107,6 +107,9 @@ function DeliveryProgress({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
+        queryKey: ["getDeliveriesByStatus"],
+      })
+      queryClient.invalidateQueries({
         queryKey: ["getDeliveryPackages", deliveryId],
       })
       queryClient.invalidateQueries({

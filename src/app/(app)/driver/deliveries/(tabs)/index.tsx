@@ -9,7 +9,7 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native"
-import { getDeliveries } from "@/api/delivery"
+import { getDeliveriesByStatus } from "@/api/delivery"
 import { Feather, Ionicons } from "@expo/vector-icons"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
@@ -60,8 +60,8 @@ function DeliveryItem(props: {
 
 export default function DeliveriesPage() {
   const { status, data, error, fetchStatus, refetch } = useQuery({
-    queryKey: ["getDeliveries"],
-    queryFn: () => getDeliveries(),
+    queryKey: ["getDeliveriesByStatus", "IN_TRANSIT"],
+    queryFn: () => getDeliveriesByStatus("IN_TRANSIT"),
   })
 
   return (

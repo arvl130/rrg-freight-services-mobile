@@ -276,7 +276,7 @@ function MainView() {
         <View style={styles.optionSection}>
           {!isLoading && <EnableNotificationsButton />}
           <View>
-            <Link asChild href="/(app)/driver/deliveries/">
+            <Link asChild href="/(app)/driver/deliveries/(tabs)/">
               <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
                 <Text style={styles.optionBtnText}>Deliveries</Text>
               </TouchableOpacity>
