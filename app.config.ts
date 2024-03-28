@@ -1,10 +1,21 @@
 import "dotenv/config"
 import type { ExpoConfig } from "expo/config"
 
+function generateVersionNumber() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = `${now.getMonth() + 1}`.padStart(2, "0")
+  const day = `${now.getDate()}`.padStart(2, "0")
+  const hours = `${now.getHours()}`.padStart(2, "0")
+  const minutes = `${now.getMinutes()}`.padStart(2, "0")
+
+  return `1.0.0-build${year}${month}${day}_${hours}${minutes}`
+}
+
 export default (): ExpoConfig => ({
   name: "RRG Freight Services",
   slug: "rrg-freight-services-mobile",
-  version: `1.0.0-build${Date.now()}`,
+  version: generateVersionNumber(),
   orientation: "portrait",
   icon: "./src/assets/images/icon.png",
   scheme: "myapp",
