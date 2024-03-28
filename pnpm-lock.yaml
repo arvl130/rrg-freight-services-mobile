@@ -119,6 +119,9 @@ dependencies:
   react-native-screens:
     specifier: ~3.29.0
     version: 3.29.0(react-native@0.73.6)(react@18.2.0)
+  react-native-simple-dialogs:
+    specifier: ^2.0.3
+    version: 2.0.3(react-native@0.73.6)
   react-native-svg:
     specifier: ^14.1.0
     version: 14.1.0(react-native@0.73.6)(react@18.2.0)
@@ -9244,6 +9247,14 @@ packages:
       react-freeze: 1.0.4(react@18.2.0)
       react-native: 0.73.6(@babel/core@7.24.0)(@babel/preset-env@7.24.0)(react@18.2.0)
       warn-once: 0.1.1
+    dev: false
+
+  /react-native-simple-dialogs@2.0.3(react-native@0.73.6):
+    resolution: {integrity: sha512-5wFgJEp3umehYA08t9JDnDTHkQtTehZxNQld4PS4yL6ctRiAcXKCo+LoCzlHCUUTr7ylt/U7oKoMUk9cdpmN8w==}
+    peerDependencies:
+      react-native: '>=0.44'
+    dependencies:
+      react-native: 0.73.6(@babel/core@7.24.0)(@babel/preset-env@7.24.0)(react@18.2.0)
     dev: false
 
   /react-native-svg@14.1.0(react-native@0.73.6)(react@18.2.0):
