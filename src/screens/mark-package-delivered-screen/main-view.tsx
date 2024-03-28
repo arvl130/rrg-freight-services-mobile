@@ -19,7 +19,7 @@ import { router, useLocalSearchParams } from "expo-router"
 import { updatePackageStatusToDelivered } from "@/api/package"
 import storage from "@react-native-firebase/storage"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
-
+import { ProgressDialog } from "react-native-simple-dialogs"
 function TakePictureView(props: {
   onPictureTaken: (newPictureUri: string) => void
 }) {
@@ -358,6 +358,22 @@ function EnterOtpView(props: { pictureUri: string }) {
         </TouchableOpacity>
       </View>
       <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
+
+      <ProgressDialog
+        title="Loading..."
+        activityIndicatorColor="#3498db"
+        visible={isUploading || isPending}
+        activityIndicatorSize="large"
+        animationType="fade"
+        message="please wait..."
+        dialogStyle={{
+          borderRadius: 20,
+          alignItems: "center",
+          maxWidth: 250,
+          alignSelf: "center",
+          justifyContent: "center",
+        }}
+      />
     </View>
   )
 }
