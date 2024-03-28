@@ -162,9 +162,9 @@ function ReviewPictureView(props: {
 }
 
 function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
-  const resendBtn = useCountTimer((state) => state.disbaleBtn)
-  const disableResendBtn = useCountTimer((state) => state.setDisable)
-  const enableResendBtn = useCountTimer((state) => state.setEnable)
+  const resendBtn = useCountTimer((state) => state.isButtonDisabled)
+  const disableResendBtn = useCountTimer((state) => state.setDisabled)
+  const enableResendBtn = useCountTimer((state) => state.setEnabled)
   const seconds = useCountTimer((state) => state.timer)
   const countDown = useCountTimer((state) => state.decrement)
   const resetTimer = useCountTimer((state) => state.reset)

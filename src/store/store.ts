@@ -2,26 +2,26 @@ import { create } from "zustand"
 
 type CountTimer = {
   timer: number
-  disbaleBtn: boolean
+  isButtonDisabled: boolean
   decrement: () => void
   reset: () => void
-  setDisable: () => void
-  setEnable: () => void
+  setDisabled: () => void
+  setEnabled: () => void
 }
 
 export const useCountTimer = create<CountTimer>((set) => ({
   timer: 180,
-  disbaleBtn: false,
+  isButtonDisabled: false,
   decrement: () => {
     set((state) => ({ timer: state.timer - 1 }))
   },
   reset: () => {
     set({ timer: 180 })
   },
-  setDisable: () => {
-    set({ disbaleBtn: true })
+  setDisabled: () => {
+    set({ isButtonDisabled: true })
   },
-  setEnable: () => {
-    set({ disbaleBtn: false })
+  setEnabled: () => {
+    set({ isButtonDisabled: false })
   },
 }))
