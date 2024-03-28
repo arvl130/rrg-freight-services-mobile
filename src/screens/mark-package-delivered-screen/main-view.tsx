@@ -1,7 +1,6 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
 import { CameraView } from "expo-camera/next"
-import { useFocusEffect } from "@react-navigation/native"
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Alert,
   Image,
@@ -21,7 +20,6 @@ import { updatePackageStatusToDelivered } from "@/api/package"
 import storage from "@react-native-firebase/storage"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 import { ProgressDialog } from "react-native-simple-dialogs"
-import { time } from "drizzle-orm/mysql-core"
 import { useCountTimer } from "@/store/store"
 
 function TakePictureView(props: {
