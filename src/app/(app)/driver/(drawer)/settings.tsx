@@ -1,5 +1,5 @@
 import { SplashScreen } from "expo-router"
-import { Switch, Text, View } from "react-native"
+import { Image, Switch, Text, View } from "react-native"
 import { useSession } from "@/components/auth"
 import Constants from "expo-constants"
 import { getHumanizedOfUserRole } from "@/utils/humanize"
@@ -41,18 +41,45 @@ function ProfileSection() {
           alignItems: "center",
         }}
       >
-        <View
-          style={{
-            height: 100,
-            width: 100,
-            backgroundColor: "#e5e7eb",
-            borderRadius: 100 / 2,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <User size={48} color="#6b7280" />
-        </View>
+        {user ? (
+          <>
+            {user.photoUrl ? (
+              <Image
+                style={{
+                  height: 100,
+                  width: 100,
+                  backgroundColor: "#e5e7eb",
+                  borderRadius: 100 / 2,
+                }}
+                source={{
+                  uri: user.photoUrl,
+                }}
+              />
+            ) : (
+              <View
+                style={{
+                  height: 100,
+                  width: 100,
+                  backgroundColor: "#e5e7eb",
+                  borderRadius: 100 / 2,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <User size={48} color="#6b7280" />
+              </View>
+            )}
+          </>
+        ) : (
+          <View
+            style={{
+              height: 100,
+              width: 100,
+              backgroundColor: "#e5e7eb",
+              borderRadius: 37.5,
+            }}
+          />
+        )}
       </View>
 
       <TouchableOpacity
@@ -85,7 +112,7 @@ function ProfileSection() {
             fontSize: 16,
           }}
         >
-          {user?.displayName}
+          {user?.displayName ?? "..."}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -116,7 +143,7 @@ function ProfileSection() {
             fontSize: 16,
           }}
         >
-          {getHumanizedOfUserRole(user?.role!)}
+          {user ? getHumanizedOfUserRole(user.role) : "..."}
         </Text>
       </TouchableOpacity>
     </View>
