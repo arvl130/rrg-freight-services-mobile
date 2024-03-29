@@ -55,3 +55,27 @@ export async function registerNewExpoPushToken(newToken: ExpoPushToken) {
     token: string
   }
 }
+
+export async function unregisterExpoPushToken(token: ExpoPushToken) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const url = `${process.env.EXPO_PUBLIC_API_URL}/v1/user/expo-push-token/${token.data}`
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session.id}`,
+    },
+  })
+
+  if (!response.ok) throw new Error("Response not OK.")
+
+  const responseJson = await response.json()
+  return responseJson as {
+    message: string
+    token: string
+  }
+}
