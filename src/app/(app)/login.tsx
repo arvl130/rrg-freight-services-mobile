@@ -6,11 +6,13 @@ import {
   TextInput,
   StyleSheet,
   Alert,
-  Image,
   Pressable,
+  ActivityIndicator,
+  Image,
 } from "react-native"
-import EvilIcons from "react-native-vector-icons/EvilIcons"
-import Icon from "react-native-vector-icons/SimpleLineIcons"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import EnvelopeSimple from "phosphor-react-native/src/icons/EnvelopeSimple"
+import LockSimple from "phosphor-react-native/src/icons/LockSimple"
 import { getUserRoleRedirectPath, useSession } from "@/components/auth"
 import { useMutation } from "@tanstack/react-query"
 import { signInWithEmailAndPassword } from "@/api/auth"
@@ -76,11 +78,17 @@ export default function LoginScreen() {
       <View style={[styles.imageContainer, styles.shadowProp]}>
         <Image source={require("@/assets/images/logo4.png")} />
       </View>
-      <View style={styles.form}>
-        <Text style={styles.loginText}>Login</Text>
-        <View style={styles.formGroupContainer}>
+      <KeyboardAwareScrollView style={styles.form}>
+        <View
+          style={{
+            paddingVertical: 32,
+          }}
+        >
+          <Text style={styles.loginText}>Login</Text>
+        </View>
+        <View style={{ ...styles.formGroupContainer, marginTop: 0 }}>
           <Text>
-            <Icon name="envelope" size={25} color="#686868" />
+            <EnvelopeSimple size={24} color="#686868" />
           </Text>
           <TextInput
             style={styles.input}
@@ -96,7 +104,7 @@ export default function LoginScreen() {
         </View>
         <View style={styles.formGroupContainer}>
           <Text>
-            <Icon name="lock" size={25} color="#686868" />
+            <LockSimple size={24} color="#686868" />
           </Text>
           <TextInput
             secureTextEntry
@@ -123,37 +131,28 @@ export default function LoginScreen() {
             }}
           >
             <Text style={styles.btnText}>
-              {isDisabled ? (
-                <EvilIcons name="spinner-3" size={25} color="#78CFDC" />
-              ) : (
-                "Login"
-              )}
+              {isDisabled ? <ActivityIndicator color="#78CFDC" /> : "Login"}
             </Text>
           </Pressable>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   mainScreen: {
-    height: "100%",
-    backgroundColor: "#FFFFFF",
+    flex: 1,
   },
   form: {
     paddingHorizontal: 12,
-    paddingTop: 12,
     paddingBottom: 8,
-    top: "6%",
     paddingLeft: 30,
     paddingRight: 30,
   },
   loginText: {
-    fontSize: 35,
-    marginBottom: 40,
+    fontSize: 32,
     fontFamily: "Roboto-Medium",
-    letterSpacing: 3,
     color: "#78CFDC",
     textAlign: "center",
   },
@@ -167,11 +166,11 @@ const styles = StyleSheet.create({
   },
 
   formGroupContainer: {
-    marginBottom: 20,
+    marginTop: 20,
     backgroundColor: "white",
     borderWidth: 1,
     borderColor: "#ccc",
-    paddingVertical: 4,
+    paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
     flexDirection: "row",
@@ -185,14 +184,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   buttonContainer: {
-    marginTop: 4,
+    paddingVertical: 20,
   },
   loginBtn: {
-    width: "100%",
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 8,
     borderColor: "#78CFDC",
     borderStyle: "solid",
     borderWidth: 2,
@@ -200,6 +198,8 @@ const styles = StyleSheet.create({
   btnText: {
     paddingVertical: 10,
     color: "#78CFDC",
+    fontSize: 16,
+    fontFamily: "Roboto-Medium",
   },
   shadowProp: {
     elevation: 20,
