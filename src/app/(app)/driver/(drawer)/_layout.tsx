@@ -58,7 +58,7 @@ function DrawerContent(props: any) {
                     borderRadius: 75 / 2,
                   }}
                   source={{
-                    uri: user?.photoUrl!,
+                    uri: user.photoUrl,
                   }}
                 />
               ) : (
