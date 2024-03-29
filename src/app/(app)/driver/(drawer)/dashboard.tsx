@@ -1,5 +1,5 @@
 import { Link, SplashScreen } from "expo-router"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { getCountOfInTransitPackagesByDriver } from "@/api/package"
 import {
   Text,
@@ -22,10 +22,7 @@ import { getCurrentPositionAsync } from "expo-location"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
 import { useEffect, useState } from "react"
 import { useExpoPushToken } from "@/components/expo-push-token"
-import {
-  getExpoPushTokens,
-  registerNewExpoPushToken,
-} from "@/api/expo-push-token"
+import { getExpoPushTokens } from "@/api/expo-push-token"
 
 type Coordinates = {
   lat: number
@@ -66,51 +63,30 @@ function calculateDistance(
 function EnableNotificationsButtonWithRegisteredTokens(props: {
   registeredTokens: string[]
 }) {
-  const queryClient = useQueryClient()
-  const { token, requestToken } = useExpoPushToken()
-  const { isPending, mutate } = useMutation({
-    mutationFn: async () => {
-      if (token) {
-        await registerNewExpoPushToken(token)
-      } else {
-        const newToken = await requestToken()
-        if (newToken) await registerNewExpoPushToken(newToken)
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getExpoPushTokens"],
-      })
-    },
-  })
+  const { token } = useExpoPushToken()
 
   if (!token)
     return (
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={[styles.optionBtn, { opacity: isPending ? 0.6 : 1 }]}
-        disabled={isPending}
-        onPress={() => {
-          mutate()
-        }}
-      >
-        <Text style={styles.optionBtnText}>Enable Notifications</Text>
-      </TouchableOpacity>
+      <Link asChild href="/(app)/driver/(drawer)/settings">
+        <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
+          <Text style={{ ...styles.optionBtn, backgroundColor: "#f59e0b" }}>
+            Enable Notifications
+          </Text>
+        </TouchableOpacity>
+      </Link>
     )
 
   const tokenIsRegistered = props.registeredTokens.includes(token.data)
   if (!tokenIsRegistered)
     return (
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={[styles.optionBtn, { opacity: isPending ? 0.6 : 1 }]}
-        disabled={isPending}
-        onPress={() => {
-          mutate()
-        }}
-      >
-        <Text style={styles.optionBtnText}>Enable Notifications</Text>
-      </TouchableOpacity>
+      <Link asChild href="/(app)/driver/(drawer)/settings">
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{ ...styles.optionBtn, backgroundColor: "#f59e0b" }}
+        >
+          <Text style={styles.optionBtnText}>Enable Notifications</Text>
+        </TouchableOpacity>
+      </Link>
     )
 
   return <></>
