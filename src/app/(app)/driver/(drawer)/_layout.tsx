@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { Drawer } from "expo-router/drawer"
-import { Alert, Image, Text, View } from "react-native"
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native"
 import SignOut from "phosphor-react-native/src/icons/SignOut"
 import House from "phosphor-react-native/src/icons/House"
 import Gear from "phosphor-react-native/src/icons/Gear"
@@ -13,6 +13,7 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer"
 import { useSession } from "@/components/auth"
+import { Link } from "expo-router"
 
 function DrawerContent(props: any) {
   const { user } = useSession()
@@ -50,30 +51,38 @@ function DrawerContent(props: any) {
           {user ? (
             <>
               {user.photoUrl ? (
-                <Image
-                  style={{
-                    height: 75,
-                    width: 75,
-                    backgroundColor: "#e5e7eb",
-                    borderRadius: 75 / 2,
-                  }}
-                  source={{
-                    uri: user.photoUrl,
-                  }}
-                />
+                <Link asChild href="/(app)/driver/settings/photo">
+                  <TouchableOpacity activeOpacity={0.6}>
+                    <Image
+                      style={{
+                        height: 75,
+                        width: 75,
+                        backgroundColor: "#e5e7eb",
+                        borderRadius: 75 / 2,
+                      }}
+                      source={{
+                        uri: user.photoUrl,
+                      }}
+                    />
+                  </TouchableOpacity>
+                </Link>
               ) : (
-                <View
-                  style={{
-                    height: 75,
-                    width: 75,
-                    backgroundColor: "#e5e7eb",
-                    borderRadius: 75 / 2,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <User size={36} color="#6b7280" />
-                </View>
+                <Link asChild href="/(app)/driver/settings/photo">
+                  <TouchableOpacity activeOpacity={0.6}>
+                    <View
+                      style={{
+                        height: 75,
+                        width: 75,
+                        backgroundColor: "#e5e7eb",
+                        borderRadius: 75 / 2,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <User size={36} color="#6b7280" />
+                    </View>
+                  </TouchableOpacity>
+                </Link>
               )}
             </>
           ) : (

@@ -66,7 +66,7 @@ function ToastNotification({
           style={{
             color: "#fff",
             paddingVertical: 4,
-            paddingHorizontal: 12,
+            paddingHorizontal: 8,
             textAlign: "center",
           }}
         >

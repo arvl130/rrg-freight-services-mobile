@@ -1,5 +1,12 @@
-import { SplashScreen } from "expo-router"
-import { Image, Switch, Text, View } from "react-native"
+import { Link, SplashScreen } from "expo-router"
+import {
+  Image,
+  RefreshControl,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from "react-native"
 import { useSession } from "@/components/auth"
 import Constants from "expo-constants"
 import { getHumanizedOfUserRole } from "@/utils/humanize"
@@ -13,6 +20,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useExpoPushToken } from "@/components/expo-push-token"
 import { useEffect, useState } from "react"
+import { getCurrentUserDetails } from "@/api/user/details"
 
 function ProfileSection() {
   const { user } = useSession()
@@ -44,30 +52,38 @@ function ProfileSection() {
         {user ? (
           <>
             {user.photoUrl ? (
-              <Image
-                style={{
-                  height: 100,
-                  width: 100,
-                  backgroundColor: "#e5e7eb",
-                  borderRadius: 100 / 2,
-                }}
-                source={{
-                  uri: user.photoUrl,
-                }}
-              />
+              <Link asChild href="/(app)/driver/settings/photo">
+                <TouchableOpacity activeOpacity={0.6}>
+                  <Image
+                    style={{
+                      height: 100,
+                      width: 100,
+                      backgroundColor: "#e5e7eb",
+                      borderRadius: 100 / 2,
+                    }}
+                    source={{
+                      uri: user.photoUrl,
+                    }}
+                  />
+                </TouchableOpacity>
+              </Link>
             ) : (
-              <View
-                style={{
-                  height: 100,
-                  width: 100,
-                  backgroundColor: "#e5e7eb",
-                  borderRadius: 100 / 2,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <User size={48} color="#6b7280" />
-              </View>
+              <Link asChild href="/(app)/driver/settings/photo">
+                <TouchableOpacity activeOpacity={0.6}>
+                  <View
+                    style={{
+                      height: 100,
+                      width: 100,
+                      backgroundColor: "#e5e7eb",
+                      borderRadius: 100 / 2,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <User size={48} color="#6b7280" />
+                  </View>
+                </TouchableOpacity>
+              </Link>
             )}
           </>
         ) : (
@@ -82,47 +98,50 @@ function ProfileSection() {
         )}
       </View>
 
+      <Link asChild href="/(app)/driver/settings/details">
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "white",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            borderBottomWidth: 1,
+            borderColor: "#f3f4f6",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
+            style={{
+              color: "#374151",
+              fontFamily: "Roboto-Medium",
+              fontSize: 16,
+            }}
+          >
+            Name
+          </Text>
+          <Text
+            style={{
+              color: "#374151",
+              fontFamily: "Roboto",
+              fontSize: 16,
+            }}
+          >
+            {user?.displayName ?? "..."}
+          </Text>
+        </TouchableOpacity>
+      </Link>
+
       <TouchableOpacity
         activeOpacity={0.6}
         style={{
           backgroundColor: "white",
           paddingHorizontal: 12,
           paddingVertical: 8,
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
           borderBottomWidth: 1,
           borderColor: "#f3f4f6",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            color: "#374151",
-            fontFamily: "Roboto-Medium",
-            fontSize: 16,
-          }}
-        >
-          Name
-        </Text>
-        <Text
-          style={{
-            color: "#374151",
-            fontFamily: "Roboto",
-            fontSize: 16,
-          }}
-        >
-          {user?.displayName ?? "..."}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={{
-          backgroundColor: "white",
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          borderBottomLeftRadius: 12,
-          borderBottomRightRadius: 12,
           flexDirection: "row",
           justifyContent: "space-between",
         }}
@@ -146,6 +165,39 @@ function ProfileSection() {
           {user ? getHumanizedOfUserRole(user.role) : "..."}
         </Text>
       </TouchableOpacity>
+      <Link asChild href="/(app)/driver/settings/password">
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "white",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderBottomLeftRadius: 12,
+            borderBottomRightRadius: 12,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
+            style={{
+              color: "#374151",
+              fontFamily: "Roboto-Medium",
+              fontSize: 16,
+            }}
+          >
+            Password
+          </Text>
+          <Text
+            style={{
+              color: "#374151",
+              fontFamily: "Roboto",
+              fontSize: 16,
+            }}
+          >
+            ********
+          </Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   )
 }
@@ -386,10 +438,16 @@ function AboutSection() {
 }
 
 export default function SettingsPage() {
-  useSession({
+  const { user } = useSession({
     required: {
       role: "DRIVER",
     },
+  })
+
+  const { fetchStatus, refetch } = useQuery({
+    queryKey: ["getCurrentUserDetails"],
+    queryFn: () => getCurrentUserDetails(),
+    enabled: user !== null,
   })
 
   return (
@@ -402,9 +460,20 @@ export default function SettingsPage() {
         SplashScreen.hideAsync()
       }}
     >
-      <ProfileSection />
-      <NotificationsSection />
-      <AboutSection />
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={fetchStatus === "fetching"}
+            onRefresh={() => {
+              refetch()
+            }}
+          />
+        }
+      >
+        <ProfileSection />
+        <NotificationsSection />
+        <AboutSection />
+      </ScrollView>
     </View>
   )
 }

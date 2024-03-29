@@ -134,6 +134,42 @@ export default function Layout() {
           headerTintColor: "white",
         }}
       />
+      <Stack.Screen
+        name="settings/details"
+        options={{
+          title: "Update Details",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          presentation: "modal",
+          animation: "slide_from_bottom",
+        }}
+      />
+      <Stack.Screen
+        name="settings/photo"
+        options={{
+          title: "Update Photo",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          presentation: "modal",
+          animation: "slide_from_bottom",
+        }}
+      />
+      <Stack.Screen
+        name="settings/password"
+        options={{
+          title: "Update Password",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          presentation: "modal",
+          animation: "slide_from_bottom",
+        }}
+      />
     </Stack>
   )
 }
