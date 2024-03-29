@@ -1,10 +1,6 @@
 import { Stack } from "expo-router"
-import { Alert, TouchableOpacity } from "react-native"
-import List from "phosphor-react-native/src/icons/List"
-import SignOut from "phosphor-react-native/src/icons/SignOut"
 import { useSession } from "@/components/auth"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { signOut } from "@/api/auth"
+
 export default function Layout() {
   useSession({
     required: {
@@ -12,76 +8,12 @@ export default function Layout() {
     },
   })
 
-  const queryClient = useQueryClient()
-  const signOutMutation = useMutation({
-    mutationFn: signOut,
-    onSuccess: () => {
-      queryClient.setQueryData(["getCurrentUser"], () => null)
-    },
-    onError: ({ message }) => {
-      Alert.alert("Sign Out Failed", message, [
-        {
-          text: "OK",
-        },
-      ])
-    },
-  })
-  const isDisabled = signOutMutation.isPending || signOutMutation.isSuccess
   return (
     <Stack>
       <Stack.Screen
-        name="dashboard"
+        name="(drawer)"
         options={{
-          title: "Dashboard",
-          headerStyle: {
-            backgroundColor: "#79CFDC",
-          },
-          headerTintColor: "white",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{
-                marginRight: 14,
-              }}
-            >
-              <List size={24} color="white" />
-            </TouchableOpacity>
-          ),
-          headerRight: () => (
-            <TouchableOpacity
-              disabled={isDisabled}
-              onPress={async () => {
-                // Use Alert to confirm signing out
-                Alert.alert(
-                  "Confirm Sign Out",
-                  "Are you sure you want to sign out?",
-                  [
-                    {
-                      text: "Cancel",
-                      onPress: () => console.log("Cancel Pressed"),
-                      style: "cancel",
-                    },
-                    {
-                      text: "Sign Out",
-                      onPress: async () => {
-                        try {
-                          await signOutMutation.mutate()
-                        } catch {}
-                      },
-                    },
-                  ],
-                  { cancelable: false },
-                )
-              }}
-            >
-              <SignOut
-                size={24}
-                color="white"
-                style={{
-                  opacity: isDisabled ? 0.2 : undefined,
-                }}
-              />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
       <Stack.Screen
