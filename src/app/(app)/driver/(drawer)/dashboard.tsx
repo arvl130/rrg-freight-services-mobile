@@ -120,6 +120,10 @@ function EnableNotificationsButton() {
 }
 
 function MainView() {
+  const registeredExpoPushTokens = useQuery({
+    queryKey: ["getExpoPushTokens"],
+    queryFn: () => getExpoPushTokens(),
+  })
   const {
     data: totalDeliveryData,
     status,
@@ -155,8 +159,14 @@ function MainView() {
       }}
       refreshControl={
         <RefreshControl
-          refreshing={fetchStatus === "fetching"}
-          onRefresh={() => refetch()}
+          refreshing={
+            fetchStatus === "fetching" ||
+            registeredExpoPushTokens.fetchStatus === "fetching"
+          }
+          onRefresh={() => {
+            refetch()
+            registeredExpoPushTokens.refetch()
+          }}
         />
       }
     >
