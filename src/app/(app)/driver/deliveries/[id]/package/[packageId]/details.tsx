@@ -2,6 +2,7 @@ import { getPackageById } from "@/api/package"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
+import { useSavedShipment } from "@/components/saved-shipment"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
@@ -11,7 +12,13 @@ function GotoDeliverPackagePageButton(props: {
   shipmentId: number
   packageId: string
 }) {
+  const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
+  const isDisabled =
+    savedShipment === null ||
+    savedShipment.id !== props.shipmentId ||
+    !isTracking
+
   return (
     <View
       style={{
@@ -30,13 +37,13 @@ function GotoDeliverPackagePageButton(props: {
         }}
       >
         <TouchableOpacity
-          disabled={!isTracking}
+          disabled={isDisabled}
           activeOpacity={0.6}
           style={{
             backgroundColor: "#f97316",
             paddingVertical: 12,
             borderRadius: 8,
-            opacity: isTracking ? undefined : 0.6,
+            opacity: isDisabled ? 0.6 : undefined,
           }}
         >
           <Text

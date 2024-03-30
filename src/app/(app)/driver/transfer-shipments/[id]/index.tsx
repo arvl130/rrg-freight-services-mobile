@@ -7,6 +7,7 @@ import { clearStorage, saveId } from "@/utils/storage"
 import { getVehicle } from "@/api/vehicle"
 import { getTransferShipment } from "@/api/transfer-shipment"
 import { LoadingView } from "@/components/loading-view"
+import { useSavedShipment } from "@/components/saved-shipment"
 
 function VehicleDetails({ id }: { id: number }) {
   const { status, data, error } = useQuery({
@@ -61,6 +62,8 @@ function StartTransfer({
   transferShipmentId: number
   startTracking: () => Promise<void>
 }) {
+  const { reload } = useSavedShipment()
+
   return (
     <View>
       <TouchableOpacity
@@ -74,6 +77,7 @@ function StartTransfer({
             id: transferShipmentId,
             type: "TRANSFER",
           })
+          await reload()
           await startTracking()
         }}
       >
@@ -101,6 +105,8 @@ function StopTransfer({
   stopTracking: () => Promise<void>
   isCompleted: boolean
 }) {
+  const { reload } = useSavedShipment()
+
   return (
     <View>
       <TouchableOpacity
@@ -111,6 +117,7 @@ function StopTransfer({
         activeOpacity={0.6}
         onPress={async () => {
           await clearStorage()
+          await reload()
           await stopTracking()
         }}
       >

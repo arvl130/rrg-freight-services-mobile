@@ -19,8 +19,10 @@ import { getDelivery } from "@/api/delivery"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
+import { useSavedShipment } from "@/components/saved-shipment"
 
 function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
+  const { reload } = useSavedShipment()
   const { isTracking, startTracking, stopTracking } = useLocationTracker()
 
   if (isTracking)
@@ -37,6 +39,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
         activeOpacity={0.6}
         onPress={async () => {
           await clearStorage()
+          await reload()
           await stopTracking()
         }}
       >
@@ -68,6 +71,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
           id: deliveryId,
           type: "DELIVERY",
         })
+        await reload()
         await startTracking()
       }}
     >
