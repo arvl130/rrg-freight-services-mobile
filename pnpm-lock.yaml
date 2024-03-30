@@ -71,6 +71,9 @@ dependencies:
   expo-font:
     specifier: ~11.10.2
     version: 11.10.3(expo@50.0.14)
+  expo-image-picker:
+    specifier: ~14.7.1
+    version: 14.7.1(expo@50.0.14)
   expo-linking:
     specifier: ~6.2.2
     version: 6.2.2(expo@50.0.14)
@@ -5937,6 +5940,15 @@ packages:
       expo: '*'
     dependencies:
       expo: 50.0.14(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
+    dev: false
+
+  /expo-image-picker@14.7.1(expo@50.0.14):
+    resolution: {integrity: sha512-ILQVOJgI3aEzrDmCFGDPtpAepYkn8mot8G7vfQ51BfFdQbzL6N3Wm1fS/ofdWlAZJl/qT2DwaIh5xYmf3SyGZA==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      expo: 50.0.14(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
+      expo-image-loader: 4.6.0(expo@50.0.14)
     dev: false
 
   /expo-json-utils@0.12.3:

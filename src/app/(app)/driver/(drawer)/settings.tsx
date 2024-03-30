@@ -438,7 +438,7 @@ function AboutSection() {
 }
 
 export default function SettingsPage() {
-  const { user } = useSession({
+  const { user, reload } = useSession({
     required: {
       role: "DRIVER",
     },
@@ -465,6 +465,7 @@ export default function SettingsPage() {
           <RefreshControl
             refreshing={fetchStatus === "fetching"}
             onRefresh={() => {
+              reload()
               refetch()
             }}
           />
