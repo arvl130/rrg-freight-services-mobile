@@ -22,6 +22,7 @@ import { LocationTrackerProvider } from "@/components/location-tracker"
 import { NotificationPermissionProvider } from "@/components/notification-permission"
 import { ExpoPushTokenProvider } from "@/components/expo-push-token"
 import { PickerCameraPermissionProvider } from "@/components/picker-camera-permission"
+import { PickerMediaLibraryPermissionProvider } from "@/components/picker-media-library-permission"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -72,14 +73,16 @@ function RootLayoutNav() {
                 <NotificationPermissionProvider>
                   <ExpoPushTokenProvider>
                     <PickerCameraPermissionProvider>
-                      <Stack>
-                        <Stack.Screen
-                          name="(app)"
-                          options={{
-                            headerShown: false,
-                          }}
-                        />
-                      </Stack>
+                      <PickerMediaLibraryPermissionProvider>
+                        <Stack>
+                          <Stack.Screen
+                            name="(app)"
+                            options={{
+                              headerShown: false,
+                            }}
+                          />
+                        </Stack>
+                      </PickerMediaLibraryPermissionProvider>
                     </PickerCameraPermissionProvider>
                     <ToastNotifications />
                   </ExpoPushTokenProvider>
