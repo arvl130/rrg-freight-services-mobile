@@ -68,10 +68,11 @@ function EnableNotificationsButtonWithRegisteredTokens(props: {
   if (!token)
     return (
       <Link asChild href="/(app)/driver/(drawer)/settings">
-        <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
-          <Text style={{ ...styles.optionBtn, backgroundColor: "#f59e0b" }}>
-            Enable Notifications
-          </Text>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{ ...styles.optionBtn, backgroundColor: "#f59e0b" }}
+        >
+          <Text style={styles.optionBtnText}>Enable Notifications</Text>
         </TouchableOpacity>
       </Link>
     )
