@@ -20,18 +20,12 @@ import {
 import { router } from "expo-router"
 import { useSession } from "@/components/auth"
 import Warning from "phosphor-react-native/src/icons/Warning"
-import CameraSlash from "phosphor-react-native/src/icons/CameraSlash"
 import { usePickerCameraPermission } from "@/components/picker-camera-permission"
+import { usePickerMediaLibraryPermission } from "@/components/picker-media-library-permission"
 
 function UpdateForm(props: { user: PublicUser }) {
-  const { permission, requestPermission } = usePickerCameraPermission()
-  useEffect(() => {
-    if (!permission?.granted) {
-      toast.error("Camera is not accessible", {
-        icon: <CameraSlash size={16} color="#f3f4f6" weight="fill" />,
-      })
-    }
-  }, [permission])
+  const pickerCameraPermission = usePickerCameraPermission()
+  const pickerMediaLibraryPermission = usePickerMediaLibraryPermission()
 
   const { user, reload } = useSession()
   const [isChoosing, setIsChoosing] = useState(false)
@@ -236,58 +230,96 @@ function UpdateForm(props: { user: PublicUser }) {
                 flex: 1,
               }}
             >
-              {permission?.granted ? (
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  disabled={isDisabled}
-                  style={{
-                    backgroundColor: "#3b82f6",
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    opacity: isDisabled ? 0.6 : undefined,
-                  }}
-                  onPress={async () => {
-                    setIsChoosing(true)
-                    try {
-                      const { canceled, assets } = await launchCameraAsync({
-                        mediaTypes: MediaTypeOptions.Images,
-                      })
+              {pickerCameraPermission.permission?.granted ? (
+                <>
+                  {pickerMediaLibraryPermission.permission?.granted ? (
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      disabled={isDisabled}
+                      style={{
+                        backgroundColor: "#3b82f6",
+                        paddingVertical: 12,
+                        paddingHorizontal: 12,
+                        borderRadius: 8,
+                        opacity: isDisabled ? 0.6 : undefined,
+                      }}
+                      onPress={async () => {
+                        setIsChoosing(true)
+                        try {
+                          const { canceled, assets } = await launchCameraAsync({
+                            mediaTypes: MediaTypeOptions.Images,
+                          })
 
-                      if (canceled) return
-                      const [{ uri }] = assets
+                          if (canceled) return
+                          const [{ uri }] = assets
 
-                      setNewPhotoUrl(uri)
-                    } catch (e) {
-                      if (e instanceof Error) {
-                        toast.error(e.message, {
-                          icon: (
-                            <Warning size={16} color="#f59e0b" weight="fill" />
-                          ),
-                        })
-                      } else {
-                        toast.error("Unknown error occured", {
-                          icon: (
-                            <Warning size={16} color="#f59e0b" weight="fill" />
-                          ),
-                        })
-                      }
-                    } finally {
-                      setIsChoosing(false)
-                    }
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontFamily: "Roboto-Medium",
-                      fontSize: 16,
-                      textAlign: "center",
-                    }}
-                  >
-                    Take Photo
-                  </Text>
-                </TouchableOpacity>
+                          setNewPhotoUrl(uri)
+                        } catch (e) {
+                          if (e instanceof Error) {
+                            toast.error(e.message, {
+                              icon: (
+                                <Warning
+                                  size={16}
+                                  color="#f59e0b"
+                                  weight="fill"
+                                />
+                              ),
+                            })
+                          } else {
+                            toast.error("Unknown error occured", {
+                              icon: (
+                                <Warning
+                                  size={16}
+                                  color="#f59e0b"
+                                  weight="fill"
+                                />
+                              ),
+                            })
+                          }
+                        } finally {
+                          setIsChoosing(false)
+                        }
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "white",
+                          fontFamily: "Roboto-Medium",
+                          fontSize: 16,
+                          textAlign: "center",
+                        }}
+                      >
+                        Take Photo
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      activeOpacity={0.6}
+                      disabled={isDisabled}
+                      style={{
+                        backgroundColor: "#6b7280",
+                        paddingVertical: 12,
+                        paddingHorizontal: 12,
+                        borderRadius: 8,
+                        opacity: isDisabled ? 0.6 : undefined,
+                      }}
+                      onPress={() => {
+                        pickerMediaLibraryPermission.requestPermission()
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "white",
+                          fontFamily: "Roboto-Medium",
+                          fontSize: 16,
+                          textAlign: "center",
+                        }}
+                      >
+                        Request Media
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </>
               ) : (
                 <TouchableOpacity
                   activeOpacity={0.6}
@@ -299,8 +331,9 @@ function UpdateForm(props: { user: PublicUser }) {
                     borderRadius: 8,
                     opacity: isDisabled ? 0.6 : undefined,
                   }}
-                  onPress={() => {
-                    requestPermission()
+                  onPress={async () => {
+                    await pickerCameraPermission.requestPermission()
+                    pickerMediaLibraryPermission.requestPermission()
                   }}
                 >
                   <Text
