@@ -19,17 +19,10 @@ export default function TransferShipmentsPage() {
   })
 
   return (
-    <ScrollView
+    <View
       style={{
-        paddingVertical: 8,
-        paddingHorizontal: 12,
+        flex: 1,
       }}
-      refreshControl={
-        <RefreshControl
-          refreshing={status !== "pending" && fetchStatus === "fetching"}
-          onRefresh={() => refetch()}
-        />
-      }
     >
       {status === "pending" && <LoadingView />}
       {status === "error" && (
@@ -52,63 +45,76 @@ export default function TransferShipmentsPage() {
             </Text>
           ) : (
             <>
-              {data.transferShipments.map((transferShipment, index) => (
-                <View
-                  key={transferShipment.id}
-                  style={
-                    index === data.transferShipments.length - 1
-                      ? undefined
-                      : {
-                          marginBottom: 12,
-                        }
-                  }
-                >
-                  <TouchableOpacity
-                    onPress={() =>
-                      router.push({
-                        pathname: "/(app)/driver/transfer-shipments/[id]/",
-                        params: {
-                          id: transferShipment.id,
-                        },
-                      })
+              <ScrollView
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={fetchStatus === "fetching"}
+                    onRefresh={() => refetch()}
+                  />
+                }
+              >
+                {data.transferShipments.map((transferShipment, index) => (
+                  <View
+                    key={transferShipment.id}
+                    style={
+                      index === data.transferShipments.length - 1
+                        ? undefined
+                        : {
+                            marginBottom: 12,
+                          }
                     }
-                    activeOpacity={0.6}
-                    style={{
-                      backgroundColor: "black",
-                      borderRadius: 8,
-                      paddingVertical: 12,
-                      paddingHorizontal: 16,
-                    }}
                   >
-                    <View>
-                      <Text
-                        style={{
-                          color: "white",
-                          fontSize: 24,
-                        }}
-                      >
-                        {transferShipment.id}
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          color: "white",
-                        }}
-                      >
-                        Assigned:{" "}
-                        {DateTime.fromISO(
-                          transferShipment.createdAt,
-                        ).toLocaleString(DateTime.DATETIME_SHORT)}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              ))}
+                    <TouchableOpacity
+                      onPress={() =>
+                        router.push({
+                          pathname: "/(app)/driver/transfer-shipments/[id]/",
+                          params: {
+                            id: transferShipment.id,
+                          },
+                        })
+                      }
+                      activeOpacity={0.6}
+                      style={{
+                        backgroundColor: "black",
+                        borderRadius: 8,
+                        paddingVertical: 12,
+                        paddingHorizontal: 16,
+                      }}
+                    >
+                      <View>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 24,
+                          }}
+                        >
+                          {transferShipment.id}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            color: "white",
+                          }}
+                        >
+                          Assigned:{" "}
+                          {DateTime.fromISO(
+                            transferShipment.createdAt,
+                          ).toLocaleString(DateTime.DATETIME_SHORT)}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
             </>
           )}
         </View>
       )}
-    </ScrollView>
+    </View>
   )
 }
