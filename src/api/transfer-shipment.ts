@@ -1,17 +1,18 @@
 import type { SessionAndUserJSON } from "@/components/auth"
+import type {
+  ForwarderTransferShipment,
+  NormalizedForwarderTransferShipment,
+  Package,
+} from "@/server/db/entities"
+import type { ShipmentStatus } from "@/utils/constants"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-type TransferShipment = {
-  id: number
-  status: string
-  createdAt: string
-  isArchived: number
-  driverId: string
-  vehicleId: number
-  sentToAgentId: string
-}
+type NormalizedForwarderTransferShipmentWithPackageCount =
+  NormalizedForwarderTransferShipment & {
+    packageCount: number
+  }
 
-export async function getTransferShipments() {
+export async function getForwarderTransferShipments() {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
     throw new Error("Unauthorized.")
@@ -19,7 +20,7 @@ export async function getTransferShipments() {
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipments`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarders`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -35,11 +36,13 @@ export async function getTransferShipments() {
 
   return responseJson as {
     message: string
-    transferShipments: TransferShipment[]
+    shipments: NormalizedForwarderTransferShipmentWithPackageCount[]
   }
 }
 
-export async function getTransferShipment(id: number) {
+export async function getForwarderTransferShipmentsByStatus(
+  status: ShipmentStatus,
+) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
     throw new Error("Unauthorized.")
@@ -47,7 +50,35 @@ export async function getTransferShipment(id: number) {
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${id}`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarders?status=${status}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("An error occured while retrieving transfer shipments")
+  }
+
+  return responseJson as {
+    message: string
+    shipments: NormalizedForwarderTransferShipmentWithPackageCount[]
+  }
+}
+
+export async function getForwarderTransferShipment(id: number) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${id}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +94,10 @@ export async function getTransferShipment(id: number) {
     throw new Error("An error occured while retrieving transfer shipment")
   }
 
-  return responseJson as { message: string; transferShipment: TransferShipment }
+  return responseJson as {
+    message: string
+    shipment: NormalizedForwarderTransferShipment
+  }
 }
 
 type TransferShipmentLocation = {
@@ -84,7 +118,7 @@ type NewTransferShipmentLocation = {
   createdById: string
 }
 
-export async function createTransferShipmentLocation({
+export async function createForwarderTransferShipmentLocation({
   transferShipmentId,
   long,
   lat,
@@ -100,7 +134,7 @@ export async function createTransferShipmentLocation({
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${transferShipmentId}/location`,
     {
       method: "POST",
       headers: {
@@ -127,7 +161,9 @@ export async function createTransferShipmentLocation({
   }
 }
 
-export async function getTransferShipmentLocations(transferShipmentId: number) {
+export async function getForwarderTransferShipmentLocations(
+  transferShipmentId: number,
+) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
     throw new Error("Unauthorized.")
@@ -135,7 +171,7 @@ export async function getTransferShipmentLocations(transferShipmentId: number) {
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/location`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${transferShipmentId}/location`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -155,7 +191,9 @@ export async function getTransferShipmentLocations(transferShipmentId: number) {
   }
 }
 
-export async function getTransferShipmentPackages(transferShipmentId: number) {
+export async function getForwarderTransferShipmentPackages(
+  transferShipmentId: number,
+) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
     throw new Error("Unauthorized.")
@@ -163,7 +201,7 @@ export async function getTransferShipmentPackages(transferShipmentId: number) {
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/packages`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${transferShipmentId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -179,10 +217,10 @@ export async function getTransferShipmentPackages(transferShipmentId: number) {
     )
   }
 
-  return responseJson as { message: string; packages: any }
+  return responseJson as { message: string; packages: Package[] }
 }
 
-export async function updateTransferShipmentStatusToCompleted({
+export async function updateForwarderTransferShipmentStatusToCompleted({
   imageUrl,
   transferShipmentId,
 }: {
@@ -196,7 +234,7 @@ export async function updateTransferShipmentStatusToCompleted({
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer-shipment/${transferShipmentId}/complete`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${transferShipmentId}/complete`,
     {
       method: "POST",
       headers: {
@@ -214,5 +252,8 @@ export async function updateTransferShipmentStatusToCompleted({
     throw new Error("An error occured while updating transfer shipment status")
   }
 
-  return responseJson as { message: string; transferShipment: TransferShipment }
+  return responseJson as {
+    message: string
+    transferShipment: ForwarderTransferShipment
+  }
 }

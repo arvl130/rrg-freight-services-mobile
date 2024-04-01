@@ -16,6 +16,8 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+
+      {/* Deliveries */}
       <Stack.Screen
         name="deliveries/(tabs)"
         options={{
@@ -79,46 +81,6 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="deliveries/[id]/locations"
-        options={{
-          title: "Views Locations",
-        }}
-      />
-      <Stack.Screen
-        name="transfer-shipments/index"
-        options={{
-          title: "Transfer Shipments",
-          headerStyle: {
-            backgroundColor: "#79CFDC",
-          },
-          headerTintColor: "white",
-        }}
-      />
-      <Stack.Screen
-        name="transfer-shipments/[id]/index"
-        options={{
-          title: "View Transfer Shipment",
-        }}
-      />
-      <Stack.Screen
-        name="transfer-shipments/[id]/transfer"
-        options={{
-          title: "Transfer Shipment",
-        }}
-      />
-      <Stack.Screen
-        name="transfer-shipments/[id]/packages"
-        options={{
-          title: "View Transfer Shipment",
-        }}
-      />
-      <Stack.Screen
-        name="transfer-shipments/[id]/locations"
-        options={{
-          title: "View Transfer Shipment",
-        }}
-      />
-      <Stack.Screen
         name="deliveries/[id]/package/[packageId]/location"
         options={{
           title: "View Map",
@@ -128,6 +90,72 @@ export default function Layout() {
           headerTintColor: "white",
         }}
       />
+
+      {/* Forwarder Transfer */}
+      <Stack.Screen
+        name="transfer/forwarder/(tabs)"
+        options={{
+          title: "Forwarder Transfer",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/forwarder/[id]/index"
+        options={{
+          title: "View Forwarder Transfer",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/forwarder/[id]/mark-as-completed"
+        options={{
+          title: "Mark as Transferred",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/forwarder/[id]/packages/index"
+        options={{
+          title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/forwarder/[id]/packages/search"
+        options={{
+          title: "Search Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          animation: "slide_from_bottom",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/forwarder/[id]/package/[packageId]/details"
+        options={{
+          title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+
+      {/* Settings */}
       <Stack.Screen
         name="settings/details"
         options={{

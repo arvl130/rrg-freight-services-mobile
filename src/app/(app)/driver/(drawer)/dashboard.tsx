@@ -270,9 +270,9 @@ function MainView() {
             </Link>
           </View>
           <View>
-            <Link asChild href="/(app)/driver/transfer-shipments">
+            <Link asChild href="/(app)/driver/transfer/forwarder/(tabs)">
               <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
-                <Text style={styles.optionBtnText}>Transfer Shipments</Text>
+                <Text style={styles.optionBtnText}>Forwarder Transfers</Text>
               </TouchableOpacity>
             </Link>
           </View>

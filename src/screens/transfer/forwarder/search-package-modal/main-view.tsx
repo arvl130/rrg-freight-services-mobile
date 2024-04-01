@@ -17,7 +17,7 @@ import CameraRotate from "phosphor-react-native/src/icons/CameraRotate"
 import XCircle from "phosphor-react-native/src/icons/XCircle"
 import PhosphorIconPackage from "phosphor-react-native/src/icons/Package"
 import { useLocalSearchParams, Link } from "expo-router"
-import { getForwarderTransferShipmentPackages } from "@/api/transfer-shipment"
+import { getDeliveryPackages } from "@/api/shipment"
 import { useQuery } from "@tanstack/react-query"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
@@ -36,8 +36,8 @@ function SearchView(props: {
 }) {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { status, data, error, fetchStatus, refetch } = useQuery({
-    queryKey: ["getForwarderTransferShipmentPackages", id],
-    queryFn: () => getForwarderTransferShipmentPackages(Number(id)),
+    queryKey: ["getDeliveryPackages", id],
+    queryFn: () => getDeliveryPackages(Number(id)),
   })
 
   return (
@@ -116,7 +116,7 @@ function SearchView(props: {
                       key={_package.id}
                       href={{
                         pathname:
-                          "/(app)/driver/transfer/forwarder/[id]/package/[packageId]/details",
+                          "/(app)/driver/deliveries/[id]/package/[packageId]/details",
                         params: {
                           id,
                           packageId: _package.id,
