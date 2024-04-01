@@ -1,6 +1,6 @@
 import { Text, View, Image, TouchableOpacity } from "react-native"
 
-export function ErrorView(props: { message: string }) {
+export function ErrorView(props: { message: string; onRetry: () => void }) {
   return (
     <View
       style={{
@@ -39,7 +39,7 @@ export function ErrorView(props: { message: string }) {
             marginBottom: 5,
           }}
         >
-          Error!
+          Unexpected Error
         </Text>
         <Text
           style={{
@@ -53,7 +53,8 @@ export function ErrorView(props: { message: string }) {
           {props.message}
         </Text>
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={props.onRetry}
+          activeOpacity={0.6}
           style={{
             backgroundColor: "#FF6347",
             paddingVertical: 10,
@@ -68,7 +69,7 @@ export function ErrorView(props: { message: string }) {
               color: "white",
             }}
           >
-            OK
+            Try again
           </Text>
         </TouchableOpacity>
       </View>

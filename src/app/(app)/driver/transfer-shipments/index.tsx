@@ -32,7 +32,14 @@ export default function TransferShipmentsPage() {
       }
     >
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
         <View>
           {data.transferShipments.length === 0 ? (

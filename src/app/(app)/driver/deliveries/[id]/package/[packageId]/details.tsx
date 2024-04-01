@@ -67,7 +67,7 @@ export default function PackageDetailsPage() {
     id: string
     packageId: string
   }>()
-  const { status, data, error } = useQuery({
+  const { status, data, error, refetch } = useQuery({
     queryKey: ["getPackageById", packageId],
     queryFn: () => getPackageById(packageId),
   })
@@ -87,7 +87,14 @@ export default function PackageDetailsPage() {
           }}
         >
           {status === "pending" && <LoadingView />}
-          {status === "error" && <ErrorView message={error.message} />}
+          {status === "error" && (
+            <ErrorView
+              message={error.message}
+              onRetry={() => {
+                refetch()
+              }}
+            />
+          )}
           {status === "success" && (
             <View
               style={{

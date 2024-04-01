@@ -29,7 +29,7 @@ export function ViewPackageLocationPage() {
     packageId: string
   }>()
 
-  const { status, data, error } = useQuery({
+  const { status, data, error, refetch } = useQuery({
     queryKey: ["getPackageAddressByPackageId", packageId],
     queryFn: () => getPackageAddressByPackageId(packageId),
   })
@@ -41,7 +41,14 @@ export function ViewPackageLocationPage() {
       }}
     >
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
         <View style={styles.container}>
           <MapboxGL.MapView style={styles.map}>

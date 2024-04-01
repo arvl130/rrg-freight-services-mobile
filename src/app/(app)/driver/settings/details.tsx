@@ -264,7 +264,7 @@ function UpdateForm(props: { user: PublicUser }) {
 }
 
 export default function Page() {
-  const { status, data, error } = useQuery({
+  const { status, data, error, refetch } = useQuery({
     queryKey: ["getCurrentUserDetails"],
     queryFn: () => getCurrentUserDetails(),
   })
@@ -282,7 +282,14 @@ export default function Page() {
       }}
     >
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && <UpdateForm user={data.user} />}
     </View>
   )

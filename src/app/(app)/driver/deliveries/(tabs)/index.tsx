@@ -67,7 +67,14 @@ export default function DeliveriesPage() {
   return (
     <View style={styles.mainScreen}>
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
         <ScrollView
           refreshControl={

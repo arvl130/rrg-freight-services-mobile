@@ -182,7 +182,7 @@ function DeliveryProgress({
 }
 
 function VehicleDetails({ id }: { id: number }) {
-  const { status, data, error } = useQuery({
+  const { status, data, error, refetch } = useQuery({
     queryKey: ["getVehicle", id],
     queryFn: () => getVehicle(Number(id)),
   })
@@ -196,7 +196,14 @@ function VehicleDetails({ id }: { id: number }) {
       }}
     >
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
         <>
           {data === null ? (
@@ -261,7 +268,14 @@ export default function ViewDeliveryPage() {
       }
     >
       {status === "pending" && <LoadingView />}
-      {status === "error" && <ErrorView message={error.message} />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
         <>
           {data === null ? (
