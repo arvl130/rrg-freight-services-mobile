@@ -155,6 +155,60 @@ export default function Layout() {
         }}
       />
 
+      {/* Warehouse Transfer */}
+      <Stack.Screen
+        name="transfer/warehouse/(tabs)"
+        options={{
+          title: "Warehouse Transfer",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/warehouse/[id]/index"
+        options={{
+          title: "View Warehouse Transfer",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/warehouse/[id]/packages/index"
+        options={{
+          title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/warehouse/[id]/packages/search"
+        options={{
+          title: "Search Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          animation: "slide_from_bottom",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="transfer/warehouse/[id]/package/[packageId]/details"
+        options={{
+          title: "View Packages",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+
       {/* Settings */}
       <Stack.Screen
         name="settings/details"

@@ -1,3 +1,3 @@
-import { SearchModal } from "@/screens/search-package-modal/main-view"
+import { SearchModal } from "@/screens/delivery/search-package-modal/main-view"
 
 export default SearchModal

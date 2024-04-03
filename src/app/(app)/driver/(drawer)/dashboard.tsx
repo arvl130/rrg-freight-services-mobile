@@ -276,6 +276,13 @@ function MainView() {
               </TouchableOpacity>
             </Link>
           </View>
+          <View>
+            <Link asChild href="/(app)/driver/transfer/warehouse/(tabs)">
+              <TouchableOpacity activeOpacity={0.6} style={styles.optionBtn}>
+                <Text style={styles.optionBtnText}>Warehouse Transfers</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -382,8 +389,8 @@ const styles = StyleSheet.create({
   },
   optionBtn: {
     borderRadius: 15,
-    paddingVertical: 13,
-    marginBottom: 20,
+    paddingVertical: 12,
+    marginBottom: 12,
     backgroundColor: "#DF5555",
   },
   optionBtnText: {
