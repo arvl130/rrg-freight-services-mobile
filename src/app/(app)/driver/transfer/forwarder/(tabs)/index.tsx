@@ -12,7 +12,7 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
-import { getForwarderTransferShipmentsByStatus } from "@/api/transfer-shipment"
+import { getForwarderTransferShipmentsByStatus } from "@/api/shipment/transfer/fowarder"
 
 function ShipmentItem(props: {
   id: number

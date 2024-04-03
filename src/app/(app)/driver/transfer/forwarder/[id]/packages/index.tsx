@@ -1,4 +1,4 @@
-import { getForwarderTransferShipmentPackages } from "@/api/transfer-shipment"
+import { getForwarderTransferShipmentPackages } from "@/api/shipment/transfer/fowarder"
 import type { Package } from "@/server/db/entities"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"

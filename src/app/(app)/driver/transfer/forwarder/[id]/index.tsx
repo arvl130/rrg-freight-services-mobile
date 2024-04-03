@@ -12,7 +12,7 @@ import {
 import { useLocationTracker } from "@/components/location-tracker"
 import { clearStorage, saveId } from "@/utils/storage"
 import { getVehicle } from "@/api/vehicle"
-import { getForwarderTransferShipment } from "@/api/transfer-shipment"
+import { getForwarderTransferShipment } from "@/api/shipment/transfer/fowarder"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import { LocationPermissionRequiredView } from "@/components/location-permission"

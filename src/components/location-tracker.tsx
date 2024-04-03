@@ -13,7 +13,7 @@ import type { TaskManagerTaskBody } from "expo-task-manager"
 import { defineTask } from "expo-task-manager"
 import { getId } from "@/utils/storage"
 import { createDeliveryLocation } from "@/api/shipment-location"
-import { createForwarderTransferShipmentLocation } from "@/api/transfer-shipment"
+import { createForwarderTransferShipmentLocation } from "@/api/shipment/transfer/fowarder"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const LOCATION_TRACKER_TASK_NAME = "driver-location-tracker"
