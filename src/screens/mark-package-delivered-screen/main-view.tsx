@@ -160,12 +160,13 @@ function ReviewPictureView(props: {
 }
 
 function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
+  const count = useCountTimer((state) => state.timer)
   const resendBtn = useCountTimer((state) => state.isButtonDisabled)
   const disableResendBtn = useCountTimer((state) => state.setDisabled)
   const enableResendBtn = useCountTimer((state) => state.setEnabled)
-  const seconds = useCountTimer((state) => state.timer)
-  const countDown = useCountTimer((state) => state.decrement)
+  const [seconds, setSeconds] = useState(count)
   const resetTimer = useCountTimer((state) => state.reset)
+
   // const seconds=useRef(180)
   const resendOtpMutation = useMutation({
     mutationFn: resendOtp,
@@ -191,12 +192,14 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
 
   useEffect(() => {
     if (resendBtn) {
-      setTimeout(() => {
-        countDown()
+      const timer = setTimeout(() => {
+        setSeconds(seconds - 1)
       }, 1000)
 
-      if (seconds === 0) {
+      if (seconds <= 0) {
+        clearTimeout(timer)
         resetTimer()
+        setSeconds(count)
         enableResendBtn()
       }
     }
