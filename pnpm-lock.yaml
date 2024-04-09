@@ -77,6 +77,9 @@ dependencies:
   expo-linking:
     specifier: ~6.2.2
     version: 6.2.2(expo@50.0.15)
+  expo-local-authentication:
+    specifier: ~13.8.0
+    version: 13.8.0(expo@50.0.15)
   expo-location:
     specifier: ~16.5.5
     version: 16.5.5(expo@50.0.15)
@@ -5971,6 +5974,15 @@ packages:
     transitivePeerDependencies:
       - expo
       - supports-color
+    dev: false
+
+  /expo-local-authentication@13.8.0(expo@50.0.15):
+    resolution: {integrity: sha512-h0YA7grVdo3834AS70EUCsalaXrrEnoq+yTvIhRTxiPmzWxUv7rNo5ff+XsIEYNElKPmT/wh/xPV1yo3l3fhGg==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      expo: 50.0.15(@babel/core@7.24.0)(@react-native/babel-preset@0.73.21)
+      invariant: 2.2.4
     dev: false
 
   /expo-location@16.5.5(expo@50.0.15):

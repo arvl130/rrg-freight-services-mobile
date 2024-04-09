@@ -24,6 +24,7 @@ import { ExpoPushTokenProvider } from "@/components/expo-push-token"
 import { PickerCameraPermissionProvider } from "@/components/picker-camera-permission"
 import { PickerMediaLibraryPermissionProvider } from "@/components/picker-media-library-permission"
 import { SavedShipmentProvider } from "@/components/saved-shipment"
+import { SavedSessionProvider } from "@/components/saved-session"
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -67,33 +68,35 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <SavedShipmentProvider>
-            <LocationPermissionProvider>
-              <LocationTrackerProvider>
-                <CameraPermissionProvider>
-                  <NotificationPermissionProvider>
-                    <ExpoPushTokenProvider>
-                      <PickerCameraPermissionProvider>
-                        <PickerMediaLibraryPermissionProvider>
-                          <Stack>
-                            <Stack.Screen
-                              name="(app)"
-                              options={{
-                                headerShown: false,
-                              }}
-                            />
-                          </Stack>
-                        </PickerMediaLibraryPermissionProvider>
-                      </PickerCameraPermissionProvider>
-                      <ToastNotifications />
-                    </ExpoPushTokenProvider>
-                  </NotificationPermissionProvider>
-                </CameraPermissionProvider>
-              </LocationTrackerProvider>
-            </LocationPermissionProvider>
-          </SavedShipmentProvider>
-        </AuthProvider>
+        <SavedSessionProvider>
+          <AuthProvider>
+            <SavedShipmentProvider>
+              <LocationPermissionProvider>
+                <LocationTrackerProvider>
+                  <CameraPermissionProvider>
+                    <NotificationPermissionProvider>
+                      <ExpoPushTokenProvider>
+                        <PickerCameraPermissionProvider>
+                          <PickerMediaLibraryPermissionProvider>
+                            <Stack>
+                              <Stack.Screen
+                                name="(app)"
+                                options={{
+                                  headerShown: false,
+                                }}
+                              />
+                            </Stack>
+                          </PickerMediaLibraryPermissionProvider>
+                        </PickerCameraPermissionProvider>
+                        <ToastNotifications />
+                      </ExpoPushTokenProvider>
+                    </NotificationPermissionProvider>
+                  </CameraPermissionProvider>
+                </LocationTrackerProvider>
+              </LocationPermissionProvider>
+            </SavedShipmentProvider>
+          </AuthProvider>
+        </SavedSessionProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

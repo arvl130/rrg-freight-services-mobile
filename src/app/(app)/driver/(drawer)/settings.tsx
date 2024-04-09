@@ -21,6 +21,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useExpoPushToken } from "@/components/expo-push-token"
 import { useEffect, useState } from "react"
 import { getCurrentUserDetails } from "@/api/user/details"
+import { useSavedSession } from "@/components/saved-session"
 
 function ProfileSection() {
   const { user } = useSession()
@@ -264,6 +265,86 @@ function EnableNotificationButton(props: { registeredTokens: string[] }) {
   )
 }
 
+function BiometricsLoginSection() {
+  const [isSaving, setIsSaving] = useState(false)
+  const { isLoading, savedSession, save, clear } = useSavedSession()
+
+  return (
+    <View
+      style={{
+        paddingHorizontal: 12,
+      }}
+    >
+      <Text
+        style={{
+          color: "#374151",
+          fontFamily: "Roboto-Bold",
+          fontSize: 20,
+          paddingTop: 24,
+          paddingBottom: 12,
+          paddingHorizontal: 12,
+        }}
+      >
+        Biometrics Login
+      </Text>
+
+      <View
+        style={{
+          backgroundColor: "white",
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          borderRadius: 12,
+          borderBottomWidth: 1,
+          borderColor: "#f3f4f6",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text
+          style={{
+            color: "#374151",
+            fontFamily: "Roboto-Medium",
+            fontSize: 16,
+          }}
+        >
+          Show on this device
+        </Text>
+        {isLoading ? (
+          <Switch disabled value={false} />
+        ) : (
+          <>
+            {savedSession === null ? (
+              <Switch
+                disabled={isSaving}
+                value={false}
+                onValueChange={async () => {
+                  setIsSaving(true)
+                  try {
+                    await save()
+                  } catch {}
+                  setIsSaving(false)
+                }}
+              />
+            ) : (
+              <Switch
+                disabled={isSaving}
+                value
+                onValueChange={async () => {
+                  setIsSaving(true)
+                  try {
+                    await clear()
+                  } catch {}
+                  setIsSaving(false)
+                }}
+              />
+            )}
+          </>
+        )}
+      </View>
+    </View>
+  )
+}
+
 function NotificationsSection() {
   const { status, data } = useQuery({
     queryKey: ["getExpoPushTokens"],
@@ -473,6 +554,7 @@ export default function SettingsPage() {
       >
         <ProfileSection />
         <NotificationsSection />
+        <BiometricsLoginSection />
         <AboutSection />
       </ScrollView>
     </View>

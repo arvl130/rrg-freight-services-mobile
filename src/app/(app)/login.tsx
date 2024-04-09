@@ -14,12 +14,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import EnvelopeSimple from "phosphor-react-native/src/icons/EnvelopeSimple"
 import LockSimple from "phosphor-react-native/src/icons/LockSimple"
 import { getUserRoleRedirectPath, useSession } from "@/components/auth"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { signInWithEmailAndPassword } from "@/api/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { SignInError } from "@/utils/errors"
+import { useSavedSession } from "@/components/saved-session"
+import { authenticateAsync } from "expo-local-authentication"
 
 export default function LoginScreen() {
+  const queryClient = useQueryClient()
+  const savedSession = useSavedSession()
+  const [isSigninInWithBiometrics, setIsSigningInWithBiometrics] =
+    useState(false)
+
   const { user, reload } = useSession()
   const signInMutation = useMutation({
     mutationFn: signInWithEmailAndPassword,
@@ -31,6 +38,14 @@ export default function LoginScreen() {
           user,
         }),
       )
+
+      if (
+        savedSession.savedSession !== null &&
+        savedSession.savedSession.user.id !== user.id
+      ) {
+        await savedSession.clear()
+      }
+
       await reload()
     },
     onError: (error) => {
@@ -66,7 +81,11 @@ export default function LoginScreen() {
     }
   }, [user])
 
-  const isDisabled = signInMutation.isPending || signInMutation.isSuccess
+  const isDisabled =
+    signInMutation.isPending ||
+    signInMutation.isSuccess ||
+    savedSession.isLoading ||
+    isSigninInWithBiometrics
 
   return (
     <View
@@ -134,6 +153,52 @@ export default function LoginScreen() {
               {isDisabled ? <ActivityIndicator color="#78CFDC" /> : "Login"}
             </Text>
           </Pressable>
+          {savedSession.savedSession !== null && (
+            <Pressable
+              style={[styles.loginBtn, { marginTop: 20 }]}
+              disabled={isDisabled}
+              onPress={async () => {
+                setIsSigningInWithBiometrics(true)
+                if (savedSession.savedSession) {
+                  try {
+                    const { success } = await authenticateAsync()
+                    if (!success) {
+                      setIsSigningInWithBiometrics(false)
+                      return
+                    }
+
+                    await AsyncStorage.setItem(
+                      "session",
+                      JSON.stringify({
+                        session: savedSession.savedSession.session,
+                        user: savedSession.savedSession.user,
+                      }),
+                    )
+
+                    queryClient.setQueryData(["getCurrentUser"], () => {
+                      if (savedSession.savedSession) {
+                        return {
+                          message: "Current user retrieved.",
+                          session: savedSession.savedSession.session,
+                          user: savedSession.savedSession.user,
+                        }
+                      }
+                    })
+                  } catch {
+                    setIsSigningInWithBiometrics(false)
+                  }
+                }
+              }}
+            >
+              <Text style={styles.btnText}>
+                {isDisabled ? (
+                  <ActivityIndicator color="#78CFDC" />
+                ) : (
+                  "Biometric Login"
+                )}
+              </Text>
+            </Pressable>
+          )}
         </View>
       </KeyboardAwareScrollView>
     </View>
