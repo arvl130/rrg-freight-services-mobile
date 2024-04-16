@@ -307,7 +307,7 @@ function BiometricsLoginSection() {
             fontSize: 16,
           }}
         >
-          Show on this device
+          Enable this feature
         </Text>
         {isLoading ? (
           <Switch disabled value={false} />
