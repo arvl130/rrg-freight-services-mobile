@@ -1,12 +1,20 @@
-import { getDeliveryPackages } from "@/api/shipment"
+import {
+  getDeliveryPackages,
+  getDeliveryPackagesOrderedByDistance,
+} from "@/api/shipment"
+import { ErrorView } from "@/components/error-view"
+import { LoadingView } from "@/components/loading-view"
 import type { Package } from "@/server/db/entities"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
+import { getCurrentPositionAsync } from "expo-location"
 import { Link, useLocalSearchParams } from "expo-router"
 import { DateTime } from "luxon"
+import { useState } from "react"
 import {
   RefreshControl,
   ScrollView,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -127,32 +135,64 @@ export function PackageItem(props: { package: Package }) {
   )
 }
 
+function filterUndelivered(packages: Package[], isEnabled: boolean) {
+  if (!isEnabled) return packages
+
+  return packages.filter(({ status }) => status !== "DELIVERED")
+}
+
 export default function ViewPackagesPage() {
+  const [isSortedByDistance, setIsSortedByDistance] = useState(false)
+  const [undeliveredIsHidden, setUndeliveredIsHidden] = useState(false)
+
   const { id } = useLocalSearchParams<{ id: string }>()
   const { status, data, error, fetchStatus, refetch } = useQuery({
-    queryKey: ["getDeliveryPackages", id],
-    queryFn: () => getDeliveryPackages(Number(id)),
+    queryKey: ["getDeliveryPackages", id, isSortedByDistance],
+    queryFn: async () => {
+      if (isSortedByDistance) {
+        const {
+          coords: { longitude, latitude },
+        } = await getCurrentPositionAsync()
+
+        return getDeliveryPackagesOrderedByDistance(
+          Number(id),
+          latitude,
+          longitude,
+        )
+      } else return getDeliveryPackages(Number(id))
+    },
+    retry: 0,
   })
 
   return (
-    <ScrollView
+    <View
       style={{
         flex: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
         backgroundColor: "#dedbdb",
       }}
-      refreshControl={
-        <RefreshControl
-          refreshing={status !== "pending" && fetchStatus === "fetching"}
-          onRefresh={() => refetch()}
-        />
-      }
     >
-      {status === "pending" && <Text>Loading ...</Text>}
-      {status === "error" && <Text>Error: {error.message}</Text>}
+      {status === "pending" && <LoadingView />}
+      {status === "error" && (
+        <ErrorView
+          message={error.message}
+          onRetry={() => {
+            refetch()
+          }}
+        />
+      )}
       {status === "success" && (
-        <>
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: 8,
+            paddingHorizontal: 12,
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={fetchStatus === "fetching"}
+              onRefresh={() => refetch()}
+            />
+          }
+        >
           <PackageMeter
             value={
               data.packages.filter(
@@ -195,6 +235,34 @@ export default function ViewPackagesPage() {
                 </Text>
               </TouchableOpacity>
             </Link>
+            <View
+              style={{
+                marginTop: 12,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text>Show nearest first</Text>
+              <Switch
+                value={isSortedByDistance}
+                onValueChange={(isSorted) => setIsSortedByDistance(isSorted)}
+              />
+            </View>
+            <View
+              style={{
+                marginTop: 12,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text>Hide delivered</Text>
+              <Switch
+                value={undeliveredIsHidden}
+                onValueChange={(isHidden) => setUndeliveredIsHidden(isHidden)}
+              />
+            </View>
           </View>
           <View
             style={{
@@ -202,27 +270,29 @@ export default function ViewPackagesPage() {
               gap: 8,
             }}
           >
-            {data.packages.map((_package) => (
-              <Link
-                asChild
-                key={_package.id}
-                href={{
-                  pathname:
-                    "/(app)/driver/deliveries/[id]/package/[packageId]/details",
-                  params: {
-                    id,
-                    packageId: _package.id,
-                  },
-                }}
-              >
-                <TouchableOpacity activeOpacity={0.6}>
-                  <PackageItem package={_package} />
-                </TouchableOpacity>
-              </Link>
-            ))}
+            {filterUndelivered(data.packages, undeliveredIsHidden).map(
+              (_package) => (
+                <Link
+                  asChild
+                  key={_package.id}
+                  href={{
+                    pathname:
+                      "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+                    params: {
+                      id,
+                      packageId: _package.id,
+                    },
+                  }}
+                >
+                  <TouchableOpacity activeOpacity={0.6}>
+                    <PackageItem package={_package} />
+                  </TouchableOpacity>
+                </Link>
+              ),
+            )}
           </View>
-        </>
+        </ScrollView>
       )}
-    </ScrollView>
+    </View>
   )
 }
