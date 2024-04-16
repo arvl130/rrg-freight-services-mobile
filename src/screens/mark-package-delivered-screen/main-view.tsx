@@ -250,7 +250,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
             fontFamily: "Roboto-Medium",
           }}
         >
-          Resend OTP {resendBtn ? <>in {seconds} seconds</> : <></>}
+          Resend Receive Code {resendBtn ? <>in {seconds} seconds</> : <></>}
         </Text>
       </TouchableOpacity>
     </View>
