@@ -317,6 +317,14 @@ function EnterOtpView(props: { pictureUri: string }) {
       <Text
         style={{
           marginBottom: 8,
+          fontFamily: "Roboto-Bold",
+        }}
+      >
+        Tracking Number: {packageId}
+      </Text>
+      <Text
+        style={{
+          marginBottom: 8,
         }}
       >
         Enter your OTP to mark this package as delivered.
