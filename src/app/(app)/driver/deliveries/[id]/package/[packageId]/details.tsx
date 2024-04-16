@@ -304,7 +304,7 @@ export default function PackageDetailsPage() {
                           fontFamily: "Roboto-Medium",
                         }}
                       >
-                        View Location on Map
+                        Find Location
                       </Text>
                     </TouchableOpacity>
                   </Link>
