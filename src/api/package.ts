@@ -12,11 +12,13 @@ export async function updatePackageStatusToDelivered({
   packageId,
   imageUrl,
   code,
+  signatureImageData,
 }: {
   shipmentId: number
   packageId: string
   imageUrl: string
   code: number
+  signatureImageData: string
 }) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
@@ -35,6 +37,7 @@ export async function updatePackageStatusToDelivered({
       body: JSON.stringify({
         imageUrl,
         code,
+        signatureUrl: signatureImageData,
       }),
     },
   )
