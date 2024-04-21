@@ -291,7 +291,13 @@ function EnterOtpView(props: { pictureUri: string }) {
         [
           {
             text: "OK",
-            onPress: () => router.back(),
+            onPress: () =>
+              router.replace({
+                pathname: "/(app)/driver/deliveries/[id]/packages/",
+                params: {
+                  id,
+                },
+              }),
           },
         ],
       )
