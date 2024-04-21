@@ -167,6 +167,10 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   const [seconds, setSeconds] = useState(count)
   const resetTimer = useCountTimer((state) => state.reset)
 
+  const packagedAdded = useCountTimer((state) => state.packagesStored)
+  const addPackage = useCountTimer((state) => state.addPackageId)
+  const removePackage = useCountTimer((state) => state.removePackageId)
+
   // const seconds=useRef(180)
   const resendOtpMutation = useMutation({
     mutationFn: resendOtp,
@@ -191,17 +195,21 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   })
 
   useEffect(() => {
-    if (resendBtn) {
+    if (packagedAdded.includes(props.packageId)) {
+      disableResendBtn()
       const timer = setTimeout(() => {
         setSeconds(seconds - 1)
       }, 1000)
 
       if (seconds <= 0) {
+        removePackage(props.packageId)
         clearTimeout(timer)
         resetTimer()
         setSeconds(count)
         enableResendBtn()
       }
+    } else {
+      enableResendBtn()
     }
   })
 
@@ -232,7 +240,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
               {
                 text: "OK",
                 onPress: () => {
-                  disableResendBtn()
+                  addPackage(props.packageId)
                   resendOtpMutation.mutate({
                     shipmentId: props.shipmentId,
                     packageId: props.packageId,
@@ -250,9 +258,16 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
             fontFamily: "Roboto-Medium",
           }}
         >
-          Resend Receive Code {resendBtn ? <>in {seconds} seconds</> : <></>}
+          Resend OTP Code {resendBtn ? <>in {seconds} seconds</> : <></>}
         </Text>
       </TouchableOpacity>
+      <Text>
+        {resendBtn ? (
+          <>NOTE: It needs to finish the count down to remove the timer</>
+        ) : (
+          <></>
+        )}
+      </Text>
     </View>
   )
 }
