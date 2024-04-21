@@ -351,6 +351,8 @@ function EnterOtpView(props: { pictureUri: string }) {
         Enter your OTP to mark this package as delivered.
       </Text>
       <TextInput
+        keyboardType="numeric"
+        maxLength={6}
         style={{
           backgroundColor: "white",
           borderWidth: 1,
@@ -358,6 +360,9 @@ function EnterOtpView(props: { pictureUri: string }) {
           paddingVertical: 8,
           paddingHorizontal: 12,
           borderRadius: 8,
+          textAlign: "center",
+          fontSize: 18,
+          letterSpacing: 2,
         }}
         placeholder="Enter your OTP here ..."
         value={otp}

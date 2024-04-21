@@ -12,7 +12,7 @@ type CountTimer = {
 }
 
 export const useCountTimer = create<CountTimer>((set) => ({
-  timer: 180,
+  timer: 60,
   packagesStored: [],
   addPackageId: (packageId: string) => {
     set((state) => ({ packagesStored: [...state.packagesStored, packageId] }))
@@ -25,7 +25,7 @@ export const useCountTimer = create<CountTimer>((set) => ({
     }))
   },
   isButtonDisabled: false,
-  reset: () => set({ timer: 180 }),
+  reset: () => set({ timer: 60 }),
   setDisabled: () => {
     set({ isButtonDisabled: true })
   },
