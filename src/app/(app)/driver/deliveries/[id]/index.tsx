@@ -83,7 +83,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
           fontSize: 16,
         }}
       >
-        Start Delivery
+        Start Tracking
       </Text>
     </TouchableOpacity>
   )
