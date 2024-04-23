@@ -53,7 +53,7 @@ function GotoDeliverPackagePageButton(props: {
               fontFamily: "Roboto-Medium",
             }}
           >
-            Mark as Delivered
+            Confirm Delivery
           </Text>
         </TouchableOpacity>
       </Link>

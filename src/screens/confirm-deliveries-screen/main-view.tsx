@@ -318,7 +318,7 @@ function EnterOtpView(props: { pictureUri: string }) {
       )
     },
     onError: ({ message }) => {
-      Alert.alert("Mark as Delivered Failed", message, [
+      Alert.alert("Confirm Delivery Failed", message, [
         {
           text: "OK",
         },
@@ -413,7 +413,7 @@ function EnterOtpView(props: { pictureUri: string }) {
               fontFamily: "Roboto-Medium",
             }}
           >
-            Mark as Delivered
+            Confirm Delivery
           </Text>
         </TouchableOpacity>
       </View>
@@ -438,7 +438,7 @@ function EnterOtpView(props: { pictureUri: string }) {
   )
 }
 
-export function MarkAsDeliveredPage() {
+export function ConfirmDeliveryPage() {
   const [pictureUri, setPictureUri] = useState<null | string>(null)
   const [isPictureAccepted, setIsPictureAccepted] = useState(false)
 
