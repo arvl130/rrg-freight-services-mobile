@@ -21,8 +21,6 @@ import storage from "@react-native-firebase/storage"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 import { ProgressDialog } from "react-native-simple-dialogs"
 import { useCountTimer } from "@/store/store"
-import Signature from "react-native-signature-canvas"
-import toast from "react-hot-toast/headless"
 
 function TakePictureView(props: {
   onPictureTaken: (newPictureUri: string) => void
@@ -274,10 +272,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   )
 }
 
-function EnterOtpView(props: {
-  pictureUri: string
-  signatureImageData: string
-}) {
+function EnterOtpView(props: { pictureUri: string }) {
   const [isUploading, setIsUploading] = useState(false)
 
   const [otp, setOtp] = useState("")
@@ -293,7 +288,6 @@ function EnterOtpView(props: {
       packageId: string
       imageUrl: string
       code: number
-      signatureImageData: string
     }) => updatePackageStatusToDelivered(props),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -409,7 +403,6 @@ function EnterOtpView(props: {
               packageId,
               imageUrl: downloadUrl,
               code: Number(otp),
-              signatureImageData: props.signatureImageData,
             })
           }}
         >
@@ -447,9 +440,6 @@ function EnterOtpView(props: {
 
 export function MarkAsDeliveredPage() {
   const [pictureUri, setPictureUri] = useState<null | string>(null)
-  const [signatureImageData, setSignatureImageData] = useState<null | string>(
-    null,
-  )
   const [isPictureAccepted, setIsPictureAccepted] = useState(false)
 
   return (
@@ -466,24 +456,7 @@ export function MarkAsDeliveredPage() {
         ) : (
           <>
             {isPictureAccepted ? (
-              <>
-                {signatureImageData === null ? (
-                  <Signature
-                    onOK={(imageData) => setSignatureImageData(imageData)}
-                    onEmpty={() => {
-                      toast.success("Please enter your signature.")
-                    }}
-                    descriptionText="Sign here to confirm delivery."
-                    confirmText="Save"
-                    autoClear
-                  />
-                ) : (
-                  <EnterOtpView
-                    pictureUri={pictureUri}
-                    signatureImageData={signatureImageData}
-                  />
-                )}
-              </>
+              <EnterOtpView pictureUri={pictureUri} />
             ) : (
               <ReviewPictureView
                 pictureUri={pictureUri}
