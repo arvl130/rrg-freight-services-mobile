@@ -155,7 +155,7 @@ function VehicleDetails({ id }: { id: number }) {
   )
 }
 
-function CompleteDeliveryButton(props: { shipmentId: number }) {
+function ConfirmDeliveryButton(props: { shipmentId: number }) {
   return (
     <Link
       asChild
@@ -285,7 +285,7 @@ export default function Page() {
                 )}
 
                 {data.shipment.status === "IN_TRANSIT" && isTracking && (
-                  <CompleteDeliveryButton shipmentId={data.shipment.id} />
+                  <ConfirmDeliveryButton shipmentId={data.shipment.id} />
                 )}
 
                 <View
