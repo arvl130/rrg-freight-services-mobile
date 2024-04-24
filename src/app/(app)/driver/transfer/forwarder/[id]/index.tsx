@@ -155,12 +155,12 @@ function VehicleDetails({ id }: { id: number }) {
   )
 }
 
-function MarkAsCompletedButton(props: { shipmentId: number }) {
+function CompleteDeliveryButton(props: { shipmentId: number }) {
   return (
     <Link
       asChild
       href={{
-        pathname: "/(app)/driver/transfer/forwarder/[id]/mark-as-completed",
+        pathname: "/(app)/driver/transfer/forwarder/[id]/complete-delivery",
         params: {
           id: props.shipmentId,
         },
@@ -285,7 +285,7 @@ export default function Page() {
                 )}
 
                 {data.shipment.status === "IN_TRANSIT" && isTracking && (
-                  <MarkAsCompletedButton shipmentId={data.shipment.id} />
+                  <CompleteDeliveryButton shipmentId={data.shipment.id} />
                 )}
 
                 <View

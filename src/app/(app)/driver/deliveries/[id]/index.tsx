@@ -171,7 +171,7 @@ function DeliveryProgress({
             }}
           >
             <Button
-              title="Mark as Completed"
+              title="Confirm Delivery"
               disabled={isPending}
               onPress={() => mutate()}
             />

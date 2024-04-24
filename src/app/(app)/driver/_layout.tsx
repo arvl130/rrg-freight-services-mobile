@@ -71,9 +71,9 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
-        name="deliveries/[id]/package/[packageId]/mark-as-delivered"
+        name="deliveries/[id]/package/[packageId]/confirm-delivery"
         options={{
-          title: "Mark as Delivered",
+          title: "Confirm Delivery",
           headerStyle: {
             backgroundColor: "#79CFDC",
           },

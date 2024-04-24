@@ -29,7 +29,7 @@ function GotoDeliverPackagePageButton(props: {
         asChild
         href={{
           pathname:
-            "/(app)/driver/deliveries/[id]/package/[packageId]/mark-as-delivered",
+            "/(app)/driver/deliveries/[id]/package/[packageId]/confirm-delivery",
           params: {
             id: props.shipmentId,
             packageId: props.packageId,
