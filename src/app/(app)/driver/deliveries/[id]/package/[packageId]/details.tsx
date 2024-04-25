@@ -6,10 +6,7 @@ import { useSavedShipment } from "@/components/saved-shipment"
 import { Feather, EvilIcons, AntDesign, FontAwesome } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
-import { Linking, Text, TouchableOpacity, View, } from "react-native"
-
-
-
+import { Linking, Text, TouchableOpacity, View } from "react-native"
 
 function GotoDeliverPackagePageButton(props: {
   shipmentId: number
@@ -57,7 +54,8 @@ function GotoDeliverPackagePageButton(props: {
               fontFamily: "Roboto-Medium",
             }}
           >
-            Confirm Delivery <AntDesign name="checksquareo" size={15} color="black" />
+            Confirm Delivery{" "}
+            <AntDesign name="checksquareo" size={15} color="black" />
           </Text>
         </TouchableOpacity>
       </Link>
@@ -120,7 +118,7 @@ export default function PackageDetailsPage() {
                   shadowRadius: 3,
                   elevation: 3,
                 }}
-               >
+              >
                 <View
                   style={{
                     justifyContent: "center",
@@ -279,145 +277,155 @@ export default function PackageDetailsPage() {
                   </Text>
                 </View>
 
-              <View
-                style={{
-                backgroundColor: "#78CFDC",
-                borderRadius: 8,
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 20,
-                paddingVertical: 20,
-                }}
-              >
-              <View
-                style={{
-                  flexDirection: "row", padding: 0, columnGap: 10
-                }}
-              >
-                {/*Notify Button*/}
-              <View
+                <View
                   style={{
-                    marginTop: 5,
+                    backgroundColor: "#78CFDC",
+                    borderRadius: 8,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: 20,
+                    paddingVertical: 20,
                   }}
-              >
-                  <TouchableOpacity
-                    activeOpacity={0.6}
+                >
+                  <View
                     style={{
-                      backgroundColor: "#F17834",
-                      paddingVertical: 10,
-                      borderRadius: 8,
-                      width: 150,
-                      
-                    }}
-                    onPress={() => {
-                      Linking.openURL(
-                        `tel:${data.package.receiverContactNumber}`,
-                      )
+                      flexDirection: "row",
+                      padding: 0,
+                      columnGap: 10,
                     }}
                   >
-                    <Text
+                    {/*Notify Button*/}
+                    <View
                       style={{
-                        color: "black",
-                        textAlign: "center",
-                        fontFamily: "Roboto-Medium",
+                        marginTop: 5,
                       }}
                     >
-                      Notify Receiver <Feather name="bell" size={15} color="black" />
-                    </Text>
-                    
-                  </TouchableOpacity>
-                </View>
-
-                {/*Find Location Button*/}
-                <View
-                  style={{
-                    marginTop: 5,
-                  }}
-                 >
-                  <Link
-                    asChild
-                    href={{
-                      pathname:
-                        "/(app)/driver/deliveries/[id]/package/[packageId]/location",
-                      params: {
-                        id,
-                        packageId: data.package.id,
-                      },
-                    }}
-                   >
-                    <TouchableOpacity
-                      activeOpacity={0.6}
-                      style={{
-                        backgroundColor: "#EEAE3F",
-                        paddingVertical: 10,
-                        borderRadius: 8,
-                        padding: 2,
-                        columnGap: 2,
-                        width: 150,
-                        
-                      }}
-                    >
-                      <Text
+                      <TouchableOpacity
+                        activeOpacity={0.6}
                         style={{
-                          color: "black",
-                          textAlign: "center",
-                          fontFamily: "Roboto-Medium",
-                          
+                          backgroundColor: "#F17834",
+                          paddingVertical: 10,
+                          borderRadius: 8,
+                          width: 150,
+                        }}
+                        onPress={() => {
+                          Linking.openURL(
+                            `tel:${data.package.receiverContactNumber}`,
+                          )
                         }}
                       >
-                        Locate Address <EvilIcons name="location" size={18} color="black" />
-                      </Text>
-                    </TouchableOpacity>
-                  </Link>
-                </View>
-                </View>
+                        <Text
+                          style={{
+                            color: "black",
+                            textAlign: "center",
+                            fontFamily: "Roboto-Medium",
+                          }}
+                        >
+                          Notify Receiver{" "}
+                          <Feather name="bell" size={15} color="black" />
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
 
-                {/*Failed Delivery*/}
-               <View
-               style={{
-                flexDirection: "row", padding: 10, columnGap: 10
-               }}
-               > 
-                <View
-                  style={{
-                    marginTop: 5,
-                  }}
-                 >
-                  <Link
-                    asChild
-                    href={{
-                      pathname:
-                        "#",
-                      params: {
-                        id,
-                        packageId: data.package.id,
-                      },
-                    }}
-                   >
-                    <TouchableOpacity
-                      activeOpacity={0.6}
+                    {/*Find Location Button*/}
+                    <View
                       style={{
-                        backgroundColor: "#E24D4D",
-                        paddingVertical: 10,
-                        borderRadius: 8,
-                        padding: 2,
-                        columnGap: 2,
-                        width: 150,
+                        marginTop: 5,
                       }}
                     >
-                      <Text
-                        style={{
-                          color: "black",
-                          textAlign: "center",
-                          fontFamily: "Roboto-Medium",
+                      <Link
+                        asChild
+                        href={{
+                          pathname:
+                            "/(app)/driver/deliveries/[id]/package/[packageId]/location",
+                          params: {
+                            id,
+                            packageId: data.package.id,
+                          },
                         }}
                       >
-                        Failed Delivery <FontAwesome name="calendar-times-o" size={15} color="black" />
-                      </Text>
-                    </TouchableOpacity>
-                  </Link>
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          style={{
+                            backgroundColor: "#EEAE3F",
+                            paddingVertical: 10,
+                            borderRadius: 8,
+                            padding: 2,
+                            columnGap: 2,
+                            width: 150,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "black",
+                              textAlign: "center",
+                              fontFamily: "Roboto-Medium",
+                            }}
+                          >
+                            Locate Address{" "}
+                            <EvilIcons
+                              name="location"
+                              size={18}
+                              color="black"
+                            />
+                          </Text>
+                        </TouchableOpacity>
+                      </Link>
+                    </View>
+                  </View>
 
-                  {/*Confirm Delivery*/}
+                  {/*Failed Delivery*/}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      padding: 10,
+                      columnGap: 10,
+                    }}
+                  >
+                    <View
+                      style={{
+                        marginTop: 5,
+                      }}
+                    >
+                      <Link
+                        asChild
+                        href={{
+                          pathname: "#",
+                          params: {
+                            id,
+                            packageId: data.package.id,
+                          },
+                        }}
+                      >
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          style={{
+                            backgroundColor: "#E24D4D",
+                            paddingVertical: 10,
+                            borderRadius: 8,
+                            padding: 2,
+                            columnGap: 2,
+                            width: 150,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "black",
+                              textAlign: "center",
+                              fontFamily: "Roboto-Medium",
+                            }}
+                          >
+                            Failed Delivery{" "}
+                            <FontAwesome
+                              name="calendar-times-o"
+                              size={15}
+                              color="black"
+                            />
+                          </Text>
+                        </TouchableOpacity>
+                      </Link>
+
+                      {/*Confirm Delivery*/}
                     </View>
                     {data.package.status !== "DELIVERED" && (
                       <GotoDeliverPackagePageButton
@@ -426,13 +434,12 @@ export default function PackageDetailsPage() {
                       />
                     )}
                   </View>
-           </View>
-          </View>
-        </View>
+                </View>
+              </View>
+            </View>
           )}
-       </View>
-    )}
-  </View>
+        </View>
+      )}
+    </View>
   )
 }
-
