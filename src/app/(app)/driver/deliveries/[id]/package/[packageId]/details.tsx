@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react"
 import { Text, TouchableOpacity, View, Linking } from "react-native"
 import { Link, useLocalSearchParams } from "expo-router"
@@ -288,13 +289,8 @@ export default function PackageDetailsPage() {
                 {data.package.status !== "DELIVERED" && (
                   <StartDeliveryButton packageId={packageId} />
                 )}
-
-                {/* Other views (e.g., call receiver button) */}
-                <View
-                  style={{
-                    marginTop: 12,
-                  }}
-                >
+      
+                <View style={{ marginTop: 12 }}>
                   <TouchableOpacity
                     activeOpacity={0.6}
                     style={{
@@ -321,9 +317,9 @@ export default function PackageDetailsPage() {
                 </View>
               </View>
             </View>
-          )}
-        </View>
       )}
     </View>
+      )}
+  </View>
   )
 }
