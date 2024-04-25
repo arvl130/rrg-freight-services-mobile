@@ -33,7 +33,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
         style={{
           flex: 1,
           backgroundColor: "#ef4444",
-          borderRadius: 8,
+          borderRadius: 5,
           justifyContent: "center",
           alignItems: "center",
           paddingVertical: 12,
@@ -63,7 +63,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
     <TouchableOpacity
       style={{
         flex: 1,
-        borderRadius: 6,
+        borderRadius: 5,
         paddingVertical: 12,
         backgroundColor: "#65DB7F",
       }}
