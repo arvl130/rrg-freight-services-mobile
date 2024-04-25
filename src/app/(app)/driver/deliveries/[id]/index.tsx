@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
 import {
@@ -20,6 +21,7 @@ import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
 import { useSavedShipment } from "@/components/saved-shipment"
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons"
 
 function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
   const { reload } = useSavedShipment()
@@ -46,13 +48,13 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
         <Text
           style={{
             fontFamily: "Roboto-Medium",
-            color: "white",
+            color: "black",
             fontSize: 16,
             paddingHorizontal: 6,
             textAlign: "center",
           }}
         >
-          Stop Delivery
+          Stop Tracking
         </Text>
       </TouchableOpacity>
     )
@@ -63,7 +65,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
         flex: 1,
         borderRadius: 6,
         paddingVertical: 12,
-        backgroundColor: "#22c55e",
+        backgroundColor: "#65DB7F",
       }}
       activeOpacity={0.6}
       onPress={async () => {
@@ -77,7 +79,7 @@ function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
     >
       <Text
         style={{
-          color: "white",
+          color: "black",
           textAlign: "center",
           fontFamily: "Roboto-Medium",
           fontSize: 16,
@@ -123,17 +125,28 @@ function DeliveryProgress({
   })
 
   return (
-    <View>
-      <View
-        style={{
-          flexDirection: "row",
-          padding: 12,
-          columnGap: 12,
-        }}
-      >
-        <View style={[styles.statsCard, { backgroundColor: "#EDAD3E" }]}>
+    <View style={{ marginBottom: 30 }}>
+      <View style={{ flexDirection: "row", padding: 10, columnGap: 10 }}>
+        <View
+          style={[
+            styles.statsCard,
+            {
+              backgroundColor: "#FBC15D",
+              flexDirection: "row",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+            Assigned to Deliver
+          </Text>
+          <MaterialCommunityIcons
+            name="truck-outline"
+            size={66}
+            color="black"
+          />
+          <View style={styles.line} />
           <View style={styles.infoContainer}>
-            <Text style={styles.dataText}>Packages to Deliver</Text>
             <Text style={styles.miniCardTitle}>
               {status === "pending" && "..."}
               {status === "error" && "!"}
@@ -141,9 +154,52 @@ function DeliveryProgress({
             </Text>
           </View>
         </View>
-        <View style={[styles.statsCard, { backgroundColor: "#79CFDC" }]}>
+
+        <View
+          style={[
+            styles.statsCard,
+            {
+              backgroundColor: "#ED5959",
+              flexDirection: "row",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+            Failed Delivery
+          </Text>
+          <Feather name="package" size={66} color="black" />
+          <View style={styles.line} />
           <View style={styles.infoContainer}>
-            <Text style={styles.dataText}>Delivered Packages</Text>
+            <Text style={styles.miniCardTitle}>
+              {status === "pending" && "..."}
+              {status === "error" && "!"}
+              {status === "success" &&
+                data.packages.filter(
+                  (_package: any) => _package.status !== "DELIVERED",
+                ).length}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={{ flexDirection: "row", padding: 8, columnGap: 8 }}>
+        <View
+          style={[
+            styles.statsCard,
+            {
+              backgroundColor: "#AAEEF8",
+              flexDirection: "row",
+              justifyContent: "center",
+            },
+          ]}
+        >
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+            Total Items Delivered
+          </Text>
+          <Feather name="check-square" size={66} color="black" />
+          <View style={styles.line2} />
+          <View style={styles.infoContainer}>
             <Text style={styles.miniCardTitle}>
               {status === "pending" && "..."}
               {status === "error" && "!"}
@@ -168,10 +224,11 @@ function DeliveryProgress({
               paddingVertical: 12,
               borderRadius: 8,
               marginTop: 8,
+              alignItems: "center",
             }}
           >
             <Button
-              title="Mark as Completed"
+              title="Confirm Delivery"
               disabled={isPending}
               onPress={() => mutate()}
             />
@@ -213,17 +270,18 @@ function VehicleDetails({ id }: { id: number }) {
               <View
                 style={{
                   flex: 1,
-                  justifyContent: "center",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  marginTop: 80,
                 }}
               >
                 <View style={styles.truckLogo}>
                   <Image
                     source={require("@/assets/images/truckLogo.png")}
-                    style={{ width: 300, height: 200 }}
+                    style={{ width: 250, height: 200 }}
                   />
                 </View>
                 <View style={styles.truckNumber}>
-                  <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
                   <Text style={styles.truckNumber1}>
                     {data.vehicle.displayName}
                   </Text>
@@ -293,8 +351,7 @@ export default function ViewDeliveryPage() {
                   backgroundColor: "#79CFDC",
                   borderTopLeftRadius: 12,
                   borderTopRightRadius: 12,
-                  paddingTop: 16,
-                  paddingBottom: 24,
+                  padding: 30,
                   paddingHorizontal: 12,
                 }}
               >
@@ -375,7 +432,7 @@ export default function ViewDeliveryPage() {
                       <Text
                         style={{
                           fontFamily: "Roboto-Medium",
-                          color: "white",
+                          color: "black",
                           fontSize: 16,
                           paddingHorizontal: 6,
                           textAlign: "center",
@@ -431,7 +488,7 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flex: 1,
-    padding: 10,
+    padding: 30,
     borderRadius: 10,
     paddingLeft: 10,
   },
@@ -440,11 +497,6 @@ const styles = StyleSheet.create({
     fontSize: 72,
     lineHeight: 72,
   },
-  dataText: {
-    fontFamily: "Montserrat-SemiBold",
-    fontSize: 16,
-    textAlign: "center",
-  },
   truckLogo: {
     justifyContent: "center",
     alignItems: "center",
@@ -452,6 +504,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 10,
   },
   truckNumber: {
     justifyContent: "center",
@@ -464,5 +517,21 @@ const styles = StyleSheet.create({
   },
   truckNumber2: {
     fontSize: 20,
+  },
+  line: {
+    width: 2,
+    backgroundColor: "black",
+    marginHorizontal: 22,
+  },
+  line2: {
+    width: 2,
+    backgroundColor: "black",
+    marginHorizontal: 42,
+  },
+  dataText: {
+    fontFamily: "Montserrat-SemiBold",
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: "600",
   },
 })
