@@ -1,63 +1,42 @@
+import React from "react"
+import { Text, TouchableOpacity, View, Linking } from "react-native"
+import { Link, useLocalSearchParams } from "expo-router"
+import { useQuery } from "@tanstack/react-query"
 import { getPackageById } from "@/api/package"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
 import { useSavedShipment } from "@/components/saved-shipment"
 import { Feather } from "@expo/vector-icons"
-import { useQuery } from "@tanstack/react-query"
-import { Link, useLocalSearchParams } from "expo-router"
-import { Linking, Text, TouchableOpacity, View } from "react-native"
 
-function GotoDeliverPackagePageButton(props: {
-  shipmentId: number
-  packageId: string
-}) {
-  const { savedShipment } = useSavedShipment()
-  const { isTracking } = useLocationTracker()
-  const isDisabled =
-    savedShipment === null ||
-    savedShipment.id !== props.shipmentId ||
-    !isTracking
+const StartDeliveryButton = ({ packageId }) => {
+  const handleStartDelivery = () => {
+    // Implement logic to start the delivery process
+    console.log(`Initiating delivery for package ID: ${packageId}`)
+    // Add your custom logic here (e.g., update package status, notify stakeholders)
+  }
 
   return (
-    <View
+    <TouchableOpacity
+      onPress={handleStartDelivery} // Ensure onPress is correctly wired to handleStartDelivery
+      activeOpacity={0.6}
       style={{
+        backgroundColor: "#4299e1",
+        paddingVertical: 12,
+        borderRadius: 8,
         marginTop: 12,
       }}
     >
-      <Link
-        asChild
-        href={{
-          pathname:
-            "/(app)/driver/deliveries/[id]/package/[packageId]/confirm-delivery",
-          params: {
-            id: props.shipmentId,
-            packageId: props.packageId,
-          },
+      <Text
+        style={{
+          color: "white",
+          textAlign: "center",
+          fontFamily: "Roboto-Medium",
         }}
       >
-        <TouchableOpacity
-          disabled={isDisabled}
-          activeOpacity={0.6}
-          style={{
-            backgroundColor: "#f97316",
-            paddingVertical: 12,
-            borderRadius: 8,
-            opacity: isDisabled ? 0.6 : undefined,
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              fontFamily: "Roboto-Medium",
-            }}
-          >
-            Confirm Delivery
-          </Text>
-        </TouchableOpacity>
-      </Link>
-    </View>
+        Start Delivery
+      </Text>
+    </TouchableOpacity>
   )
 }
 
@@ -73,19 +52,11 @@ export default function PackageDetailsPage() {
   })
 
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
+    <View style={{ flex: 1 }}>
       {isLoading ? (
         <Text>Loading ...</Text>
       ) : (
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
+        <View style={{ flex: 1 }}>
           {status === "pending" && <LoadingView />}
           {status === "error" && (
             <ErrorView
@@ -170,8 +141,8 @@ export default function PackageDetailsPage() {
                       Address:
                     </Text>{" "}
                     {data.package.receiverStreetAddress},{" "}
-                    {data.package.receiverBarangay}, {data.package.receiverCity}
-                    , {data.package.receiverStateOrProvince},{" "}
+                    {data.package.receiverBarangay},{data.package.receiverCity},
+                    {data.package.receiverStateOrProvince},{" "}
                     {data.package.receiverCountryCode}{" "}
                     {data.package.receiverPostalCode}
                   </Text>
@@ -204,6 +175,7 @@ export default function PackageDetailsPage() {
                     {data.package.receiverEmailAddress}
                   </Text>
                 </View>
+
                 <View
                   style={{
                     height: 1,
@@ -211,6 +183,7 @@ export default function PackageDetailsPage() {
                     marginVertical: 24,
                   }}
                 />
+
                 <View>
                   <Text
                     style={{
@@ -308,13 +281,15 @@ export default function PackageDetailsPage() {
                       </Text>
                     </TouchableOpacity>
                   </Link>
+                  {/* Your existing package details view */}
                 </View>
+
+                {/* Start Delivery button */}
                 {data.package.status !== "DELIVERED" && (
-                  <GotoDeliverPackagePageButton
-                    shipmentId={Number(id)}
-                    packageId={packageId}
-                  />
+                  <StartDeliveryButton packageId={packageId} />
                 )}
+
+                {/* Other views (e.g., call receiver button) */}
                 <View
                   style={{
                     marginTop: 12,
