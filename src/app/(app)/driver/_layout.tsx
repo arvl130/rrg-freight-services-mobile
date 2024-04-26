@@ -1,5 +1,31 @@
-import { Stack } from "expo-router"
+import { Link, Stack, useLocalSearchParams } from "expo-router"
 import { useSession } from "@/components/auth"
+import { TouchableOpacity } from "react-native"
+import MagnifyingGlass from "phosphor-react-native/src/icons/MagnifyingGlass"
+
+function SearchButton() {
+  const { id } = useLocalSearchParams<{
+    id: string
+  }>()
+
+  return (
+    <>
+      <Link
+        asChild
+        href={{
+          pathname: "/(app)/driver/deliveries/[id]/packages/search",
+          params: {
+            id,
+          },
+        }}
+      >
+        <TouchableOpacity activeOpacity={0.6}>
+          <MagnifyingGlass size={24} color="white" weight="bold" />
+        </TouchableOpacity>
+      </Link>
+    </>
+  )
+}
 
 export default function Layout() {
   useSession({
@@ -46,6 +72,7 @@ export default function Layout() {
             backgroundColor: "#79CFDC",
           },
           headerTintColor: "white",
+          headerRight: () => <SearchButton />,
         }}
       />
       <Stack.Screen
