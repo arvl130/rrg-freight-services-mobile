@@ -1,6 +1,6 @@
 import { Link, Stack, useLocalSearchParams } from "expo-router"
 import { useSession } from "@/components/auth"
-import { TouchableOpacity } from "react-native"
+import { TouchableNativeFeedback, View } from "react-native"
 import MagnifyingGlass from "phosphor-react-native/src/icons/MagnifyingGlass"
 
 function SearchButton() {
@@ -19,9 +19,21 @@ function SearchButton() {
           },
         }}
       >
-        <TouchableOpacity activeOpacity={0.6}>
-          <MagnifyingGlass size={20} color="white" weight="bold" />
-        </TouchableOpacity>
+        <TouchableNativeFeedback
+          background={TouchableNativeFeedback.Ripple("#8080804d", true)}
+        >
+          <View
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 15,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <MagnifyingGlass size={20} color="white" weight="bold" />
+          </View>
+        </TouchableNativeFeedback>
       </Link>
     </>
   )
