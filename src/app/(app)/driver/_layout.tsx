@@ -20,7 +20,7 @@ function SearchButton() {
         }}
       >
         <TouchableOpacity activeOpacity={0.6}>
-          <MagnifyingGlass size={24} color="white" weight="bold" />
+          <MagnifyingGlass size={20} color="white" weight="bold" />
         </TouchableOpacity>
       </Link>
     </>
