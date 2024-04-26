@@ -256,6 +256,20 @@ export default function PackageDetailsPage() {
                     </Text>{" "}
                     {data.package.receiverEmailAddress}
                   </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Failed Attempts:
+                    </Text>{" "}
+                    {data.package.failedAttempts}
+                  </Text>
                 </View>
                 <View
                   style={{
