@@ -8,10 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
 import { Linking, Text, TouchableOpacity, View } from "react-native"
 
-function GotoDeliverPackagePageButton(props: {
-  shipmentId: number
-  packageId: string
-}) {
+function FailDeliveryLink(props: { shipmentId: number; packageId: string }) {
   const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
   const isDisabled =
@@ -22,7 +19,59 @@ function GotoDeliverPackagePageButton(props: {
   return (
     <View
       style={{
-        marginTop: 5,
+        flex: 1,
+      }}
+    >
+      <Link
+        asChild
+        href={{
+          pathname:
+            "/(app)/driver/deliveries/[id]/package/[packageId]/fail-delivery",
+          params: {
+            id: props.shipmentId,
+            packageId: props.packageId,
+          },
+        }}
+      >
+        <TouchableOpacity
+          disabled={isDisabled}
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "#ef4444",
+            minHeight: 48,
+            justifyContent: "center",
+            borderRadius: 8,
+            opacity: isDisabled ? 0.6 : undefined,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Failed Delivery{" "}
+            <FontAwesome name="calendar-times-o" size={15} color="white" />
+          </Text>
+        </TouchableOpacity>
+      </Link>
+    </View>
+  )
+}
+
+function ConfirmDeliveryLink(props: { shipmentId: number; packageId: string }) {
+  const { savedShipment } = useSavedShipment()
+  const { isTracking } = useLocationTracker()
+  const isDisabled =
+    savedShipment === null ||
+    savedShipment.id !== props.shipmentId ||
+    !isTracking
+
+  return (
+    <View
+      style={{
+        flex: 1,
       }}
     >
       <Link
@@ -40,22 +89,22 @@ function GotoDeliverPackagePageButton(props: {
           disabled={isDisabled}
           activeOpacity={0.6}
           style={{
-            backgroundColor: "#65DB7F",
-            paddingVertical: 10,
+            backgroundColor: "#16a34a",
+            minHeight: 48,
+            justifyContent: "center",
             borderRadius: 8,
-            width: 150,
-            opacity: isDisabled ? 0.7 : undefined,
+            opacity: isDisabled ? 0.6 : undefined,
           }}
         >
           <Text
             style={{
-              color: "black",
+              color: "white",
               textAlign: "center",
               fontFamily: "Roboto-Medium",
             }}
           >
             Confirm Delivery{" "}
-            <AntDesign name="checksquareo" size={15} color="black" />
+            <AntDesign name="checksquareo" size={15} color="white" />
           </Text>
         </TouchableOpacity>
       </Link>
@@ -110,7 +159,8 @@ export default function PackageDetailsPage() {
                 style={{
                   backgroundColor: "white",
                   borderRadius: 12,
-                  paddingVertical: 0,
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
                   marginHorizontal: 0,
                   shadowColor: "#171717",
                   shadowOffset: { width: -2, height: 4 },
@@ -285,28 +335,29 @@ export default function PackageDetailsPage() {
                     justifyContent: "center",
                     marginTop: 20,
                     paddingVertical: 20,
+                    paddingHorizontal: 12,
+                    rowGap: 10,
                   }}
                 >
                   <View
                     style={{
                       flexDirection: "row",
-                      padding: 0,
                       columnGap: 10,
                     }}
                   >
                     {/*Notify Button*/}
                     <View
                       style={{
-                        marginTop: 5,
+                        flex: 1,
                       }}
                     >
                       <TouchableOpacity
                         activeOpacity={0.6}
                         style={{
                           backgroundColor: "#F17834",
-                          paddingVertical: 10,
+                          minHeight: 48,
+                          justifyContent: "center",
                           borderRadius: 8,
-                          width: 150,
                         }}
                         onPress={() => {
                           Linking.openURL(
@@ -330,7 +381,7 @@ export default function PackageDetailsPage() {
                     {/*Find Location Button*/}
                     <View
                       style={{
-                        marginTop: 5,
+                        flex: 1,
                       }}
                     >
                       <Link
@@ -348,11 +399,11 @@ export default function PackageDetailsPage() {
                           activeOpacity={0.6}
                           style={{
                             backgroundColor: "#EEAE3F",
-                            paddingVertical: 10,
+                            minHeight: 48,
+                            justifyContent: "center",
                             borderRadius: 8,
                             padding: 2,
                             columnGap: 2,
-                            width: 150,
                           }}
                         >
                           <Text
@@ -374,64 +425,23 @@ export default function PackageDetailsPage() {
                     </View>
                   </View>
 
-                  {/*Failed Delivery*/}
                   <View
                     style={{
                       flexDirection: "row",
-                      padding: 10,
                       columnGap: 10,
                     }}
                   >
-                    <View
-                      style={{
-                        marginTop: 5,
-                      }}
-                    >
-                      <Link
-                        asChild
-                        href={{
-                          pathname: "#",
-                          params: {
-                            id,
-                            packageId: data.package.id,
-                          },
-                        }}
-                      >
-                        <TouchableOpacity
-                          activeOpacity={0.6}
-                          style={{
-                            backgroundColor: "#E24D4D",
-                            paddingVertical: 10,
-                            borderRadius: 8,
-                            padding: 2,
-                            columnGap: 2,
-                            width: 150,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "black",
-                              textAlign: "center",
-                              fontFamily: "Roboto-Medium",
-                            }}
-                          >
-                            Failed Delivery{" "}
-                            <FontAwesome
-                              name="calendar-times-o"
-                              size={15}
-                              color="black"
-                            />
-                          </Text>
-                        </TouchableOpacity>
-                      </Link>
-
-                      {/*Confirm Delivery*/}
-                    </View>
                     {data.package.status !== "DELIVERED" && (
-                      <GotoDeliverPackagePageButton
-                        shipmentId={Number(id)}
-                        packageId={packageId}
-                      />
+                      <>
+                        <FailDeliveryLink
+                          shipmentId={Number(id)}
+                          packageId={packageId}
+                        />
+                        <ConfirmDeliveryLink
+                          shipmentId={Number(id)}
+                          packageId={packageId}
+                        />
+                      </>
                     )}
                   </View>
                 </View>

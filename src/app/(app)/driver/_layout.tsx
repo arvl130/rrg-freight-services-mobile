@@ -81,6 +81,16 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="deliveries/[id]/package/[packageId]/fail-delivery"
+        options={{
+          title: "Fail Delivery",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+        }}
+      />
+      <Stack.Screen
         name="deliveries/[id]/package/[packageId]/location"
         options={{
           title: "View Map",

@@ -45,6 +45,41 @@ export async function updatePackageStatusToDelivered({
   return responseJson as { message: string; package: any }
 }
 
+export async function updatePackageStatusToFailedDelivery({
+  shipmentId,
+  packageId,
+  failureReason,
+}: {
+  shipmentId: number
+  packageId: string
+  failureReason: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${shipmentId}/package/${packageId}/mark-failed`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.id}`,
+      },
+      body: JSON.stringify({
+        failureReason,
+      }),
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) throw new Error(responseJson.message)
+
+  return responseJson as { message: string; package: any }
+}
+
 export async function updateDeliveryStatusToCompleted(deliveryId: number) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
