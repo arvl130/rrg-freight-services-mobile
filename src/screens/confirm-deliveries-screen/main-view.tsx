@@ -1,6 +1,6 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
 import { CameraView } from "expo-camera/next"
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
   Alert,
   Image,
@@ -439,6 +439,8 @@ function EnterOtpView(props: { pictureUri: string }) {
 }
 
 export function ConfirmDeliveryPage() {
+  const [isOtpEntered, setIsOtpEntered] = useState(false)
+  const [otp, setOtp] = useState("")
   const [pictureUri, setPictureUri] = useState<null | string>(null)
   const [isPictureAccepted, setIsPictureAccepted] = useState(false)
 
@@ -448,29 +450,39 @@ export function ConfirmDeliveryPage() {
         flex: 1,
       }}
     >
-      <CameraPermissionRequiredView>
-        {pictureUri === null ? (
-          <TakePictureView
-            onPictureTaken={(newPictureUri) => setPictureUri(newPictureUri)}
-          />
-        ) : (
-          <>
-            {isPictureAccepted ? (
-              <EnterOtpView pictureUri={pictureUri} />
-            ) : (
-              <ReviewPictureView
-                pictureUri={pictureUri}
-                onRetry={() => {
-                  setPictureUri(null)
-                }}
-                onAccept={() => {
-                  setIsPictureAccepted(true)
-                }}
-              />
-            )}
-          </>
-        )}
-      </CameraPermissionRequiredView>
+      {!isOtpEntered ? (
+        <EnterOtpView
+          onOtpEntered={(enteredOtp) => {
+            setOtp(enteredOtp)
+            setIsOtpEntered(true)
+          }}
+        />
+      ) : (
+        <CameraPermissionRequiredView>
+          {pictureUri === null ? (
+            <TakePictureView
+              onPictureTaken={(newPictureUri) => setPictureUri(newPictureUri)}
+            />
+          ) : (
+            <>
+              {isPictureAccepted ? (
+                <FinalConfirmationView />
+              ) : (
+                <ReviewPictureView
+                  pictureUri={pictureUri}
+                  onRetry={() => {
+                    setPictureUri(null)
+                    setIsOtpEntered(false)
+                  }}
+                  onAccept={() => {
+                    setIsPictureAccepted(true)
+                  }}
+                />
+              )}
+            </>
+          )}
+        </CameraPermissionRequiredView>
+      )}
     </View>
   )
 }
