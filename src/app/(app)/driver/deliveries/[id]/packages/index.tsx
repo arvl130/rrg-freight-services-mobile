@@ -22,6 +22,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  StyleSheet,
 } from "react-native"
 
 function PackageMeter(props: { value: number; total: number }) {
@@ -147,6 +148,7 @@ export function PackageItem(props: { package: Package }) {
             DateTime.DATETIME_SHORT_WITH_SECONDS,
           )}
         </Text>
+        <Text style={styles.deliveryAttempt}>Delivery Attempt: 2 / 3</Text>
       </View>
     </>
   )
@@ -284,3 +286,8 @@ export default function ViewPackagesPage() {
     </View>
   )
 }
+const styles = StyleSheet.create({
+  deliveryAttempt: {
+    color: "#8B8383",
+  },
+})

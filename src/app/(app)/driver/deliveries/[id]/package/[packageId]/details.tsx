@@ -240,6 +240,22 @@ export default function PackageDetailsPage() {
                   />
                   <Text
                     style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                        color: "#529FAB",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Failed Delivery Attempts: {data.package.failedAttempts} /
+                      3
+                    </Text>
+                  </Text>
+                  <Text
+                    style={{
                       fontFamily: "Roboto-Bold",
                       fontSize: 20,
                       color: "black",
@@ -309,20 +325,6 @@ export default function PackageDetailsPage() {
                       Email:
                     </Text>{" "}
                     {data.package.receiverEmailAddress}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "black",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: "Roboto-Bold",
-                      }}
-                    >
-                      Failed Attempts:
-                    </Text>{" "}
-                    {data.package.failedAttempts}
                   </Text>
                 </View>
                 <View
