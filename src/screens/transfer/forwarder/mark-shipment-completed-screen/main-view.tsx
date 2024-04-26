@@ -263,12 +263,12 @@ function ConfirmView(props: { pictureUri: string }) {
       </View>
 
       <ProgressDialog
-        title="Loading..."
+        title="Loading"
         activityIndicatorColor="#3498db"
         visible={isUploading || isPending}
         activityIndicatorSize="large"
         animationType="fade"
-        message="please wait..."
+        message="Please wait."
         dialogStyle={{
           borderRadius: 20,
           alignItems: "center",

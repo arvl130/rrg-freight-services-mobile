@@ -1,6 +1,6 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
 import { CameraView } from "expo-camera/next"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Alert,
   Image,
@@ -14,7 +14,7 @@ import CameraRotate from "phosphor-react-native/src/icons/CameraRotate"
 import CheckCircle from "phosphor-react-native/src/icons/CheckCircle"
 import ArrowClockwise from "phosphor-react-native/src/icons/ArrowClockwise"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { resendOtp } from "@/api/shipment-package-otp"
+import { getOtpValidity, resendOtp } from "@/api/shipment-package-otp"
 import { router, useLocalSearchParams } from "expo-router"
 import { updatePackageStatusToDelivered } from "@/api/package"
 import storage from "@react-native-firebase/storage"
@@ -171,7 +171,6 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   const addPackage = useCountTimer((state) => state.addPackageId)
   const removePackage = useCountTimer((state) => state.removePackageId)
 
-  // const seconds=useRef(180)
   const resendOtpMutation = useMutation({
     mutationFn: resendOtp,
     onSuccess: () => {
@@ -211,7 +210,16 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
     } else {
       enableResendBtn()
     }
-  })
+  }, [
+    packagedAdded,
+    props.packageId,
+    disableResendBtn,
+    seconds,
+    removePackage,
+    resetTimer,
+    count,
+    enableResendBtn,
+  ])
 
   return (
     <View
@@ -272,59 +280,37 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   )
 }
 
-function EnterOtpView(props: { pictureUri: string }) {
-  const [isUploading, setIsUploading] = useState(false)
-
+function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
   const [otp, setOtp] = useState("")
   const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
 
-  const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
-    mutationFn: (props: {
-      shipmentId: number
-      packageId: string
-      imageUrl: string
-      code: number
-    }) => updatePackageStatusToDelivered(props),
+    mutationFn: (input: { code: number }) =>
+      getOtpValidity({
+        shipmentId: Number(id),
+        packageId,
+        code: input.code,
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getPackageById", packageId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDeliveryPackages", id],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDelivery", id],
-      })
-
-      Alert.alert(
-        "Status Updated",
-        "The package status has been successfully updated.",
-        [
-          {
-            text: "OK",
-            onPress: () =>
-              router.replace({
-                pathname: "/(app)/driver/deliveries/[id]/packages/",
-                params: {
-                  id,
-                },
-              }),
+      Alert.alert("OTP Verified", "The correct OTP has been entered.", [
+        {
+          text: "OK",
+          onPress: () => {
+            props.onValidOtpEntered(Number(otp))
           },
-        ],
-      )
+        },
+      ])
     },
     onError: ({ message }) => {
-      Alert.alert("Confirm Delivery Failed", message, [
+      Alert.alert("OTP Verification Failed", message, [
         {
           text: "OK",
         },
       ])
     },
-    onSettled: () => setIsUploading(false),
   })
 
   return (
@@ -379,9 +365,9 @@ function EnterOtpView(props: { pictureUri: string }) {
             backgroundColor: "#3b82f6",
             paddingVertical: 12,
             borderRadius: 8,
-            opacity: isUploading || isPending ? 0.6 : 1,
+            opacity: isPending ? 0.6 : 1,
           }}
-          disabled={isUploading || isPending}
+          disabled={isPending}
           onPress={async () => {
             if (!otp.match(REGEX_ONE_OR_MORE_DIGITS)) {
               Alert.alert("Invalid OTP", "Please enter numbers only.", [
@@ -392,16 +378,7 @@ function EnterOtpView(props: { pictureUri: string }) {
               return
             }
 
-            setIsUploading(true)
-            const ref = storage().ref(`proof-of-delivery/${packageId}`)
-
-            await ref.putFile(props.pictureUri)
-            const downloadUrl = await ref.getDownloadURL()
-
             mutate({
-              shipmentId: Number(id),
-              packageId,
-              imageUrl: downloadUrl,
               code: Number(otp),
             })
           }}
@@ -420,12 +397,132 @@ function EnterOtpView(props: { pictureUri: string }) {
       <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
 
       <ProgressDialog
-        title="Loading..."
+        title="Loading ..."
         activityIndicatorColor="#3498db"
-        visible={isUploading || isPending}
+        visible={isPending}
         activityIndicatorSize="large"
         animationType="fade"
-        message="please wait..."
+        message="Please wait"
+        dialogStyle={{
+          borderRadius: 20,
+          alignItems: "center",
+          maxWidth: 250,
+          alignSelf: "center",
+          justifyContent: "center",
+        }}
+      />
+    </View>
+  )
+}
+
+function FinalConfirmationView(props: { otp: number; pictureUri: string }) {
+  const { id, packageId } = useLocalSearchParams<{
+    id: string
+    packageId: string
+  }>()
+
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      const ref = storage().ref(`proof-of-delivery/${packageId}`)
+      await ref.putFile(props.pictureUri)
+      const imageUrl = await ref.getDownloadURL()
+
+      await updatePackageStatusToDelivered({
+        shipmentId: Number(id),
+        packageId,
+        code: props.otp,
+        imageUrl,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getPackageById", packageId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", id],
+      })
+
+      Alert.alert(
+        "Status Updated",
+        "The package status has been successfully updated.",
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              router.replace({
+                pathname: "/(app)/driver/deliveries/[id]/",
+                params: {
+                  id,
+                },
+              }),
+          },
+        ],
+      )
+    },
+    onError: ({ message }) => {
+      Alert.alert("Error while confirming delivery", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+      }}
+    >
+      <Text
+        style={{
+          marginBottom: 8,
+        }}
+      >
+        Tap the button below to mark this package as delivered.
+      </Text>
+
+      <View
+        style={{
+          marginTop: 12,
+        }}
+      >
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "#3b82f6",
+            paddingVertical: 12,
+            borderRadius: 8,
+            opacity: isPending ? 0.6 : 1,
+          }}
+          disabled={isPending}
+          onPress={() => mutate()}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Mark as Delivered
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ProgressDialog
+        title="Loading ..."
+        activityIndicatorColor="#3498db"
+        visible={isPending}
+        activityIndicatorSize="large"
+        animationType="fade"
+        message="Please wait"
         dialogStyle={{
           borderRadius: 20,
           alignItems: "center",
@@ -439,8 +536,7 @@ function EnterOtpView(props: { pictureUri: string }) {
 }
 
 export function ConfirmDeliveryPage() {
-  const [isOtpEntered, setIsOtpEntered] = useState(false)
-  const [otp, setOtp] = useState("")
+  const [otp, setOtp] = useState<null | number>(null)
   const [pictureUri, setPictureUri] = useState<null | string>(null)
   const [isPictureAccepted, setIsPictureAccepted] = useState(false)
 
@@ -450,11 +546,10 @@ export function ConfirmDeliveryPage() {
         flex: 1,
       }}
     >
-      {!isOtpEntered ? (
+      {otp === null ? (
         <EnterOtpView
-          onOtpEntered={(enteredOtp) => {
-            setOtp(enteredOtp)
-            setIsOtpEntered(true)
+          onValidOtpEntered={(code) => {
+            setOtp(code)
           }}
         />
       ) : (
@@ -466,13 +561,12 @@ export function ConfirmDeliveryPage() {
           ) : (
             <>
               {isPictureAccepted ? (
-                <FinalConfirmationView />
+                <FinalConfirmationView otp={otp} pictureUri={pictureUri} />
               ) : (
                 <ReviewPictureView
                   pictureUri={pictureUri}
                   onRetry={() => {
                     setPictureUri(null)
-                    setIsOtpEntered(false)
                   }}
                   onAccept={() => {
                     setIsPictureAccepted(true)
