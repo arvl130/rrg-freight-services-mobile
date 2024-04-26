@@ -125,8 +125,8 @@ function DeliveryProgress({
   })
 
   return (
-    <View style={{ marginBottom: 30 }}>
-      <View style={{ flexDirection: "row", padding: 10, columnGap: 10 }}>
+    <View>
+      <View style={{ flexDirection: "row", padding: 5, columnGap: 10 }}>
         <View
           style={[
             styles.statsCard,
@@ -137,10 +137,11 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
             Assigned to Deliver
           </Text>
           <MaterialCommunityIcons
+            style={styles.truckIcon}
             name="truck-outline"
             size={66}
             color="black"
@@ -165,10 +166,15 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
             Failed Delivery
           </Text>
-          <Feather name="package" size={66} color="black" />
+          <Feather
+            name="package"
+            size={66}
+            color="black"
+            style={styles.truckIcon}
+          />
           <View style={styles.line} />
           <View style={styles.infoContainer}>
             <Text style={styles.miniCardTitle}>
@@ -194,10 +200,15 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
             Total Items Delivered
           </Text>
-          <Feather name="check-square" size={66} color="black" />
+          <Feather
+            name="check-square"
+            size={66}
+            color="black"
+            style={styles.truckIcon}
+          />
           <View style={styles.line2} />
           <View style={styles.infoContainer}>
             <Text style={styles.miniCardTitle}>
@@ -272,23 +283,22 @@ function VehicleDetails({ id }: { id: number }) {
                   flex: 1,
                   justifyContent: "flex-start",
                   alignItems: "center",
-                  marginTop: 80,
+                  marginTop: 40,
                 }}
               >
                 <View style={styles.truckLogo}>
                   <Image
                     source={require("@/assets/images/truckLogo.png")}
-                    style={{ width: 250, height: 200 }}
+                    style={{ width: 200, height: 150 }}
                   />
                 </View>
                 <View style={styles.truckNumber}>
                   <Text style={styles.truckNumber1}>
-                    {data.vehicle.displayName}
+                    Delivery {data.vehicle.displayName}
                   </Text>
                   <Text
                     style={{
-                      color: "white",
-                      backgroundColor: "#16a34a",
+                      color: "black",
                       marginTop: 3,
                       paddingHorizontal: 12,
                       fontSize: 24,
@@ -351,7 +361,7 @@ export default function ViewDeliveryPage() {
                   backgroundColor: "#79CFDC",
                   borderTopLeftRadius: 12,
                   borderTopRightRadius: 12,
-                  padding: 30,
+                  padding: 15,
                   paddingHorizontal: 12,
                 }}
               >
@@ -488,13 +498,13 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flex: 1,
-    padding: 30,
+    padding: 20,
     borderRadius: 10,
-    paddingLeft: 10,
+    paddingLeft: 20,
   },
   miniCardTitle: {
     fontFamily: "Montserrat-Bold",
-    fontSize: 72,
+    fontSize: 60,
     lineHeight: 72,
   },
   truckLogo: {
@@ -521,17 +531,22 @@ const styles = StyleSheet.create({
   line: {
     width: 2,
     backgroundColor: "black",
-    marginHorizontal: 22,
+    marginHorizontal: 16,
+    marginVertical: 10,
   },
   line2: {
     width: 2,
     backgroundColor: "black",
-    marginHorizontal: 42,
+    marginHorizontal: 40,
+    marginVertical: 10,
   },
   dataText: {
     fontFamily: "Montserrat-SemiBold",
-    fontSize: 16,
+    fontSize: 11,
     textAlign: "center",
     fontWeight: "600",
+  },
+  truckIcon: {
+    paddingTop: 10,
   },
 })
