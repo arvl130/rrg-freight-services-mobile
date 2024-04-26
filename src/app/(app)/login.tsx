@@ -149,7 +149,7 @@ export default function LoginScreen() {
               >
                 <Text style={styles.btnText}>
                   {isDisabled ? (
-                    <ActivityIndicator color="#79CFDC" />
+                    <ActivityIndicator color="#FFFFFF" />
                   ) : (
                     "Sign In with Biometrics"
                   )}

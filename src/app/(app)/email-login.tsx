@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
@@ -147,7 +146,7 @@ export default function LoginScreen() {
               }}
             >
               <Text style={styles.btnText}>
-                {isDisabled ? <ActivityIndicator color="#78CFDC" /> : "Login"}
+                {isDisabled ? <ActivityIndicator color="#FFFFFF" /> : "Login"}
               </Text>
             </Pressable>
           </View>

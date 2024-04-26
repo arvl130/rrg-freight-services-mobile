@@ -137,7 +137,7 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
             Assigned to Deliver
           </Text>
           <MaterialCommunityIcons
@@ -166,7 +166,7 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
             Failed Delivery
           </Text>
           <Feather
@@ -200,7 +200,7 @@ function DeliveryProgress({
             },
           ]}
         >
-          <Text style={[styles.dataText, { position: "absolute", top: 4 }]}>
+          <Text style={[styles.dataText, { position: "absolute", top: 8 }]}>
             Total Items Delivered
           </Text>
           <Feather
