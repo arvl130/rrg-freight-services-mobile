@@ -49,6 +49,12 @@ export default function RootLayout() {
           title: "Dashboard",
         }}
       />
+      <Stack.Screen
+        name="email-login"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   )
 }

@@ -1,8 +1,10 @@
+/* eslint-disable prettier/prettier */
 import { SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   Alert,
   Pressable,
@@ -10,21 +12,17 @@ import {
   Image,
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import EnvelopeSimple from "phosphor-react-native/src/icons/EnvelopeSimple"
+import LockSimple from "phosphor-react-native/src/icons/LockSimple"
 import { getUserRoleRedirectPath, useSession } from "@/components/auth"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { signInWithEmailAndPassword } from "@/api/auth"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { SignInError } from "@/utils/errors"
 import { useSavedSession } from "@/components/saved-session"
-import { authenticateAsync } from "expo-local-authentication"
-import Ionicons from "@expo/vector-icons/build/Ionicons"
 
 export default function LoginScreen() {
-  const queryClient = useQueryClient()
   const savedSession = useSavedSession()
-  const [isSigninInWithBiometrics, setIsSigningInWithBiometrics] =
-    useState(false)
-
   const { user, reload } = useSession()
   const signInMutation = useMutation({
     mutationFn: signInWithEmailAndPassword,
@@ -67,6 +65,11 @@ export default function LoginScreen() {
     },
   })
 
+  const [userCredentials, setUserCredentials] = useState({
+    email: "",
+    password: "",
+  })
+
   useEffect(() => {
     if (user) {
       const redirectPath = getUserRoleRedirectPath(user.role)
@@ -77,8 +80,7 @@ export default function LoginScreen() {
   const isDisabled =
     signInMutation.isPending ||
     signInMutation.isSuccess ||
-    savedSession.isLoading ||
-    isSigninInWithBiometrics
+    savedSession.isLoading
 
   return (
     <View
@@ -99,71 +101,65 @@ export default function LoginScreen() {
           <Text style={styles.loginText}>Login</Text>
         </View>
         <View style={styles.loginContainer}>
-          <View style={styles.fingerPrint}>
-            <Ionicons name="finger-print" size={64} color="#78CFDC" />
-            <Text style={styles.biometricsDescription}>
-              Biometrics Authentication
+          <View style={{ ...styles.formGroupContainer, marginTop: 0 }}>
+            <Text>
+              <EnvelopeSimple size={24} color="#686868" />
             </Text>
-            <Text style={styles.biometricsSubDescription}>
-              log in using your biometric credentials
-            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={userCredentials.email}
+              onChangeText={(text) =>
+                setUserCredentials((currUserCredentials) => ({
+                  ...currUserCredentials,
+                  email: text,
+                }))
+              }
+            />
           </View>
 
+          <View style={styles.formGroupContainer}>
+            <Text>
+              <LockSimple size={24} color="#686868" />
+            </Text>
+            <TextInput
+              secureTextEntry
+              style={styles.input}
+              placeholder="Password"
+              value={userCredentials.password}
+              onChangeText={(text) =>
+                setUserCredentials((currUserCredentials) => ({
+                  ...currUserCredentials,
+                  password: text,
+                }))
+              }
+            />
+          </View>
           <View style={styles.buttonContainer}>
-            {savedSession.savedSession !== null && (
-              <Pressable
-                style={[styles.loginBtn, { marginTop: 20 }]}
-                disabled={isDisabled}
-                onPress={async () => {
-                  setIsSigningInWithBiometrics(true)
-                  if (savedSession.savedSession) {
-                    try {
-                      const { success } = await authenticateAsync()
-                      if (!success) {
-                        setIsSigningInWithBiometrics(false)
-                        return
-                      }
-
-                      await AsyncStorage.setItem(
-                        "session",
-                        JSON.stringify({
-                          session: savedSession.savedSession.session,
-                          user: savedSession.savedSession.user,
-                        }),
-                      )
-
-                      queryClient.setQueryData(["getCurrentUser"], () => {
-                        if (savedSession.savedSession) {
-                          return {
-                            message: "Current user retrieved.",
-                            session: savedSession.savedSession.session,
-                            user: savedSession.savedSession.user,
-                          }
-                        }
-                      })
-                    } catch {
-                      setIsSigningInWithBiometrics(false)
-                    }
-                  }
-                }}
-              >
-                <Text style={styles.btnText}>
-                  {isDisabled ? (
-                    <ActivityIndicator color="#79CFDC" />
-                  ) : (
-                    "Sign In with Biometrics"
-                  )}
-                </Text>
-              </Pressable>
-            )}
+            <Pressable
+              style={styles.loginBtn}
+              disabled={isDisabled}
+              onPress={() => {
+                signInMutation.mutate({
+                  email: userCredentials.email,
+                  password: userCredentials.password,
+                })
+              }}
+            >
+              <Text style={styles.btnText}>
+                {isDisabled ? <ActivityIndicator color="#78CFDC" /> : "Login"}
+              </Text>
+            </Pressable>
           </View>
           <Pressable
-            style={styles.signInWithEMail}
+            style={styles.signInWithBiometrics}
             onPress={() => {
-              router.push("/email-login")
+              router.push("/login")
             }}
           >
-            <Text style={styles.signInWithEMail}>Sign In with Email</Text>
+            <Text style={styles.signInWithBiometrics}>
+              Sign In with Biometrics
+            </Text>
           </Pressable>
         </View>
       </KeyboardAwareScrollView>
@@ -254,7 +250,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Medium",
     fontSize: 14,
   },
-  signInWithEMail: {
+  signInWithBiometrics: {
     color: "#79CFDC",
     alignItems: "center",
     textDecorationLine: "underline",

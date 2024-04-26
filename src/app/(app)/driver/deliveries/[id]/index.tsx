@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
   },
   dataText: {
     fontFamily: "Montserrat-SemiBold",
-    fontSize: 16,
+    fontSize: 11,
     textAlign: "center",
     fontWeight: "600",
   },
