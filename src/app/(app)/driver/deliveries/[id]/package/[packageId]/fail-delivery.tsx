@@ -5,7 +5,7 @@ import { TouchableOpacity, ActivityIndicator, Text, View } from "react-native"
 import { z } from "zod"
 import { Picker } from "@react-native-picker/picker"
 import { router, useLocalSearchParams } from "expo-router"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { updatePackageStatusToFailedDelivery } from "@/api/package"
 
 function FormSelect(props: {
@@ -154,6 +154,7 @@ function UpdateForm() {
     packageId: string
   }>()
 
+  const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async (input: { failureReason: string }) => {
       await updatePackageStatusToFailedDelivery({
@@ -163,6 +164,13 @@ function UpdateForm() {
       })
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", id],
+      })
+
       router.replace({
         pathname: "/(app)/driver/deliveries/[id]/",
         params: {

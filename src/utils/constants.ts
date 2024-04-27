@@ -4,9 +4,9 @@ export type Gender = (typeof SUPPORTED_GENDERS)[number]
 export const SUPPORTED_USER_ROLES = [
   "ADMIN",
   "WAREHOUSE",
+  "DRIVER",
   "OVERSEAS_AGENT",
   "DOMESTIC_AGENT",
-  "DRIVER",
 ] as const
 export type UserRole = (typeof SUPPORTED_USER_ROLES)[number]
 
@@ -40,9 +40,16 @@ export const SUPPORTED_PACKAGE_RECEPTION_MODES = [
 export type PackageReceptionMode =
   (typeof SUPPORTED_PACKAGE_RECEPTION_MODES)[number]
 
+export const SUPPORTED_PACKAGE_REMARKS = [
+  "GOOD_CONDITION",
+  "BAD_CONDITION",
+] as const
+export type PackageRemarks = (typeof SUPPORTED_PACKAGE_REMARKS)[number]
+
 export const SUPPORTED_SHIPMENT_PACKAGE_STATUSES = [
   "PREPARING",
   "IN_TRANSIT",
+  "OUT_FOR_DELIVERY",
   "COMPLETED",
   "FAILED",
 ] as const
@@ -52,6 +59,7 @@ export type ShipmentPackageStatus =
 export const SUPPORTED_SHIPMENT_STATUSES = [
   "PREPARING",
   "IN_TRANSIT",
+  "OUT_FOR_DELIVERY",
   "COMPLETED",
   "FAILED",
 ] as const
@@ -60,6 +68,7 @@ export type ShipmentStatus = (typeof SUPPORTED_SHIPMENT_STATUSES)[number]
 const shipmentStatusHumanized: Record<ShipmentStatus, string> = {
   PREPARING: "Preparing",
   IN_TRANSIT: "In Transit",
+  OUT_FOR_DELIVERY: "Out For Delivery",
   COMPLETED: "Completed",
   FAILED: "Failed",
 }
@@ -94,10 +103,21 @@ export type UsersTableItemScreen =
 
 export const LEAFLET_DEFAULT_ZOOM_LEVEL = 16
 export const REGEX_ONE_OR_MORE_DIGITS = /^\d+$/
+export const REGEX_EMPTY_STRING_OR_ONE_OR_MORE_DIGITS = /^(\d+|)$/
+export const REGEX_ONE_OR_MORE_DIGITS_WITH_DECIMALS = /^\d+\.?\d*$/
+export const REGEX_HTML_INPUT_DATESTR = /^\d{4}-\d{2}-\d{2}$/
+export const REGEX_ONE_OR_MORE_DIGITS_WITH_DECIMALS_INSIDE_PARENTHESIS =
+  /\((\d*\.?\d+)\s/
 
 type NewPackageStatusDescriptionOptions =
   | {
-      status: "INCOMING" | "SORTING" | "DELIVERING" | "DELIVERED"
+      status:
+        | "INCOMING"
+        | "SORTING"
+        | "OUT_FOR_DELIVERY"
+        | "DELIVERED"
+        | "PREPARING_FOR_DELIVERY"
+        | "ARRIVING"
     }
   | {
       status: "IN_WAREHOUSE" | "TRANSFERRING_WAREHOUSE"
@@ -106,6 +126,10 @@ type NewPackageStatusDescriptionOptions =
   | {
       status: "TRANSFERRING_FORWARDER" | "TRANSFERRED_FORWARDER"
       forwarderName: string
+    }
+  | {
+      status: "FAILED_DELIVERY"
+      reason: string
     }
 
 export function getDescriptionForNewPackageStatusLog(
@@ -117,12 +141,15 @@ export function getDescriptionForNewPackageStatusLog(
   if (options.status === "IN_WAREHOUSE")
     return `Your package has been received at our warehouse (${options.warehouseName}).`
 
+  if (options.status === "PREPARING_FOR_DELIVERY")
+    return "Your package is being prepared for delivery."
+
   if (options.status === "SORTING") return "Your package is being sorted."
 
   if (options.status === "TRANSFERRING_WAREHOUSE")
     return `Your package is being transferred to another warehouse (${options.warehouseName}).`
 
-  if (options.status === "DELIVERING")
+  if (options.status === "OUT_FOR_DELIVERY" || options.status === "ARRIVING")
     return "Your package is out for delivery."
 
   if (options.status === "DELIVERED") return "Your package has been delivered."
@@ -133,12 +160,16 @@ export function getDescriptionForNewPackageStatusLog(
   if (options.status === "TRANSFERRED_FORWARDER")
     return `Your package has been transferred to another forwarder (${options.forwarderName}).`
 
+  if (options.status === "FAILED_DELIVERY")
+    return `The delivery attempt for your package has failed. Reason: ${options.reason}`
+
   return ""
 }
 
 const shipmentStatusLogWithDescriptions: Record<ShipmentStatus, string> = {
   PREPARING: "Shipment is currently being prepared.",
   IN_TRANSIT: "Shipment is currently in transit.",
+  OUT_FOR_DELIVERY: "Shipment is currently out for delivery.",
   COMPLETED: "Shipment has succesfully reached its destination.",
   FAILED: "Shipment failed to reach its destination.",
 }
@@ -174,6 +205,7 @@ export const SUPPORTED_ACTIVITY_ENTITY = [
   "VEHICLE",
   "WAREHOUSE",
   "PACKAGE_CATEGORY",
+  "DELIVERABLE_PROVINCE",
 ] as const
 export type ActivityEntity = (typeof SUPPORTED_ACTIVITY_ENTITY)[number]
 
@@ -186,3 +218,9 @@ export const SUPPORTED_AUTHENTICATOR_TRANSPORT_TYPES = [
   "smart-card",
   "usb",
 ] as const
+
+// Source: https://dev.mysql.com/doc/refman/8.0/en/string-type-syntax.html
+export const MYSQL_TEXT_COLUMN_DEFAULT_LIMIT = 65_535
+export const MYSQL_ERROR_DUPLICATE_ENTRY = 1062
+
+export const CLIENT_TIMEZONE = "Asia/Manila"

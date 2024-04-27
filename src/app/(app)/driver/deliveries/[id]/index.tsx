@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link, useLocalSearchParams } from "expo-router"
+import { Link, router, useLocalSearchParams } from "expo-router"
 import {
-  Button,
+  Alert,
   Image,
   RefreshControl,
   ScrollView,
@@ -16,12 +16,14 @@ import { clearStorage, saveId } from "@/utils/storage"
 import { getVehicle } from "@/api/vehicle"
 import { getDeliveryPackages } from "@/api/shipment"
 import { updateDeliveryStatusToCompleted } from "@/api/package"
-import { getDelivery } from "@/api/delivery"
+import { getDelivery, getNextPackageToDeliverInDelivery } from "@/api/delivery"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import { LocationPermissionRequiredView } from "@/components/location-permission"
 import { useSavedShipment } from "@/components/saved-shipment"
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons"
+import { getCurrentPositionAsync } from "expo-location"
+import type { DeliveryShipment, Shipment } from "@/server/db/entities"
 
 function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
   const { reload } = useSavedShipment()
@@ -101,27 +103,6 @@ function DeliveryProgress({
   const { status, data } = useQuery({
     queryKey: ["getDeliveryPackages", deliveryId],
     queryFn: () => getDeliveryPackages(Number(deliveryId)),
-  })
-  const { isTracking, stopTracking } = useLocationTracker()
-
-  const queryClient = useQueryClient()
-  const { isPending, mutate } = useMutation({
-    mutationKey: ["updateDeliveryStatusToCompleted", deliveryId],
-    mutationFn: async () => {
-      if (isTracking) await stopTracking()
-      await updateDeliveryStatusToCompleted(Number(deliveryId))
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getDeliveriesByStatus"],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDeliveryPackages", deliveryId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDelivery", deliveryId],
-      })
-    },
   })
 
   return (
@@ -222,29 +203,6 @@ function DeliveryProgress({
           </View>
         </View>
       </View>
-
-      {status === "success" &&
-        data.packages.filter((_package) => _package.status === "DELIVERED")
-          .length === data.packages.length &&
-        !isCompleted && (
-          <View
-            style={{
-              marginBottom: 8,
-              backgroundColor: "#22c55e",
-              paddingHorizontal: 8,
-              paddingVertical: 12,
-              borderRadius: 8,
-              marginTop: 8,
-              alignItems: "center",
-            }}
-          >
-            <Button
-              title="Confirm Delivery"
-              disabled={isPending}
-              onPress={() => mutate()}
-            />
-          </View>
-        )}
     </View>
   )
 }
@@ -316,6 +274,371 @@ function VehicleDetails({ id }: { id: number }) {
       )}
     </View>
   )
+}
+
+function CalculateNearestPackage(props: { shipmentId: number }) {
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      const {
+        coords: { longitude, latitude },
+      } = await getCurrentPositionAsync()
+
+      return await getNextPackageToDeliverInDelivery({
+        shipmentId: props.shipmentId,
+        long: longitude,
+        lat: latitude,
+      })
+    },
+    onSuccess: ({ packageId }) => {
+      if (packageId) {
+        Alert.alert(
+          "Next Delivery Set",
+          `Package with tracking number ${packageId} has been set as the next delivery.`,
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                router.navigate({
+                  pathname:
+                    "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+                  params: {
+                    id: props.shipmentId,
+                    packageId,
+                  },
+                })
+              },
+            },
+          ],
+        )
+      } else
+        Alert.alert(
+          "No More Packages",
+          `There are no more packages to deliver.`,
+          [
+            {
+              text: "OK",
+            },
+          ],
+        )
+    },
+    onError: ({ message }) => {
+      Alert.alert("Next Delivery Set Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
+
+  return (
+    <View
+      style={{
+        marginTop: 12,
+      }}
+    >
+      <TouchableOpacity
+        disabled={isPending}
+        activeOpacity={0.6}
+        style={{
+          backgroundColor: "#F17834",
+          minHeight: 48,
+          justifyContent: "center",
+          borderRadius: 8,
+          opacity: isPending ? 0.6 : undefined,
+        }}
+        onPress={() => mutate()}
+      >
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontFamily: "Roboto-Medium",
+            fontSize: 16,
+          }}
+        >
+          Find Nearest package
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+function GoToNearestPackage(props: {
+  shipmentId: number
+  nextToBeDeliveredPackageId: string
+}) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDeliveryPackages", props.shipmentId],
+    queryFn: async () => {
+      return await getDeliveryPackages(props.shipmentId)
+    },
+  })
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      const {
+        coords: { longitude, latitude },
+      } = await getCurrentPositionAsync()
+
+      return await getNextPackageToDeliverInDelivery({
+        shipmentId: props.shipmentId,
+        long: longitude,
+        lat: latitude,
+      })
+    },
+    onSuccess: ({ packageId }) => {
+      if (packageId) {
+        Alert.alert(
+          "Next Delivery Set",
+          `Package with tracking number ${packageId} has been set as the next delivery.`,
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                router.navigate({
+                  pathname:
+                    "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+                  params: {
+                    id: props.shipmentId,
+                    packageId,
+                  },
+                })
+              },
+            },
+          ],
+        )
+      } else
+        Alert.alert(
+          "No More Packages",
+          `There are no more packages to deliver.`,
+          [
+            {
+              text: "OK",
+            },
+          ],
+        )
+    },
+    onError: ({ message }) => {
+      Alert.alert("Next Delivery Set Failed", message, [
+        {
+          text: "OK",
+        },
+      ])
+    },
+  })
+
+  if (status === "pending") return <Text>...</Text>
+  if (status === "error") return <Text>Error occured: {error.message}</Text>
+
+  const inTransitPackages = data.packages.filter(
+    ({ shipmentPackageStatus }) => shipmentPackageStatus === "IN_TRANSIT",
+  )
+
+  if (inTransitPackages.length === 0)
+    return (
+      <View
+        style={{
+          borderRadius: 6,
+          backgroundColor: "#dcfce7",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingVertical: 12,
+          marginTop: 12,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "Roboto-Medium",
+            color: "#14532d",
+            paddingHorizontal: 6,
+            textAlign: "center",
+          }}
+        >
+          There are no more packages to deliver.
+        </Text>
+      </View>
+    )
+
+  const nextPackageIsStillInTransit = inTransitPackages.some(
+    ({ id }) => id === props.nextToBeDeliveredPackageId,
+  )
+
+  if (nextPackageIsStillInTransit)
+    return (
+      <View
+        style={{
+          marginTop: 12,
+        }}
+      >
+        <Link
+          asChild
+          href={{
+            pathname:
+              "/(app)/driver/deliveries/[id]/package/[packageId]/details",
+            params: {
+              id: props.shipmentId,
+              packageId: props.nextToBeDeliveredPackageId,
+            },
+          }}
+        >
+          <TouchableOpacity
+            disabled={isPending}
+            activeOpacity={0.6}
+            style={{
+              backgroundColor: "#F17834",
+              minHeight: 48,
+              justifyContent: "center",
+              borderRadius: 8,
+              opacity: isPending ? 0.6 : undefined,
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontFamily: "Roboto-Medium",
+                fontSize: 16,
+              }}
+            >
+              Go To Nearest package
+            </Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+    )
+  else
+    return (
+      <View
+        style={{
+          marginTop: 12,
+        }}
+      >
+        <TouchableOpacity
+          disabled={isPending}
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "#F17834",
+            minHeight: 48,
+            justifyContent: "center",
+            borderRadius: 8,
+            opacity: isPending ? 0.6 : undefined,
+          }}
+          onPress={() => mutate()}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+              fontSize: 16,
+            }}
+          >
+            Find Next Nearest package
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
+}
+
+function TrackingEnabledButtons(props: {
+  delivery: Shipment & DeliveryShipment
+  shipmentId: number
+}) {
+  const { savedShipment } = useSavedShipment()
+  const { isTracking } = useLocationTracker()
+
+  if (!isTracking) return <></>
+  if (savedShipment === null) return <></>
+  if (savedShipment.id !== props.shipmentId) return <></>
+
+  return (
+    <>
+      {props.delivery.nextToBeDeliveredPackageId === null ? (
+        <CalculateNearestPackage shipmentId={props.shipmentId} />
+      ) : (
+        <GoToNearestPackage
+          nextToBeDeliveredPackageId={props.delivery.nextToBeDeliveredPackageId}
+          shipmentId={props.shipmentId}
+        />
+      )}
+    </>
+  )
+}
+
+function CompletePackageButton(props: { shipmentId: number }) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDeliveryPackages", props.shipmentId],
+    queryFn: async () => {
+      return await getDeliveryPackages(props.shipmentId)
+    },
+  })
+
+  const { isTracking, stopTracking } = useLocationTracker()
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["updateDeliveryStatusToCompleted", props.shipmentId],
+    mutationFn: async () => {
+      if (isTracking) await stopTracking()
+      await updateDeliveryStatusToCompleted(props.shipmentId)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveriesByStatus"],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", props.shipmentId.toString()],
+      })
+    },
+  })
+
+  if (status === "pending") return <Text>...</Text>
+  if (status === "error") return <Text>Error occured: {error.message}</Text>
+
+  const hasPendingPackages = data.packages.some(
+    ({ shipmentPackageStatus }) => shipmentPackageStatus === "IN_TRANSIT",
+  )
+
+  if (hasPendingPackages) return <></>
+  else
+    return (
+      <View
+        style={{
+          marginTop: 12,
+        }}
+      >
+        <TouchableOpacity
+          disabled={isPending}
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "#16a34a",
+            minHeight: 48,
+            flexDirection: "row",
+            justifyContent: "center",
+            columnGap: 4,
+            alignItems: "center",
+            borderRadius: 8,
+            opacity: isPending ? 0.6 : undefined,
+          }}
+          onPress={() => {
+            mutate()
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+              fontSize: 16,
+            }}
+          >
+            Mark as Completed
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
 }
 
 export default function ViewDeliveryPage() {
@@ -459,6 +782,15 @@ export default function ViewDeliveryPage() {
                     <StartStopDelivery deliveryId={data.delivery.id} />
                   )}
                 </View>
+
+                <TrackingEnabledButtons
+                  delivery={data.delivery}
+                  shipmentId={Number(params.id)}
+                />
+
+                {data.delivery.status !== "COMPLETED" && (
+                  <CompletePackageButton shipmentId={data.delivery.id} />
+                )}
               </View>
             </>
           )}

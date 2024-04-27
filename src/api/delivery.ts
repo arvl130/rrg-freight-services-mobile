@@ -88,3 +88,39 @@ export async function getDelivery(id: number) {
     delivery: Shipment & DeliveryShipment
   }
 }
+
+export async function getNextPackageToDeliverInDelivery({
+  shipmentId,
+  lat,
+  long,
+}: {
+  shipmentId: number
+  lat: number
+  long: number
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${shipmentId}/get-next-delivery`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.id}`,
+      },
+      body: JSON.stringify({
+        lat,
+        long,
+      }),
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) throw new Error(responseJson.message)
+
+  return responseJson as { message: string; packageId: null | number }
+}

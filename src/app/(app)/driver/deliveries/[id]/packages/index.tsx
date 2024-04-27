@@ -159,8 +159,8 @@ function filterUndelivered(packages: Package[], isEnabled: boolean) {
 }
 
 export default function ViewPackagesPage() {
-  const [isSortedByDistance, setIsSortedByDistance] = useState(false)
-  const [undeliveredIsHidden, setUndeliveredIsHidden] = useState(false)
+  const [isSortedByDistance, setIsSortedByDistance] = useState(true)
+  const [undeliveredIsHidden, setUndeliveredIsHidden] = useState(true)
 
   const { id } = useLocalSearchParams<{ id: string }>()
   const { status, data, error, fetchStatus, refetch } = useQuery({
@@ -231,7 +231,7 @@ export default function ViewPackagesPage() {
                 alignItems: "center",
               }}
             >
-              <Text>Show nearest first</Text>
+              <Text>Order by Nearest</Text>
               <Switch
                 value={isSortedByDistance}
                 onValueChange={(isSorted) => setIsSortedByDistance(isSorted)}
@@ -245,7 +245,7 @@ export default function ViewPackagesPage() {
                 alignItems: "center",
               }}
             >
-              <Text>Hide delivered</Text>
+              <Text>Hide Delivered Packages</Text>
               <Switch
                 value={undeliveredIsHidden}
                 onValueChange={(isHidden) => setUndeliveredIsHidden(isHidden)}

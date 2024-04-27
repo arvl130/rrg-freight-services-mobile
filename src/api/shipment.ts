@@ -2,6 +2,7 @@ import type { Shipment } from "@/utils/entities"
 import type { Package } from "@/server/db/entities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import type { SessionAndUserJSON } from "@/components/auth"
+import type { ShipmentPackageStatus } from "@/utils/constants"
 
 export async function getShipment(shipmentId: number) {
   const sessionStr = await AsyncStorage.getItem("session")
@@ -52,7 +53,10 @@ export async function getDeliveryPackages(deliveryId: number) {
     throw new Error("An error occured while retrieving delivery packages")
   }
 
-  return responseJson as { message: string; packages: Package[] }
+  return responseJson as {
+    message: string
+    packages: (Package & { shipmentPackageStatus: ShipmentPackageStatus })[]
+  }
 }
 
 export async function getDeliveryPackagesOrderedByDistance(

@@ -1,20 +1,32 @@
+import { getDelivery } from "@/api/delivery"
 import { getPackageById } from "@/api/package"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
 import { useSavedShipment } from "@/components/saved-shipment"
-import { Feather, EvilIcons, AntDesign, FontAwesome } from "@expo/vector-icons"
+import {
+  Feather,
+  AntDesign,
+  FontAwesome,
+  Ionicons,
+  FontAwesome6,
+} from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocalSearchParams } from "expo-router"
 import { Linking, Text, TouchableOpacity, View } from "react-native"
 
-function FailDeliveryLink(props: { shipmentId: number; packageId: string }) {
+function FailDeliveryLink(props: {
+  isNextPackageToDeliver: boolean
+  shipmentId: number
+  packageId: string
+}) {
   const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
   const isDisabled =
     savedShipment === null ||
     savedShipment.id !== props.shipmentId ||
-    !isTracking
+    !isTracking ||
+    !props.isNextPackageToDeliver
 
   return (
     <View
@@ -39,11 +51,16 @@ function FailDeliveryLink(props: { shipmentId: number; packageId: string }) {
           style={{
             backgroundColor: "#ef4444",
             minHeight: 48,
+            flexDirection: "row",
             justifyContent: "center",
+            columnGap: 4,
+            alignItems: "center",
             borderRadius: 8,
             opacity: isDisabled ? 0.6 : undefined,
           }}
         >
+          <FontAwesome name="calendar-times-o" size={15} color="white" />
+
           <Text
             style={{
               color: "white",
@@ -51,8 +68,7 @@ function FailDeliveryLink(props: { shipmentId: number; packageId: string }) {
               fontFamily: "Roboto-Medium",
             }}
           >
-            Failed Delivery{" "}
-            <FontAwesome name="calendar-times-o" size={15} color="white" />
+            Failed Delivery
           </Text>
         </TouchableOpacity>
       </Link>
@@ -60,13 +76,18 @@ function FailDeliveryLink(props: { shipmentId: number; packageId: string }) {
   )
 }
 
-function ConfirmDeliveryLink(props: { shipmentId: number; packageId: string }) {
+function ConfirmDeliveryLink(props: {
+  isNextPackageToDeliver: boolean
+  shipmentId: number
+  packageId: string
+}) {
   const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
   const isDisabled =
     savedShipment === null ||
     savedShipment.id !== props.shipmentId ||
-    !isTracking
+    !isTracking ||
+    !props.isNextPackageToDeliver
 
   return (
     <View
@@ -91,11 +112,15 @@ function ConfirmDeliveryLink(props: { shipmentId: number; packageId: string }) {
           style={{
             backgroundColor: "#16a34a",
             minHeight: 48,
+            flexDirection: "row",
             justifyContent: "center",
+            columnGap: 4,
+            alignItems: "center",
             borderRadius: 8,
             opacity: isDisabled ? 0.6 : undefined,
           }}
         >
+          <AntDesign name="checksquareo" size={15} color="white" />
           <Text
             style={{
               color: "white",
@@ -103,12 +128,41 @@ function ConfirmDeliveryLink(props: { shipmentId: number; packageId: string }) {
               fontFamily: "Roboto-Medium",
             }}
           >
-            Confirm Delivery{" "}
-            <AntDesign name="checksquareo" size={15} color="white" />
+            Confirm Delivery
           </Text>
         </TouchableOpacity>
       </Link>
     </View>
+  )
+}
+
+function BottomButtons(props: { shipmentId: number; packageId: string }) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDelivery", props.shipmentId],
+    queryFn: () => getDelivery(props.shipmentId),
+  })
+
+  if (status === "pending") return <Text>...</Text>
+  if (status === "error") return <Text>Error occured: {error.message}</Text>
+  if (data === null) return <Text>No such delivery.</Text>
+
+  return (
+    <>
+      <FailDeliveryLink
+        isNextPackageToDeliver={
+          data.delivery.nextToBeDeliveredPackageId === props.packageId
+        }
+        shipmentId={props.shipmentId}
+        packageId={props.packageId}
+      />
+      <ConfirmDeliveryLink
+        isNextPackageToDeliver={
+          data.delivery.nextToBeDeliveredPackageId === props.packageId
+        }
+        shipmentId={props.shipmentId}
+        packageId={props.packageId}
+      />
+    </>
   )
 }
 
@@ -371,6 +425,9 @@ export default function PackageDetailsPage() {
                           backgroundColor: "#F17834",
                           minHeight: 48,
                           justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          columnGap: 4,
                           borderRadius: 8,
                         }}
                         onPress={() => {
@@ -379,6 +436,7 @@ export default function PackageDetailsPage() {
                           )
                         }}
                       >
+                        <Ionicons name="call" size={18} color="black" />
                         <Text
                           style={{
                             color: "black",
@@ -386,8 +444,7 @@ export default function PackageDetailsPage() {
                             fontFamily: "Roboto-Medium",
                           }}
                         >
-                          Notify Receiver{" "}
-                          <Feather name="bell" size={15} color="black" />
+                          Call Receiver
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -414,12 +471,19 @@ export default function PackageDetailsPage() {
                           style={{
                             backgroundColor: "#EEAE3F",
                             minHeight: 48,
+                            flexDirection: "row",
                             justifyContent: "center",
+                            columnGap: 4,
+                            alignItems: "center",
                             borderRadius: 8,
                             padding: 2,
-                            columnGap: 2,
                           }}
                         >
+                          <FontAwesome6
+                            name="location-dot"
+                            size={16}
+                            color="black"
+                          />
                           <Text
                             style={{
                               color: "black",
@@ -427,12 +491,7 @@ export default function PackageDetailsPage() {
                               fontFamily: "Roboto-Medium",
                             }}
                           >
-                            Locate Address{" "}
-                            <EvilIcons
-                              name="location"
-                              size={18}
-                              color="black"
-                            />
+                            Locate Address
                           </Text>
                         </TouchableOpacity>
                       </Link>
@@ -446,16 +505,10 @@ export default function PackageDetailsPage() {
                     }}
                   >
                     {data.package.status !== "DELIVERED" && (
-                      <>
-                        <FailDeliveryLink
-                          shipmentId={Number(id)}
-                          packageId={packageId}
-                        />
-                        <ConfirmDeliveryLink
-                          shipmentId={Number(id)}
-                          packageId={packageId}
-                        />
-                      </>
+                      <BottomButtons
+                        shipmentId={Number(id)}
+                        packageId={packageId}
+                      />
                     )}
                   </View>
                 </View>
