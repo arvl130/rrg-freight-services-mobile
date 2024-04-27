@@ -13,14 +13,19 @@ import Aperture from "phosphor-react-native/src/icons/Aperture"
 import CameraRotate from "phosphor-react-native/src/icons/CameraRotate"
 import CheckCircle from "phosphor-react-native/src/icons/CheckCircle"
 import ArrowClockwise from "phosphor-react-native/src/icons/ArrowClockwise"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
 import { getOtpValidity, resendOtp } from "@/api/shipment-package-otp"
 import { router, useLocalSearchParams } from "expo-router"
-import { updatePackageStatusToDelivered } from "@/api/package"
+import { updatePackageStatusToDelivered, getPackageById } from "@/api/package"
 import storage from "@react-native-firebase/storage"
 import { REGEX_ONE_OR_MORE_DIGITS } from "@/utils/constants"
 import { ProgressDialog } from "react-native-simple-dialogs"
 import { useCountTimer } from "@/store/store"
+import { useLocationTracker } from "@/components/location-tracker"
+import { ErrorView } from "@/components/error-view"
+import { LoadingView } from "@/components/loading-view"
+import { Feather } from "@expo/vector-icons"
+import { setStatusBarBackgroundColor } from "expo-status-bar"
 
 function TakePictureView(props: {
   onPictureTaken: (newPictureUri: string) => void
@@ -233,6 +238,9 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
           backgroundColor: "#6b7280",
           paddingVertical: 12,
           borderRadius: 8,
+          width: 150,
+          top: -11,
+          marginLeft: 35,
           opacity: resendOtpMutation.isPending || resendBtn ? 0.6 : 1,
         }}
         disabled={resendOtpMutation.isPending || resendBtn}
@@ -264,9 +272,10 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
             color: "white",
             textAlign: "center",
             fontFamily: "Roboto-Medium",
+            fontSize: 18,
           }}
         >
-          Resend OTP Code {resendBtn ? <>in {seconds} seconds</> : <></>}
+          Resend OTP {resendBtn ? <>in {seconds} seconds</> : <></>}
         </Text>
       </TouchableOpacity>
       <Text>
@@ -318,23 +327,20 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
       style={{
         flex: 1,
         paddingHorizontal: 12,
-        paddingVertical: 8,
+        backgroundColor: "white",
       }}
     >
+      <PackageDetailsPage />
       <Text
         style={{
           marginBottom: 8,
           fontFamily: "Roboto-Bold",
+          fontSize: 20,
+          textAlign: "center",
+          marginTop: 10,
         }}
       >
-        Tracking Number: {packageId}
-      </Text>
-      <Text
-        style={{
-          marginBottom: 8,
-        }}
-      >
-        Enter your OTP to mark this package as delivered.
+        Proof Delivery
       </Text>
       <TextInput
         keyboardType="numeric"
@@ -355,17 +361,21 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
         value={otp}
         onChangeText={(text) => setOtp(text)}
       />
+
       <View
         style={{
-          marginTop: 12,
+          marginTop: 20,
+          flexDirection: "row",
         }}
       >
         <TouchableOpacity
           activeOpacity={0.6}
           style={{
-            backgroundColor: "#3b82f6",
+            backgroundColor: "#79CFDC",
             paddingVertical: 12,
             borderRadius: 8,
+            width: 150,
+            height: 50,
             opacity: isPending ? 0.6 : 1,
           }}
           disabled={isPending}
@@ -389,13 +399,14 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
               color: "white",
               textAlign: "center",
               fontFamily: "Roboto-Medium",
+              fontSize: 18,
             }}
           >
-            Confirm Delivery
+            Submit
           </Text>
         </TouchableOpacity>
+        <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
       </View>
-      <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
 
       <ProgressDialog
         title="Loading ..."
@@ -577,6 +588,167 @@ export function ConfirmDeliveryPage() {
             </>
           )}
         </CameraPermissionRequiredView>
+      )}
+    </View>
+  )
+}
+
+export default function PackageDetailsPage() {
+  const { isLoading } = useLocationTracker()
+  const { id, packageId } = useLocalSearchParams<{
+    id: string
+    packageId: string
+  }>()
+  const { status, data, error, refetch } = useQuery({
+    queryKey: ["getPackageById", packageId],
+    queryFn: () => getPackageById(packageId),
+  })
+
+  return (
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {isLoading ? (
+        <Text>Loading ...</Text>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          {status === "pending" && <LoadingView />}
+          {status === "error" && (
+            <ErrorView
+              message={error.message}
+              onRetry={() => {
+                refetch()
+              }}
+            />
+          )}
+          {status === "success" && (
+            <View
+              style={{
+                flex: 1,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                backgroundColor: "#F8F8F8",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  marginHorizontal: 0,
+                  shadowColor: "#171717",
+                  shadowOffset: { width: -2, height: 4 },
+                  shadowOpacity: 0,
+                  shadowRadius: 0,
+                  elevation: 0,
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingBottom: 12,
+                  }}
+                >
+                  <Feather
+                    name="package"
+                    style={{
+                      fontSize: 96,
+                      marginVertical: 12,
+                      color: "black",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "Roboto-Bold",
+                      fontSize: 20,
+                      color: "black",
+                    }}
+                  >
+                    ID: {data.package.id}
+                  </Text>
+                </View>
+
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Receiver Name:
+                    </Text>{" "}
+                    {data.package.receiverFullName}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Address:
+                    </Text>{" "}
+                    {data.package.receiverStreetAddress},{" "}
+                    {data.package.receiverBarangay}, {data.package.receiverCity}
+                    , {data.package.receiverStateOrProvince},{" "}
+                    {data.package.receiverCountryCode}{" "}
+                    {data.package.receiverPostalCode}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Contact Number:
+                    </Text>{" "}
+                    {data.package.receiverContactNumber}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Email:
+                    </Text>{" "}
+                    {data.package.receiverEmailAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "black",
+                    marginVertical: 24,
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        </View>
       )}
     </View>
   )
