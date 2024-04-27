@@ -339,6 +339,7 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
       <TextInput
         keyboardType="numeric"
         maxLength={6}
+        secureTextEntry
         style={{
           backgroundColor: "white",
           borderWidth: 1,
