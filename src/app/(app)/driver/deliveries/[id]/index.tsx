@@ -368,12 +368,13 @@ function GoToNearestPackage(props: {
   nextToBeDeliveredPackageId: string
 }) {
   const { status, data, error } = useQuery({
-    queryKey: ["getDeliveryPackages", props.shipmentId],
+    queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
     queryFn: async () => {
       return await getDeliveryPackages(props.shipmentId)
     },
   })
 
+  const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async () => {
       const {
@@ -387,6 +388,10 @@ function GoToNearestPackage(props: {
       })
     },
     onSuccess: ({ packageId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
+      })
+
       if (packageId) {
         Alert.alert(
           "Next Delivery Set",
@@ -567,7 +572,7 @@ function TrackingEnabledButtons(props: {
 
 function CompletePackageButton(props: { shipmentId: number }) {
   const { status, data, error } = useQuery({
-    queryKey: ["getDeliveryPackages", props.shipmentId],
+    queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
     queryFn: async () => {
       return await getDeliveryPackages(props.shipmentId)
     },
@@ -597,7 +602,7 @@ function CompletePackageButton(props: { shipmentId: number }) {
   if (status === "pending") return <Text>...</Text>
   if (status === "error") return <Text>Error occured: {error.message}</Text>
 
-  const allPackagesCompleted = data.packages.some(
+  const allPackagesCompleted = data.packages.every(
     ({ shipmentPackageStatus }) => shipmentPackageStatus === "COMPLETED",
   )
 
