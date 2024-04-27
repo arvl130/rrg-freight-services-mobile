@@ -5,7 +5,11 @@ import {
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import type { Package } from "@/server/db/entities"
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
+import {
+  FontAwesome5,
+  MaterialCommunityIcons,
+  Entypo,
+} from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { getCurrentPositionAsync } from "expo-location"
 import { Link, useLocalSearchParams } from "expo-router"
@@ -60,7 +64,11 @@ export function PackageItem(props: { package: Package }) {
           paddingHorizontal: 12,
           borderRadius: 8,
           backgroundColor:
-            props.package.status === "DELIVERED" ? "#A4D8D8" : "white",
+            props.package.status === "DELIVERED"
+              ? "#A4D8D8"
+              : props.package.status === "FAILED_DELIVERY"
+                ? "#fee2e2"
+                : "white",
         }}
       >
         <View
@@ -80,7 +88,16 @@ export function PackageItem(props: { package: Package }) {
           {props.package.status === "DELIVERED" ? (
             <FontAwesome5 name="check" size={32} />
           ) : (
-            <MaterialCommunityIcons name="truck-delivery-outline" size={32} />
+            <>
+              {props.package.status === "FAILED_DELIVERY" ? (
+                <Entypo name="cross" size={32} color="black" />
+              ) : (
+                <MaterialCommunityIcons
+                  name="truck-delivery-outline"
+                  size={32}
+                />
+              )}
+            </>
           )}
         </View>
         <Text>
