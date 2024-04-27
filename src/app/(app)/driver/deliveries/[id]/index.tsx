@@ -246,7 +246,7 @@ function VehicleDetails({ id }: { id: number }) {
               >
                 <View style={styles.truckLogo}>
                   <Image
-                    source={require("@/assets/images/truckLogo.png")}
+                    source={require("@/assets/images/truckLogo.gif")}
                     style={{ width: 200, height: 150 }}
                   />
                 </View>
