@@ -144,6 +144,9 @@ function UpdateForm() {
     handleSubmit,
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      failureReason: "Consignee not available at the address provided.",
+    },
   })
 
   const { id, packageId } = useLocalSearchParams<{
