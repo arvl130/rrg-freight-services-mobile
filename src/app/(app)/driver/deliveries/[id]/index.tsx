@@ -597,12 +597,11 @@ function CompletePackageButton(props: { shipmentId: number }) {
   if (status === "pending") return <Text>...</Text>
   if (status === "error") return <Text>Error occured: {error.message}</Text>
 
-  const hasPendingPackages = data.packages.some(
-    ({ shipmentPackageStatus }) => shipmentPackageStatus === "IN_TRANSIT",
+  const allPackagesCompleted = data.packages.some(
+    ({ shipmentPackageStatus }) => shipmentPackageStatus === "COMPLETED",
   )
 
-  if (hasPendingPackages) return <></>
-  else
+  if (allPackagesCompleted)
     return (
       <View
         style={{
@@ -639,6 +638,9 @@ function CompletePackageButton(props: { shipmentId: number }) {
         </TouchableOpacity>
       </View>
     )
+  else {
+    return <></>
+  }
 }
 
 export default function ViewDeliveryPage() {
