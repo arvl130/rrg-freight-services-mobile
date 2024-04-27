@@ -277,6 +277,7 @@ function VehicleDetails({ id }: { id: number }) {
 }
 
 function CalculateNearestPackage(props: { shipmentId: number }) {
+  const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async () => {
       const {
@@ -290,6 +291,10 @@ function CalculateNearestPackage(props: { shipmentId: number }) {
       })
     },
     onSuccess: ({ packageId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
+      })
+
       if (packageId) {
         Alert.alert(
           "Next Delivery Set",
