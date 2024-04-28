@@ -24,7 +24,7 @@ import {
   View,
   StyleSheet,
 } from "react-native"
-
+import { getPackageById } from "@/api/package"
 function PackageMeter(props: { value: number; total: number }) {
   return (
     <View
@@ -148,7 +148,9 @@ export function PackageItem(props: { package: Package }) {
             DateTime.DATETIME_SHORT_WITH_SECONDS,
           )}
         </Text>
-        <Text style={styles.deliveryAttempt}>Delivery Attempt: 2 / 3</Text>
+        <Text style={styles.deliveryAttempt}>
+          Delivery Attempt: {props.package.failedAttempts} / 2
+        </Text>
       </View>
     </>
   )
