@@ -236,7 +236,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
         activeOpacity={0.6}
         style={{
           backgroundColor: "#6b7280",
-          paddingVertical: 12,
+          paddingVertical: 15,
           borderRadius: 8,
           width: 150,
           top: -11,
@@ -356,6 +356,8 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
           textAlign: "center",
           fontSize: 18,
           letterSpacing: 2,
+          width: 335,
+          marginLeft: 30,
         }}
         placeholder="Enter your OTP here ..."
         value={otp}
@@ -372,7 +374,9 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
           activeOpacity={0.6}
           style={{
             backgroundColor: "#79CFDC",
-            paddingVertical: 12,
+            paddingVertical: 15,
+            marginLeft: 30,
+            marginTop: 1,
             borderRadius: 8,
             width: 150,
             height: 50,
