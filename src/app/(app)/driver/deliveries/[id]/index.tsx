@@ -163,7 +163,7 @@ function DeliveryProgress({
               {status === "error" && "!"}
               {status === "success" &&
                 data.packages.filter(
-                  (_package: any) => _package.status !== "DELIVERED",
+                  (_package) => _package.shipmentPackageStatus === "FAILED",
                 ).length}
             </Text>
           </View>
@@ -197,7 +197,7 @@ function DeliveryProgress({
               {status === "error" && "!"}
               {status === "success" &&
                 data.packages.filter(
-                  (_package: any) => _package.status === "DELIVERED",
+                  (_package) => _package.shipmentPackageStatus === "COMPLETED",
                 ).length}
             </Text>
           </View>
