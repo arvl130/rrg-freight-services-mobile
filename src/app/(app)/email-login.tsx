@@ -171,10 +171,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   form: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingBottom: 8,
-    paddingLeft: 30,
-    paddingRight: 30,
   },
   loginText: {
     fontSize: 32,
@@ -207,6 +205,7 @@ const styles = StyleSheet.create({
   input: {
     paddingLeft: 10,
     width: "100%",
+    flex: 1,
   },
   buttonContainer: {
     paddingVertical: 20,
@@ -232,7 +231,8 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     backgroundColor: "white",
-    padding: 30,
+    paddingVertical: 32,
+    paddingHorizontal: 24,
     borderRadius: 25,
   },
   fingerPrint: {
