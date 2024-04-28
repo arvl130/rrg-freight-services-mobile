@@ -251,7 +251,7 @@ export default function PackageDetailsPage() {
                       }}
                     >
                       Failed Delivery Attempts: {data.package.failedAttempts} /
-                      3
+                      2
                     </Text>
                   </Text>
                   <Text
