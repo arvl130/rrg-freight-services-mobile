@@ -122,7 +122,7 @@ export default function Layout() {
       <Stack.Screen
         name="deliveries/[id]/package/[packageId]/fail-delivery"
         options={{
-          title: "Fail Delivery",
+          title: "Failed Delivery",
           headerStyle: {
             backgroundColor: "#79CFDC",
           },
