@@ -160,7 +160,7 @@ function ConfirmDeliveryButton(props: { shipmentId: number }) {
     <Link
       asChild
       href={{
-        pathname: "/(app)/driver/transfer/forwarder/[id]/complete-delivery",
+        pathname: "/(app)/driver/transfer/forwarder/[id]/mark-as-completed",
         params: {
           id: props.shipmentId,
         },
