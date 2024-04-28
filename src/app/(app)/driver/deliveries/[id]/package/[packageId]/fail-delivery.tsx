@@ -14,7 +14,6 @@ import { useLocationTracker } from "@/components/location-tracker"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { Feather } from "@expo/vector-icons"
-import { setStatusBarBackgroundColor } from "expo-status-bar"
 
 function FormSelect(props: {
   isEnabled: boolean
@@ -152,7 +151,7 @@ type FormSchema = z.infer<typeof formSchema>
 
 function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
-  const { id, packageId } = useLocalSearchParams<{
+  const { packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
@@ -326,7 +325,7 @@ function UpdateForm() {
     id: string
     packageId: string
   }>()
-  const { data } = useQuery({
+  const { status, data } = useQuery({
     queryKey: ["getPackageById", packageId],
     queryFn: () => getPackageById(packageId),
   })
@@ -382,7 +381,9 @@ function UpdateForm() {
               fontFamily: "Roboto-Medium",
             }}
           >
-            {data.package.failedAttempts} / 2
+            {status === "pending" && "..."}
+            {status === "error" && "error"}
+            {status === "success" && `${data.package.failedAttempts} / 2`}
           </Text>
         </View>
       </View>

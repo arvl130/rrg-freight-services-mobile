@@ -24,7 +24,7 @@ import {
   View,
   StyleSheet,
 } from "react-native"
-import { getPackageById } from "@/api/package"
+
 function PackageMeter(props: { value: number; total: number }) {
   return (
     <View
