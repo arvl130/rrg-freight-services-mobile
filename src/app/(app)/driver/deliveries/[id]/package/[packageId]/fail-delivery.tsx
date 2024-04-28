@@ -5,8 +5,16 @@ import { TouchableOpacity, ActivityIndicator, Text, View } from "react-native"
 import { z } from "zod"
 import { Picker } from "@react-native-picker/picker"
 import { router, useLocalSearchParams } from "expo-router"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { updatePackageStatusToFailedDelivery } from "@/api/package"
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
+import {
+  updatePackageStatusToFailedDelivery,
+  getPackageById,
+} from "@/api/package"
+import { useLocationTracker } from "@/components/location-tracker"
+import { ErrorView } from "@/components/error-view"
+import { LoadingView } from "@/components/loading-view"
+import { Feather } from "@expo/vector-icons"
+import { setStatusBarBackgroundColor } from "expo-status-bar"
 
 function FormSelect(props: {
   isEnabled: boolean
@@ -25,17 +33,22 @@ function FormSelect(props: {
         borderWidth: 1,
         borderColor: "#d1d5db",
         borderRadius: 8,
+        overflow: "hidden",
+        elevation: 2,
       }}
     >
       <View
         style={{
-          opacity: props.isEnabled ? 0.6 : undefined,
+          opacity: props.isEnabled ? 1 : 0.6,
         }}
       >
         <Picker
           enabled={props.isEnabled}
           selectedValue={field.value}
           onValueChange={field.onChange}
+          style={{
+            height: 50,
+          }}
         >
           {FAILURE_REASONS.map(({ id, summary, description }) => (
             <Picker.Item key={id} label={summary} value={description} />
@@ -148,12 +161,14 @@ function UpdateForm() {
       failureReason: "Consignee not available at the address provided.",
     },
   })
-
   const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
-
+  const { data } = useQuery({
+    queryKey: ["getPackageById", packageId],
+    queryFn: () => getPackageById(packageId),
+  })
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async (input: { failureReason: string }) => {
@@ -182,6 +197,35 @@ function UpdateForm() {
 
   return (
     <View>
+      <View style={{ flexDirection: "row" }}>
+        <Text
+          style={{
+            fontSize: 16,
+            paddingTop: 12,
+            paddingBottom: 6,
+            paddingHorizontal: 12,
+            fontFamily: "Roboto-Medium",
+            color: "#374151",
+          }}
+        >
+          Failed Delivery Attempts:
+        </Text>
+        <View style={{ marginLeft: 170 }}>
+          <Text
+            style={{
+              color: "#949494",
+              fontSize: 16,
+              paddingTop: 12,
+              paddingBottom: 6,
+              paddingHorizontal: 12,
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            {data.package.failedAttempts} / 2
+          </Text>
+        </View>
+      </View>
+
       <Text
         style={{
           fontSize: 16,
@@ -206,7 +250,7 @@ function UpdateForm() {
       <TouchableOpacity
         activeOpacity={0.6}
         style={{
-          backgroundColor: "#3b82f6",
+          backgroundColor: "#79CFDC",
           paddingVertical: 12,
           paddingHorizontal: 12,
           borderRadius: 8,
@@ -233,6 +277,166 @@ function UpdateForm() {
     </View>
   )
 }
+function PackageDetailsPage() {
+  const { isLoading } = useLocationTracker()
+  const { id, packageId } = useLocalSearchParams<{
+    id: string
+    packageId: string
+  }>()
+  const { status, data, error, refetch } = useQuery({
+    queryKey: ["getPackageById", packageId],
+    queryFn: () => getPackageById(packageId),
+  })
+
+  return (
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {isLoading ? (
+        <Text>Loading ...</Text>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          {status === "pending" && <LoadingView />}
+          {status === "error" && (
+            <ErrorView
+              message={error.message}
+              onRetry={() => {
+                refetch()
+              }}
+            />
+          )}
+          {status === "success" && (
+            <View
+              style={{
+                flex: 1,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                backgroundColor: "#F8F8F8",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  paddingVertical: 12,
+                  paddingHorizontal: 12,
+                  marginHorizontal: 0,
+                  shadowColor: "#171717",
+                  shadowOffset: { width: -2, height: 4 },
+                  shadowOpacity: 0,
+                  shadowRadius: 0,
+                  elevation: 0,
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingBottom: 12,
+                  }}
+                >
+                  <Feather
+                    name="package"
+                    style={{
+                      fontSize: 96,
+                      marginVertical: 12,
+                      color: "black",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "Roboto-Bold",
+                      fontSize: 20,
+                      color: "black",
+                    }}
+                  >
+                    ID: {data.package.id}
+                  </Text>
+                </View>
+
+                <View>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Receiver Name:
+                    </Text>{" "}
+                    {data.package.receiverFullName}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Address:
+                    </Text>{" "}
+                    {data.package.receiverStreetAddress},{" "}
+                    {data.package.receiverBarangay}, {data.package.receiverCity}
+                    , {data.package.receiverStateOrProvince},{" "}
+                    {data.package.receiverCountryCode}{" "}
+                    {data.package.receiverPostalCode}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Contact Number:
+                    </Text>{" "}
+                    {data.package.receiverContactNumber}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Roboto-Bold",
+                      }}
+                    >
+                      Email:
+                    </Text>{" "}
+                    {data.package.receiverEmailAddress}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: "black",
+                    marginVertical: 24,
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  )
+}
 
 export default function Page() {
   return (
@@ -243,6 +447,7 @@ export default function Page() {
         paddingHorizontal: 12,
       }}
     >
+      <PackageDetailsPage />
       <UpdateForm />
     </View>
   )
