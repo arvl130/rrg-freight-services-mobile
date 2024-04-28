@@ -129,7 +129,7 @@ export default function LoginScreen() {
               </Text>
               <View style={styles.buttonContainer}>
                 <Pressable
-                  style={[styles.loginBtn, { marginTop: 20 }]}
+                  style={styles.loginBtn}
                   disabled={isDisabled}
                   onPress={async () => {
                     setIsSigningInWithBiometrics(true)
