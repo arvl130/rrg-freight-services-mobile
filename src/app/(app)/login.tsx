@@ -1,4 +1,4 @@
-import { SplashScreen, router } from "expo-router"
+import { Link, SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
   View,
@@ -104,67 +104,87 @@ export default function LoginScreen() {
             <Text style={styles.biometricsDescription}>
               Biometrics Authentication
             </Text>
-            <Text style={styles.biometricsSubDescription}>
-              log in using your biometric credentials
-            </Text>
           </View>
 
-          <View style={styles.buttonContainer}>
-            {savedSession.savedSession !== null && (
-              <Pressable
-                style={[styles.loginBtn, { marginTop: 20 }]}
-                disabled={isDisabled}
-                onPress={async () => {
-                  setIsSigningInWithBiometrics(true)
-                  if (savedSession.savedSession) {
-                    try {
-                      const { success } = await authenticateAsync()
-                      if (!success) {
-                        setIsSigningInWithBiometrics(false)
-                        return
-                      }
-
-                      await AsyncStorage.setItem(
-                        "session",
-                        JSON.stringify({
-                          session: savedSession.savedSession.session,
-                          user: savedSession.savedSession.user,
-                        }),
-                      )
-
-                      queryClient.setQueryData(["getCurrentUser"], () => {
-                        if (savedSession.savedSession) {
-                          return {
-                            message: "Current user retrieved.",
-                            session: savedSession.savedSession.session,
-                            user: savedSession.savedSession.user,
-                          }
-                        }
-                      })
-                    } catch {
-                      setIsSigningInWithBiometrics(false)
-                    }
-                  }
+          {savedSession.savedSession === null ? (
+            <Text
+              style={{
+                marginBottom: 16,
+                fontFamily: "Roboto",
+                textAlign: "center",
+              }}
+            >
+              Sign in with Biometrics is not yet setup on this device.
+            </Text>
+          ) : (
+            <>
+              <Text
+                style={{
+                  marginTop: 8,
+                  fontFamily: "Roboto-Medium",
+                  textAlign: "center",
                 }}
               >
-                <Text style={styles.btnText}>
-                  {isDisabled ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    "Sign In with Biometrics"
-                  )}
-                </Text>
-              </Pressable>
-            )}
-          </View>
-          <Pressable
-            style={styles.signInWithEMail}
-            onPress={() => {
-              router.push("/email-login")
+                Log in using your biometric credentials
+              </Text>
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  style={[styles.loginBtn, { marginTop: 20 }]}
+                  disabled={isDisabled}
+                  onPress={async () => {
+                    setIsSigningInWithBiometrics(true)
+                    if (savedSession.savedSession) {
+                      try {
+                        const { success } = await authenticateAsync()
+                        if (!success) {
+                          setIsSigningInWithBiometrics(false)
+                          return
+                        }
+
+                        await AsyncStorage.setItem(
+                          "session",
+                          JSON.stringify({
+                            session: savedSession.savedSession.session,
+                            user: savedSession.savedSession.user,
+                          }),
+                        )
+
+                        queryClient.setQueryData(["getCurrentUser"], () => {
+                          if (savedSession.savedSession) {
+                            return {
+                              message: "Current user retrieved.",
+                              session: savedSession.savedSession.session,
+                              user: savedSession.savedSession.user,
+                            }
+                          }
+                        })
+                      } catch {
+                        setIsSigningInWithBiometrics(false)
+                      }
+                    }
+                  }}
+                >
+                  <Text style={styles.btnText}>
+                    {isDisabled ? (
+                      <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                      "Sign In with Biometrics"
+                    )}
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+
+          <View
+            style={{
+              alignItems: "center",
             }}
           >
-            <Text style={styles.signInWithEMail}>Sign In with Email</Text>
-          </Pressable>
+            <Link style={styles.signInWithEMail} href="/email-login" replace>
+              <Text style={styles.signInWithEMail}>Sign In with Email</Text>
+            </Link>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </View>

@@ -1,4 +1,4 @@
-import { SplashScreen, router } from "expo-router"
+import { Link, SplashScreen, router } from "expo-router"
 import { useEffect, useState } from "react"
 import {
   View,
@@ -150,16 +150,17 @@ export default function LoginScreen() {
               </Text>
             </Pressable>
           </View>
-          <Pressable
-            style={styles.signInWithBiometrics}
-            onPress={() => {
-              router.push("/login")
+          <View
+            style={{
+              alignItems: "center",
             }}
           >
-            <Text style={styles.signInWithBiometrics}>
-              Sign In with Biometrics
-            </Text>
-          </Pressable>
+            <Link style={styles.signInWithBiometrics} href="/login" replace>
+              <Text style={styles.signInWithBiometrics}>
+                Sign In with Biometrics
+              </Text>
+            </Link>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </View>
