@@ -39,7 +39,7 @@ function FormSelect(props: {
     >
       <View
         style={{
-          opacity: props.isEnabled ? 1 : 0.6,
+          opacity: props.isEnabled ? 0.6 : undefined,
         }}
       >
         <Picker
@@ -150,133 +150,6 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>
 
-function UpdateForm() {
-  const {
-    control,
-    formState: { errors },
-    handleSubmit,
-  } = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      failureReason: "Consignee not available at the address provided.",
-    },
-  })
-  const { id, packageId } = useLocalSearchParams<{
-    id: string
-    packageId: string
-  }>()
-  const { data } = useQuery({
-    queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
-  })
-  const queryClient = useQueryClient()
-  const { isPending, mutate } = useMutation({
-    mutationFn: async (input: { failureReason: string }) => {
-      await updatePackageStatusToFailedDelivery({
-        shipmentId: Number(id),
-        packageId,
-        failureReason: input.failureReason,
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getDelivery", id],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["getDeliveryPackages", id],
-      })
-
-      router.replace({
-        pathname: "/(app)/driver/deliveries/[id]/",
-        params: {
-          id,
-        },
-      })
-    },
-  })
-
-  return (
-    <View>
-      <View style={{ flexDirection: "row" }}>
-        <Text
-          style={{
-            fontSize: 16,
-            paddingTop: 12,
-            paddingBottom: 6,
-            paddingHorizontal: 12,
-            fontFamily: "Roboto-Medium",
-            color: "#374151",
-          }}
-        >
-          Failed Delivery Attempts:
-        </Text>
-        <View style={{ marginLeft: 170 }}>
-          <Text
-            style={{
-              color: "#949494",
-              fontSize: 16,
-              paddingTop: 12,
-              paddingBottom: 6,
-              paddingHorizontal: 12,
-              fontFamily: "Roboto-Medium",
-            }}
-          >
-            {data.package.failedAttempts} / 2
-          </Text>
-        </View>
-      </View>
-
-      <Text
-        style={{
-          fontSize: 16,
-          paddingTop: 12,
-          paddingBottom: 6,
-          paddingHorizontal: 12,
-          fontFamily: "Roboto-Medium",
-          color: "#374151",
-        }}
-      >
-        Please choose a reason for delivery failure:
-      </Text>
-      <FormSelect
-        isEnabled={!isPending}
-        control={control}
-        name="failureReason"
-      />
-      {errors.failureReason && (
-        <FormErrorMessage message={errors.failureReason.message} />
-      )}
-
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={{
-          backgroundColor: "#79CFDC",
-          paddingVertical: 12,
-          paddingHorizontal: 12,
-          borderRadius: 8,
-          marginTop: 16,
-          opacity: isPending ? 0.6 : undefined,
-        }}
-        onPress={handleSubmit((formData) => mutate(formData))}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontFamily: "Roboto-Medium",
-            fontSize: 16,
-            textAlign: "center",
-          }}
-        >
-          {isPending ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            "Mark as Failed Delivery"
-          )}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  )
-}
 function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
   const { id, packageId } = useLocalSearchParams<{
@@ -434,6 +307,134 @@ function PackageDetailsPage() {
           )}
         </View>
       )}
+    </View>
+  )
+}
+
+function UpdateForm() {
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      failureReason: "Consignee not available at the address provided.",
+    },
+  })
+  const { id, packageId } = useLocalSearchParams<{
+    id: string
+    packageId: string
+  }>()
+  const { data } = useQuery({
+    queryKey: ["getPackageById", packageId],
+    queryFn: () => getPackageById(packageId),
+  })
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: { failureReason: string }) => {
+      await updatePackageStatusToFailedDelivery({
+        shipmentId: Number(id),
+        packageId,
+        failureReason: input.failureReason,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDelivery", id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", id],
+      })
+
+      router.replace({
+        pathname: "/(app)/driver/deliveries/[id]/",
+        params: {
+          id,
+        },
+      })
+    },
+  })
+
+  return (
+    <View>
+      <View style={{ flexDirection: "row" }}>
+        <Text
+          style={{
+            fontSize: 16,
+            paddingTop: 12,
+            paddingBottom: 6,
+            paddingHorizontal: 12,
+            fontFamily: "Roboto-Medium",
+            color: "#374151",
+          }}
+        >
+          Failed Delivery Attempts:
+        </Text>
+        <View style={{ marginLeft: 170 }}>
+          <Text
+            style={{
+              color: "#949494",
+              fontSize: 16,
+              paddingTop: 12,
+              paddingBottom: 6,
+              paddingHorizontal: 12,
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            {data.package.failedAttempts} / 2
+          </Text>
+        </View>
+      </View>
+
+      <Text
+        style={{
+          fontSize: 16,
+          paddingTop: 12,
+          paddingBottom: 6,
+          paddingHorizontal: 12,
+          fontFamily: "Roboto-Medium",
+          color: "#374151",
+        }}
+      >
+        Please choose a reason for delivery failure:
+      </Text>
+      <FormSelect
+        isEnabled={!isPending}
+        control={control}
+        name="failureReason"
+      />
+      {errors.failureReason && (
+        <FormErrorMessage message={errors.failureReason.message} />
+      )}
+
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={{
+          backgroundColor: "#79CFDC",
+          paddingVertical: 12,
+          paddingHorizontal: 12,
+          borderRadius: 8,
+          marginTop: 16,
+          opacity: isPending ? 0.6 : undefined,
+        }}
+        onPress={handleSubmit((formData) => mutate(formData))}
+      >
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "Roboto-Medium",
+            fontSize: 16,
+            textAlign: "center",
+          }}
+        >
+          {isPending ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            "Mark as Failed Delivery"
+          )}
+        </Text>
+      </TouchableOpacity>
     </View>
   )
 }
