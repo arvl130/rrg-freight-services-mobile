@@ -750,6 +750,10 @@ export default function ViewDeliveryPage() {
     queryKey: ["getDelivery", params.id],
     queryFn: () => getDelivery(Number(params.id)),
   })
+  const { refetch: refetchPackages } = useQuery({
+    queryKey: ["getDeliveryPackages", params.id],
+    queryFn: () => getDeliveryPackages(Number(params.id)),
+  })
 
   return (
     <ScrollView
@@ -757,7 +761,10 @@ export default function ViewDeliveryPage() {
       refreshControl={
         <RefreshControl
           refreshing={status !== "pending" && fetchStatus === "fetching"}
-          onRefresh={() => refetch()}
+          onRefresh={() => {
+            refetch()
+            refetchPackages()
+          }}
         />
       }
     >

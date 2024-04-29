@@ -35,6 +35,34 @@ function filterBySearchTerm(items: PackageWithDetails[], searchTerm: string) {
   )
 }
 
+function GoodToGoMessage() {
+  return (
+    <View
+      style={{
+        backgroundColor: "#22c55e",
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        marginBottom: 12,
+        borderRadius: 12,
+        flexDirection: "row",
+        columnGap: 8,
+        alignItems: "center",
+      }}
+    >
+      <AntDesign name="checkcircle" size={24} color="white" />
+      <Text
+        style={{
+          fontFamily: "Roboto-Medium",
+          fontSize: 16,
+          color: "white",
+        }}
+      >
+        All Packages Checked. Good to Go!
+      </Text>
+    </View>
+  )
+}
+
 function SearchView(props: {
   searchTerm: string
   onChangeSearchTerm: (newSearchTerm: string) => void
@@ -54,6 +82,10 @@ function SearchView(props: {
         paddingHorizontal: 12,
       }}
     >
+      {status === "success" &&
+        data.packages.every(
+          (_package) => _package.shipmentPackageIsDriverApproved,
+        ) && <GoodToGoMessage />}
       <View
         style={{
           flexDirection: "row",
