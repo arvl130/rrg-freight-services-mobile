@@ -100,6 +100,18 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="deliveries/[id]/packages/checklist"
+        options={{
+          title: "Packages Checklist",
+          headerStyle: {
+            backgroundColor: "#79CFDC",
+          },
+          headerTintColor: "white",
+          animation: "slide_from_bottom",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
         name="deliveries/[id]/package/[packageId]/details"
         options={{
           title: "View Packages",

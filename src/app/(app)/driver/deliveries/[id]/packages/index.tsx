@@ -5,6 +5,7 @@ import {
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import type { Package } from "@/server/db/entities"
+import type { ShipmentPackageStatus } from "@/utils/constants"
 import {
   FontAwesome5,
   MaterialCommunityIcons,
@@ -55,7 +56,12 @@ function PackageMeter(props: { value: number; total: number }) {
   )
 }
 
-export function PackageItem(props: { package: Package }) {
+export function PackageItem(props: {
+  package: Package & {
+    shipmentPackageStatus: ShipmentPackageStatus
+    shipmentPackageIsDriverApproved: boolean
+  }
+}) {
   return (
     <>
       <View
@@ -156,7 +162,13 @@ export function PackageItem(props: { package: Package }) {
   )
 }
 
-function filterUndelivered(packages: Package[], isEnabled: boolean) {
+function filterUndelivered(
+  packages: (Package & {
+    shipmentPackageStatus: ShipmentPackageStatus
+    shipmentPackageIsDriverApproved: boolean
+  })[],
+  isEnabled: boolean,
+) {
   if (!isEnabled) return packages
 
   return packages.filter(({ status }) => status !== "DELIVERED")

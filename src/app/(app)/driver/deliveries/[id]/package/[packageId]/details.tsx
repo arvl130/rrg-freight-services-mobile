@@ -1,5 +1,8 @@
-import { getDelivery } from "@/api/delivery"
-import { getPackageById } from "@/api/package"
+import {
+  approveDeliveryPackageById,
+  getDelivery,
+  getDeliveryPackageById,
+} from "@/api/delivery"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
@@ -11,8 +14,8 @@ import {
   Ionicons,
   FontAwesome6,
 } from "@expo/vector-icons"
-import { useQuery } from "@tanstack/react-query"
-import { Link, useLocalSearchParams } from "expo-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Link, router, useLocalSearchParams } from "expo-router"
 import { Linking, Text, TouchableOpacity, View } from "react-native"
 
 function FailDeliveryLink(props: {
@@ -166,6 +169,70 @@ function BottomButtons(props: { shipmentId: number; packageId: string }) {
   )
 }
 
+function ApproveButton(props: { shipmentId: number; packageId: string }) {
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      await approveDeliveryPackageById(props)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [
+          "getDeliveryPackageById",
+          props.shipmentId.toString(),
+          props.packageId,
+        ],
+      })
+      router.push({
+        pathname: "/(app)/driver/deliveries/[id]/",
+        params: {
+          id: props.shipmentId,
+        },
+      })
+    },
+  })
+
+  return (
+    <>
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        <TouchableOpacity
+          disabled={isPending}
+          activeOpacity={0.6}
+          style={{
+            backgroundColor: "#16a34a",
+            minHeight: 48,
+            flexDirection: "row",
+            justifyContent: "center",
+            columnGap: 4,
+            alignItems: "center",
+            borderRadius: 8,
+            opacity: isPending ? 0.6 : undefined,
+          }}
+          onPress={() => mutate()}
+        >
+          <AntDesign name="checksquareo" size={15} color="white" />
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+            }}
+          >
+            Check
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </>
+  )
+}
+
 export default function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
   const { id, packageId } = useLocalSearchParams<{
@@ -173,8 +240,12 @@ export default function PackageDetailsPage() {
     packageId: string
   }>()
   const { status, data, error, refetch } = useQuery({
-    queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+    queryKey: ["getDeliveryPackageById", id, packageId],
+    queryFn: () =>
+      getDeliveryPackageById({
+        shipmentId: Number(id),
+        packageId,
+      }),
   })
 
   return (
@@ -506,8 +577,17 @@ export default function PackageDetailsPage() {
                       columnGap: 10,
                     }}
                   >
-                    {data.package.status !== "DELIVERED" && (
-                      <BottomButtons
+                    {data.package.shipmentPackageIsDriverApproved ? (
+                      <>
+                        {data.package.status !== "DELIVERED" && (
+                          <BottomButtons
+                            shipmentId={Number(id)}
+                            packageId={packageId}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <ApproveButton
                         shipmentId={Number(id)}
                         packageId={packageId}
                       />

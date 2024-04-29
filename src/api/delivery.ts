@@ -1,6 +1,6 @@
 import type { SessionAndUserJSON } from "@/components/auth"
-import type { Shipment, DeliveryShipment } from "@/server/db/entities"
-import type { ShipmentStatus } from "@/utils/constants"
+import type { Shipment, DeliveryShipment, Package } from "@/server/db/entities"
+import type { ShipmentPackageStatus, ShipmentStatus } from "@/utils/constants"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export async function getDeliveries() {
@@ -123,4 +123,67 @@ export async function getNextPackageToDeliverInDelivery({
   if (!response.ok) throw new Error(responseJson.message)
 
   return responseJson as { message: string; packageId: null | number }
+}
+
+export async function getDeliveryPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${options.shipmentId}/package/${options.packageId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Retrieving package failed.")
+  }
+
+  return responseJson as {
+    message: string
+    package: Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    }
+  }
+}
+
+export async function approveDeliveryPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/delivery/${options.shipmentId}/package/${options.packageId}/driver-approve`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Approving delivery package failed.")
+  }
+
+  return responseJson as {
+    message: string
+  }
 }

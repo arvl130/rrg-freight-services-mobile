@@ -55,7 +55,10 @@ export async function getDeliveryPackages(deliveryId: number) {
 
   return responseJson as {
     message: string
-    packages: (Package & { shipmentPackageStatus: ShipmentPackageStatus })[]
+    packages: (Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    })[]
   }
 }
 
@@ -85,5 +88,11 @@ export async function getDeliveryPackagesOrderedByDistance(
     throw new Error("An error occured while retrieving delivery packages")
   }
 
-  return responseJson as { message: string; packages: Package[] }
+  return responseJson as {
+    message: string
+    packages: (Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    })[]
+  }
 }

@@ -25,9 +25,100 @@ import { MaterialCommunityIcons, Feather } from "@expo/vector-icons"
 import { getCurrentPositionAsync } from "expo-location"
 import type { DeliveryShipment, Shipment } from "@/server/db/entities"
 
+function NotAllApprovedMessage(props: { shipmentId: number }) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDeliveryPackages", props.shipmentId.toString()],
+    queryFn: async () => {
+      return await getDeliveryPackages(props.shipmentId)
+    },
+  })
+
+  if (status === "pending") return <Text>...</Text>
+  if (status === "error") return <Text>Error occured: {error.message}</Text>
+
+  const isAllApproved = data.packages.every(
+    ({ shipmentPackageIsDriverApproved }) => shipmentPackageIsDriverApproved,
+  )
+
+  if (isAllApproved) return <></>
+
+  return (
+    <View
+      style={{
+        borderRadius: 6,
+        backgroundColor: "#dcfce7",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingVertical: 12,
+        marginTop: 12,
+      }}
+    >
+      <Text
+        style={{
+          fontFamily: "Roboto-Medium",
+          color: "#14532d",
+          paddingHorizontal: 6,
+        }}
+      >
+        All packages need to be checked before delivery can begin.
+      </Text>
+    </View>
+  )
+}
+
 function StartStopDelivery({ deliveryId }: { deliveryId: number }) {
+  const { status, data, error } = useQuery({
+    queryKey: ["getDeliveryPackages", deliveryId.toString()],
+    queryFn: async () => {
+      return await getDeliveryPackages(deliveryId)
+    },
+  })
+
   const { reload } = useSavedShipment()
   const { isTracking, startTracking, stopTracking } = useLocationTracker()
+
+  if (status === "pending") return <Text>...</Text>
+  if (status === "error") return <Text>Error occured: {error.message}</Text>
+
+  const isAllApproved = data.packages.every(
+    ({ shipmentPackageIsDriverApproved }) => shipmentPackageIsDriverApproved,
+  )
+
+  if (!isAllApproved)
+    return (
+      <Link
+        asChild
+        href={{
+          pathname: "/(app)/driver/deliveries/[id]/packages/checklist",
+          params: {
+            id: deliveryId,
+          },
+        }}
+      >
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={{
+            flex: 1,
+            backgroundColor: "#3b82f6",
+            borderRadius: 5,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 12,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontFamily: "Roboto-Medium",
+              fontSize: 16,
+            }}
+          >
+            Checklist
+          </Text>
+        </TouchableOpacity>
+      </Link>
+    )
 
   if (isTracking)
     return (
@@ -252,7 +343,7 @@ function VehicleDetails({ id }: { id: number }) {
                 </View>
                 <View style={styles.truckNumber}>
                   <Text style={styles.truckNumber1}>
-                    Delivery {data.vehicle.displayName}
+                    {data.vehicle.displayName}
                   </Text>
                   <Text
                     style={{
@@ -800,6 +891,8 @@ export default function ViewDeliveryPage() {
                   shipmentId={Number(params.id)}
                 />
 
+                <NotAllApprovedMessage shipmentId={Number(params.id)} />
+
                 {data.delivery.status !== "COMPLETED" && (
                   <CompletePackageButton shipmentId={data.delivery.id} />
                 )}
@@ -842,7 +935,7 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flex: 1,
-    padding: 20,
+    padding: 16,
     borderRadius: 10,
     paddingLeft: 20,
   },
