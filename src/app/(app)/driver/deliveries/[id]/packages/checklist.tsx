@@ -15,12 +15,14 @@ import XCircle from "phosphor-react-native/src/icons/XCircle"
 import PhosphorIconPackage from "phosphor-react-native/src/icons/Package"
 import { useLocalSearchParams, Link } from "expo-router"
 import { getDeliveryPackages } from "@/api/shipment"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
 import type { Package } from "@/server/db/entities"
 import type { ShipmentPackageStatus } from "@/utils/constants"
 import { AntDesign, Entypo } from "@expo/vector-icons"
+import { approveDeliveryPackageById } from "@/api/delivery"
+import { ProgressDialog } from "react-native-simple-dialogs"
 
 type PackageWithDetails = Package & {
   shipmentPackageStatus: ShipmentPackageStatus
@@ -186,6 +188,45 @@ function ScanMainView(props: {
   onHideScanner: () => void
 }) {
   const [isUsingFrontCamera, setIsUsingFrontCamera] = useState(false)
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const {
+    status,
+    data: packages,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getDeliveryPackages", id],
+    queryFn: () => getDeliveryPackages(Number(id)),
+  })
+
+  const queryClient = useQueryClient()
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: { packageId: string }) => {
+      await approveDeliveryPackageById({
+        shipmentId: Number(id),
+        packageId: input.packageId,
+      })
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackages", id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackageById", id, variables.packageId],
+      })
+    },
+  })
+
+  if (status === "pending") return <LoadingView />
+  if (status === "error")
+    return (
+      <ErrorView
+        message={error.message}
+        onRetry={() => {
+          refetch()
+        }}
+      />
+    )
 
   return (
     <View
@@ -193,6 +234,22 @@ function ScanMainView(props: {
         flex: 1,
       }}
     >
+      <ProgressDialog
+        title="Loading"
+        activityIndicatorColor="#3498db"
+        visible={isPending}
+        activityIndicatorSize="large"
+        animationType="fade"
+        message="Please wait."
+        dialogStyle={{
+          borderRadius: 20,
+          alignItems: "center",
+          maxWidth: 250,
+          alignSelf: "center",
+          justifyContent: "center",
+        }}
+      />
+
       <CameraView
         style={{
           flex: 1,
@@ -201,6 +258,11 @@ function ScanMainView(props: {
         facing={isUsingFrontCamera ? "front" : "back"}
         onBarcodeScanned={({ data }) => {
           props.onBarcodeScanned(data)
+          if (packages.packages.some((_package) => _package.id === data)) {
+            mutate({
+              packageId: data,
+            })
+          }
         }}
         barcodeScannerSettings={{
           barcodeTypes: ["qr"],
@@ -283,8 +345,7 @@ export default function SearchModal() {
     >
       {isScanning ? (
         <ScanView
-          onBarcodeScanned={(newSearchTerm) => {
-            setSearchTerm(newSearchTerm)
+          onBarcodeScanned={() => {
             setIsScanning(false)
           }}
           onHideScanner={() => {
