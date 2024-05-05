@@ -22,6 +22,7 @@ function FailDeliveryLink(props: {
   isNextPackageToDeliver: boolean
   shipmentId: number
   packageId: string
+  packageStatus: string
 }) {
   const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
@@ -29,7 +30,8 @@ function FailDeliveryLink(props: {
     savedShipment === null ||
     savedShipment.id !== props.shipmentId ||
     !isTracking ||
-    !props.isNextPackageToDeliver
+    !props.isNextPackageToDeliver ||
+    props.packageStatus !== "OUT_FOR_DELIVERY"
 
   return (
     <View
@@ -83,6 +85,7 @@ function ConfirmDeliveryLink(props: {
   isNextPackageToDeliver: boolean
   shipmentId: number
   packageId: string
+  packageStatus: string
 }) {
   const { savedShipment } = useSavedShipment()
   const { isTracking } = useLocationTracker()
@@ -90,7 +93,8 @@ function ConfirmDeliveryLink(props: {
     savedShipment === null ||
     savedShipment.id !== props.shipmentId ||
     !isTracking ||
-    !props.isNextPackageToDeliver
+    !props.isNextPackageToDeliver ||
+    props.packageStatus !== "OUT_FOR_DELIVERY"
 
   return (
     <View
@@ -139,7 +143,11 @@ function ConfirmDeliveryLink(props: {
   )
 }
 
-function BottomButtons(props: { shipmentId: number; packageId: string }) {
+function BottomButtons(props: {
+  shipmentId: number
+  packageId: string
+  packageStatus: string
+}) {
   const { status, data, error } = useQuery({
     queryKey: ["getDelivery", props.shipmentId.toString()],
     queryFn: () => getDelivery(props.shipmentId),
@@ -151,20 +159,28 @@ function BottomButtons(props: { shipmentId: number; packageId: string }) {
 
   return (
     <>
-      <FailDeliveryLink
-        isNextPackageToDeliver={
-          data.delivery.nextToBeDeliveredPackageId === props.packageId
-        }
-        shipmentId={props.shipmentId}
-        packageId={props.packageId}
-      />
-      <ConfirmDeliveryLink
-        isNextPackageToDeliver={
-          data.delivery.nextToBeDeliveredPackageId === props.packageId
-        }
-        shipmentId={props.shipmentId}
-        packageId={props.packageId}
-      />
+      {props.packageStatus === "OUT_FOR_DELIVERY" ? (
+        <>
+          <FailDeliveryLink
+            isNextPackageToDeliver={
+              data.delivery.nextToBeDeliveredPackageId === props.packageId
+            }
+            shipmentId={props.shipmentId}
+            packageId={props.packageId}
+            packageStatus={props.packageStatus}
+          />
+          <ConfirmDeliveryLink
+            isNextPackageToDeliver={
+              data.delivery.nextToBeDeliveredPackageId === props.packageId
+            }
+            shipmentId={props.shipmentId}
+            packageId={props.packageId}
+            packageStatus={props.packageStatus}
+          />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   )
 }
@@ -583,6 +599,7 @@ export default function PackageDetailsPage() {
                           <BottomButtons
                             shipmentId={Number(id)}
                             packageId={packageId}
+                            packageStatus={data.package.status}
                           />
                         )}
                       </>
