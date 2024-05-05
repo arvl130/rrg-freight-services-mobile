@@ -228,7 +228,7 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
   return (
     <View
       style={{
-        marginTop: 12,
+        flex: 1,
       }}
     >
       <TouchableOpacity
@@ -237,9 +237,6 @@ function ResendOtpButton(props: { shipmentId: number; packageId: string }) {
           backgroundColor: "#6b7280",
           paddingVertical: 15,
           borderRadius: 8,
-          width: 150,
-          top: -11,
-          marginLeft: 35,
           opacity: resendOtpMutation.isPending || resendBtn ? 0.6 : 1,
         }}
         disabled={resendOtpMutation.isPending || resendBtn}
@@ -339,7 +336,7 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
           marginTop: 10,
         }}
       >
-        Proof Delivery
+        Proof of Delivery
       </Text>
       <TextInput
         keyboardType="numeric"
@@ -355,8 +352,6 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
           textAlign: "center",
           fontSize: 18,
           letterSpacing: 2,
-          width: 335,
-          marginLeft: 30,
         }}
         placeholder="Enter your OTP here ..."
         value={otp}
@@ -367,47 +362,51 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
         style={{
           marginTop: 20,
           flexDirection: "row",
+          columnGap: 12,
         }}
       >
-        <TouchableOpacity
-          activeOpacity={0.6}
+        <View
           style={{
-            backgroundColor: "#79CFDC",
-            paddingVertical: 15,
-            marginLeft: 30,
-            marginTop: 1,
-            borderRadius: 8,
-            width: 150,
-            height: 50,
-            opacity: isPending ? 0.6 : 1,
-          }}
-          disabled={isPending}
-          onPress={async () => {
-            if (!otp.match(REGEX_ONE_OR_MORE_DIGITS)) {
-              Alert.alert("Invalid OTP", "Please enter numbers only.", [
-                {
-                  text: "OK",
-                },
-              ])
-              return
-            }
-
-            mutate({
-              code: Number(otp),
-            })
+            flex: 1,
           }}
         >
-          <Text
+          <TouchableOpacity
+            activeOpacity={0.6}
             style={{
-              color: "white",
-              textAlign: "center",
-              fontFamily: "Roboto-Medium",
-              fontSize: 18,
+              backgroundColor: "#79CFDC",
+              paddingVertical: 15,
+              marginTop: 1,
+              borderRadius: 8,
+              opacity: isPending ? 0.6 : 1,
+            }}
+            disabled={isPending}
+            onPress={async () => {
+              if (!otp.match(REGEX_ONE_OR_MORE_DIGITS)) {
+                Alert.alert("Invalid OTP", "Please enter numbers only.", [
+                  {
+                    text: "OK",
+                  },
+                ])
+                return
+              }
+
+              mutate({
+                code: Number(otp),
+              })
             }}
           >
-            Submit
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontFamily: "Roboto-Medium",
+                fontSize: 18,
+              }}
+            >
+              Submit
+            </Text>
+          </TouchableOpacity>
+        </View>
         <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
       </View>
 
