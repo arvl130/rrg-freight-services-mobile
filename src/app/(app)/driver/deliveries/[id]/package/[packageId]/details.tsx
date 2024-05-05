@@ -141,7 +141,7 @@ function ConfirmDeliveryLink(props: {
 
 function BottomButtons(props: { shipmentId: number; packageId: string }) {
   const { status, data, error } = useQuery({
-    queryKey: ["getDelivery", props.shipmentId],
+    queryKey: ["getDelivery", props.shipmentId.toString()],
     queryFn: () => getDelivery(props.shipmentId),
   })
 
