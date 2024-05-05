@@ -898,7 +898,9 @@ export default function ViewDeliveryPage() {
                   shipmentId={Number(params.id)}
                 />
 
-                <NotAllApprovedMessage shipmentId={Number(params.id)} />
+                {data.delivery.status === "IN_TRANSIT" && (
+                  <NotAllApprovedMessage shipmentId={Number(params.id)} />
+                )}
 
                 {data.delivery.status !== "COMPLETED" && (
                   <CompletePackageButton shipmentId={data.delivery.id} />
