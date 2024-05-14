@@ -16,7 +16,14 @@ import {
 } from "@expo/vector-icons"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, router, useLocalSearchParams } from "expo-router"
-import { Linking, Text, TouchableOpacity, View } from "react-native"
+import {
+  RefreshControl,
+  Linking,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 function FailDeliveryLink(props: {
   isNextPackageToDeliver: boolean
@@ -202,8 +209,8 @@ function ApproveButton(props: { shipmentId: number; packageId: string }) {
           props.packageId,
         ],
       })
-      router.push({
-        pathname: "/(app)/driver/deliveries/[id]/",
+      router.navigate({
+        pathname: "/(app)/driver/deliveries/[id]/packages/checklist",
         params: {
           id: props.shipmentId,
         },
@@ -255,7 +262,7 @@ export default function PackageDetailsPage() {
     id: string
     packageId: string
   }>()
-  const { status, data, error, refetch } = useQuery({
+  const { status, data, error, refetch, fetchStatus } = useQuery({
     queryKey: ["getDeliveryPackageById", id, packageId],
     queryFn: () =>
       getDeliveryPackageById({
@@ -264,11 +271,28 @@ export default function PackageDetailsPage() {
       }),
   })
 
+  const getDeliveryQuery = useQuery({
+    queryKey: ["getDelivery", id],
+    queryFn: () => getDelivery(Number(id)),
+  })
+
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         flex: 1,
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={
+            fetchStatus === "fetching" ||
+            getDeliveryQuery.fetchStatus === "fetching"
+          }
+          onRefresh={() => {
+            refetch()
+            getDeliveryQuery.refetch()
+          }}
+        />
+      }
     >
       {isLoading ? (
         <Text>Loading ...</Text>
@@ -616,6 +640,6 @@ export default function PackageDetailsPage() {
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }

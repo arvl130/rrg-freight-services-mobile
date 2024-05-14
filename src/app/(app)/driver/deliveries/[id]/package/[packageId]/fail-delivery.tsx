@@ -345,6 +345,9 @@ function UpdateForm() {
       queryClient.invalidateQueries({
         queryKey: ["getDeliveryPackages", id],
       })
+      queryClient.invalidateQueries({
+        queryKey: ["getDeliveryPackageById"],
+      })
 
       router.replace({
         pathname: "/(app)/driver/deliveries/[id]/",
