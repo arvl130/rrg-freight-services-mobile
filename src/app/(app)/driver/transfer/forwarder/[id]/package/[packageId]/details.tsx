@@ -9,7 +9,14 @@ import { ApproveButton } from "@/screens/transfer/forwarder/view-package-details
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
-import { Linking, Text, TouchableOpacity, View } from "react-native"
+import {
+  ScrollView,
+  Linking,
+  Text,
+  TouchableOpacity,
+  View,
+  RefreshControl,
+} from "react-native"
 
 export default function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
@@ -17,7 +24,7 @@ export default function PackageDetailsPage() {
     id: string
     packageId: string
   }>()
-  const { status, data, error, refetch } = useQuery({
+  const { status, data, error, refetch, fetchStatus } = useQuery({
     queryKey: ["getForwarderTransferShipmentPackageById", id, packageId],
     queryFn: () =>
       getForwarderTransferShipmentPackageById({
@@ -32,10 +39,22 @@ export default function PackageDetailsPage() {
   })
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         flex: 1,
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={
+            fetchStatus === "fetching" ||
+            getForwarderTransferShipmentQuery.fetchStatus === "fetching"
+          }
+          onRefresh={() => {
+            refetch()
+            getForwarderTransferShipmentQuery.refetch()
+          }}
+        />
+      }
     >
       {isLoading ? (
         <Text>Loading ...</Text>
@@ -278,6 +297,6 @@ export default function PackageDetailsPage() {
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }

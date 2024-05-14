@@ -1,4 +1,4 @@
-import { approveWarehouseTransferShipmentPackageById } from "@/api/shipment/transfer/warehouse"
+import { approveForwarderTransferShipmentPackageById } from "@/api/shipment/transfer/fowarder"
 import { AntDesign } from "@expo/vector-icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { router } from "expo-router"
@@ -11,24 +11,24 @@ export function ApproveButton(props: {
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async () => {
-      await approveWarehouseTransferShipmentPackageById(props)
+      await approveForwarderTransferShipmentPackageById(props)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          "getWarehouseTransferShipmentPackages",
+          "getForwarderTransferShipmentPackages",
           props.shipmentId.toString(),
         ],
       })
       queryClient.invalidateQueries({
         queryKey: [
-          "getWarehouseTransferShipmentPackageById",
+          "getForwarderTransferShipmentPackageById",
           props.shipmentId.toString(),
           props.packageId,
         ],
       })
       router.navigate({
-        pathname: "/(app)/driver/transfer/warehouse/[id]/packages/checklist",
+        pathname: "/(app)/driver/transfer/forwarder/[id]/packages/checklist",
         params: {
           id: props.shipmentId,
         },

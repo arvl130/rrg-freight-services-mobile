@@ -1,28 +1,60 @@
-import { getPackageById } from "@/api/package"
+import {
+  getWarehouseTransferShipment,
+  getWarehouseTransferShipmentPackageById,
+} from "@/api/shipment/transfer/warehouse"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
+import { ApproveButton } from "@/screens/transfer/warehouse/view-package-details-screen/approve-button"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
-import { Linking, Text, TouchableOpacity, View } from "react-native"
+import {
+  Linking,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 export default function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
-  const { packageId } = useLocalSearchParams<{
+  const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
-  const { status, data, error, refetch } = useQuery({
-    queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+  const { status, data, error, refetch, fetchStatus } = useQuery({
+    queryKey: ["getWarehouseTransferShipmentPackageById", id, packageId],
+    queryFn: () =>
+      getWarehouseTransferShipmentPackageById({
+        shipmentId: Number(id),
+        packageId,
+      }),
+  })
+
+  const getWarehouseTransferShipmentQuery = useQuery({
+    queryKey: ["getWarehouseTransferShipment", id],
+    queryFn: () => getWarehouseTransferShipment(Number(id)),
   })
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         flex: 1,
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={
+            fetchStatus === "fetching" ||
+            getWarehouseTransferShipmentQuery.fetchStatus === "fetching"
+          }
+          onRefresh={() => {
+            refetch()
+            getWarehouseTransferShipmentQuery.refetch()
+          }}
+        />
+      }
     >
       {isLoading ? (
         <Text>Loading ...</Text>
@@ -248,11 +280,24 @@ export default function PackageDetailsPage() {
                     </Text>
                   </TouchableOpacity>
                 </View>
+
+                {getWarehouseTransferShipmentQuery.data !== undefined &&
+                  getWarehouseTransferShipmentQuery.data !== null &&
+                  getWarehouseTransferShipmentQuery.data.shipment.status ===
+                    "IN_TRANSIT" &&
+                  !data.package.shipmentPackageIsDriverApproved && (
+                    <ApproveButton
+                      shipmentId={
+                        getWarehouseTransferShipmentQuery.data.shipment.id
+                      }
+                      packageId={data.package.id}
+                    />
+                  )}
               </View>
             </View>
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }

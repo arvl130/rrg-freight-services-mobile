@@ -5,7 +5,7 @@ import type {
   ShipmentLocation,
   NewShipmentLocation,
 } from "@/server/db/entities"
-import type { ShipmentStatus } from "@/utils/constants"
+import type { ShipmentPackageStatus, ShipmentStatus } from "@/utils/constants"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type NormalizedWarehouseTransferShipmentWithPackageCount =
@@ -196,5 +196,74 @@ export async function getWarehouseTransferShipmentPackages(shipmentId: number) {
     throw new Error("An error occured while retrieving shipment packages.")
   }
 
-  return responseJson as { message: string; packages: Package[] }
+  return responseJson as {
+    message: string
+    packages: (Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    })[]
+  }
+}
+
+export async function getWarehouseTransferShipmentPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/warehouse/${options.shipmentId}/package/${options.packageId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Retrieving package failed.")
+  }
+
+  return responseJson as {
+    message: string
+    package: Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    }
+  }
+}
+
+export async function approveWarehouseTransferShipmentPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/warehouse/${options.shipmentId}/package/${options.packageId}/driver-approve`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Approving warehouse transfer package failed.")
+  }
+
+  return responseJson as {
+    message: string
+  }
 }

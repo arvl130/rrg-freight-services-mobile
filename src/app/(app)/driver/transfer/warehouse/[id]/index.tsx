@@ -1,165 +1,24 @@
 import { useQuery } from "@tanstack/react-query"
-import { Link, useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
+import { RefreshControl, ScrollView, StyleSheet, Text } from "react-native"
 import {
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native"
-import { useLocationTracker } from "@/components/location-tracker"
-import { clearStorage, saveId } from "@/utils/storage"
-import { getVehicle } from "@/api/vehicle"
-import { getWarehouseTransferShipment } from "@/api/shipment/transfer/warehouse"
+  getWarehouseTransferShipment,
+  getWarehouseTransferShipmentPackages,
+} from "@/api/shipment/transfer/warehouse"
 import { LoadingView } from "@/components/loading-view"
 import { ErrorView } from "@/components/error-view"
-import { LocationPermissionRequiredView } from "@/components/location-permission"
-import { useSavedShipment } from "@/components/saved-shipment"
-
-function StartStopTransfer({ shipmentId }: { shipmentId: number }) {
-  const { reload } = useSavedShipment()
-  const { isTracking, startTracking, stopTracking } = useLocationTracker()
-
-  if (isTracking)
-    return (
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          backgroundColor: "#ef4444",
-          borderRadius: 8,
-          justifyContent: "center",
-          alignItems: "center",
-          paddingVertical: 12,
-        }}
-        activeOpacity={0.6}
-        onPress={async () => {
-          await clearStorage()
-          await reload()
-          await stopTracking()
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Roboto-Medium",
-            color: "white",
-            fontSize: 16,
-            paddingHorizontal: 6,
-            textAlign: "center",
-          }}
-        >
-          Stop Transfer
-        </Text>
-      </TouchableOpacity>
-    )
-
-  return (
-    <TouchableOpacity
-      style={{
-        flex: 1,
-        borderRadius: 6,
-        paddingVertical: 12,
-        backgroundColor: "#22c55e",
-      }}
-      activeOpacity={0.6}
-      onPress={async () => {
-        await saveId({
-          id: shipmentId,
-          type: "TRANSFER",
-        })
-        await reload()
-        await startTracking()
-      }}
-    >
-      <Text
-        style={{
-          color: "white",
-          textAlign: "center",
-          fontFamily: "Roboto-Medium",
-          fontSize: 16,
-        }}
-      >
-        Start Transfer
-      </Text>
-    </TouchableOpacity>
-  )
-}
-
-function VehicleDetails({ id }: { id: number }) {
-  const { status, data, error, refetch } = useQuery({
-    queryKey: ["getVehicle", id],
-    queryFn: () => getVehicle(Number(id)),
-  })
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {status === "pending" && <LoadingView />}
-      {status === "error" && (
-        <ErrorView
-          message={error.message}
-          onRetry={() => {
-            refetch()
-          }}
-        />
-      )}
-      {status === "success" && (
-        <>
-          {data === null ? (
-            <Text>No such vehicle.</Text>
-          ) : (
-            <LocationPermissionRequiredView>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                }}
-              >
-                <View style={styles.truckLogo}>
-                  <Image
-                    source={require("@/assets/images/truck-logo.png")}
-                    style={{ width: 300, height: 200 }}
-                  />
-                </View>
-                <View style={styles.truckNumber}>
-                  <Text style={styles.truckNumber2}>Assigned Vehicle</Text>
-                  <Text style={styles.truckNumber1}>
-                    {data.vehicle.displayName}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "white",
-                      backgroundColor: "#16a34a",
-                      marginTop: 3,
-                      paddingHorizontal: 12,
-                      fontSize: 24,
-                      borderRadius: 8,
-                      fontFamily: "Roboto-Medium",
-                    }}
-                  >
-                    {data.vehicle.plateNumber}
-                  </Text>
-                </View>
-              </View>
-            </LocationPermissionRequiredView>
-          )}
-        </>
-      )}
-    </View>
-  )
-}
+import { MainView } from "@/screens/transfer/warehouse/view-shipment-screen/main-view"
 
 export default function Page() {
   const params = useLocalSearchParams<{ id: string }>()
-  const { status, data, error, fetchStatus, refetch } = useQuery({
+  const getShipmentQuery = useQuery({
     queryKey: ["getWarehouseTransferShipment", params.id],
     queryFn: () => getWarehouseTransferShipment(Number(params.id)),
+  })
+
+  const getPackagesQuery = useQuery({
+    queryKey: ["getWarehouseTransferShipmentPackages", params.id],
+    queryFn: () => getWarehouseTransferShipmentPackages(Number(params.id)),
   })
 
   return (
@@ -167,134 +26,47 @@ export default function Page() {
       contentContainerStyle={styles.mainScreen}
       refreshControl={
         <RefreshControl
-          refreshing={status !== "pending" && fetchStatus === "fetching"}
-          onRefresh={() => refetch()}
+          refreshing={
+            getShipmentQuery.fetchStatus === "fetching" ||
+            getPackagesQuery.fetchStatus === "fetching"
+          }
+          onRefresh={() => {
+            getShipmentQuery.refetch()
+            getPackagesQuery.refetch()
+          }}
         />
       }
     >
-      {status === "pending" && <LoadingView />}
-      {status === "error" && (
+      {getShipmentQuery.status === "pending" && <LoadingView />}
+      {getShipmentQuery.status === "error" && (
         <ErrorView
-          message={error.message}
+          message={getShipmentQuery.error.message}
           onRetry={() => {
-            refetch()
+            getShipmentQuery.refetch()
           }}
         />
       )}
-      {status === "success" && (
+      {getShipmentQuery.status === "success" && (
         <>
-          {data === null ? (
+          {getShipmentQuery.data === null ? (
             <Text>No such shipment.</Text>
           ) : (
             <>
-              <VehicleDetails id={data.shipment.vehicleId} />
-
-              <View
-                style={{
-                  backgroundColor: "#79CFDC",
-                  borderTopLeftRadius: 12,
-                  borderTopRightRadius: 12,
-                  paddingTop: 16,
-                  paddingBottom: 24,
-                  paddingHorizontal: 12,
-                }}
-              >
-                {data.shipment.status === "COMPLETED" && (
-                  <View
-                    style={{
-                      borderRadius: 6,
-                      backgroundColor: "#dcfce7",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingVertical: 12,
-                      marginBottom: 12,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: "Roboto-Medium",
-                        color: "#14532d",
-                        paddingHorizontal: 6,
-                        textAlign: "center",
-                      }}
-                    >
-                      This shipment has been completed.
-                    </Text>
-                  </View>
-                )}
-
-                {data.shipment.status === "PREPARING" && (
-                  <View
-                    style={{
-                      borderRadius: 6,
-                      backgroundColor: "#fee2e2",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingVertical: 12,
-                      marginBottom: 12,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: "Roboto-Medium",
-                        color: "#7f1d1d",
-                        paddingHorizontal: 6,
-                        textAlign: "center",
-                      }}
-                    >
-                      This shipment is still being prepared.
-                    </Text>
-                  </View>
-                )}
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 12,
+              {getPackagesQuery.status === "pending" && <LoadingView />}
+              {getPackagesQuery.status === "error" && (
+                <ErrorView
+                  message={getPackagesQuery.error.message}
+                  onRetry={() => {
+                    getPackagesQuery.refetch()
                   }}
-                >
-                  <Link
-                    asChild
-                    href={{
-                      pathname:
-                        "/(app)/driver/transfer/warehouse/[id]/packages/",
-                      params: {
-                        id: data.shipment.id,
-                      },
-                    }}
-                  >
-                    <TouchableOpacity
-                      activeOpacity={0.6}
-                      style={{
-                        flex: 1,
-                        borderRadius: 6,
-                        backgroundColor: "#EEAE3F",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingVertical: 12,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: "Roboto-Medium",
-                          color: "white",
-                          fontSize: 16,
-                          paddingHorizontal: 6,
-                          textAlign: "center",
-                        }}
-                      >
-                        View Packages
-                      </Text>
-                    </TouchableOpacity>
-                  </Link>
-
-                  {/* TODO: Only show these buttons on the shipment
-                    that is currently being tracked. */}
-                  {data.shipment.status === "IN_TRANSIT" && (
-                    <StartStopTransfer shipmentId={data.shipment.id} />
-                  )}
-                </View>
-              </View>
+                />
+              )}
+              {getPackagesQuery.status === "success" && (
+                <MainView
+                  shipment={getShipmentQuery.data.shipment}
+                  packages={getPackagesQuery.data.packages}
+                />
+              )}
             </>
           )}
         </>
