@@ -4,7 +4,7 @@ import type {
   NormalizedForwarderTransferShipment,
   Package,
 } from "@/server/db/entities"
-import type { ShipmentStatus } from "@/utils/constants"
+import type { ShipmentPackageStatus, ShipmentStatus } from "@/utils/constants"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 type NormalizedForwarderTransferShipmentWithPackageCount =
@@ -191,9 +191,7 @@ export async function getForwarderTransferShipmentLocations(
   }
 }
 
-export async function getForwarderTransferShipmentPackages(
-  transferShipmentId: number,
-) {
+export async function getForwarderTransferShipmentPackages(shipmentId: number) {
   const sessionStr = await AsyncStorage.getItem("session")
   if (sessionStr === null) {
     throw new Error("Unauthorized.")
@@ -201,7 +199,7 @@ export async function getForwarderTransferShipmentPackages(
 
   const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${transferShipmentId}/packages`,
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${shipmentId}/packages`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -217,7 +215,13 @@ export async function getForwarderTransferShipmentPackages(
     )
   }
 
-  return responseJson as { message: string; packages: Package[] }
+  return responseJson as {
+    message: string
+    packages: (Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    })[]
+  }
 }
 
 export async function updateForwarderTransferShipmentStatusToCompleted({
@@ -255,5 +259,68 @@ export async function updateForwarderTransferShipmentStatusToCompleted({
   return responseJson as {
     message: string
     transferShipment: ForwarderTransferShipment
+  }
+}
+
+export async function getForwarderTransferShipmentPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${options.shipmentId}/package/${options.packageId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Retrieving package failed.")
+  }
+
+  return responseJson as {
+    message: string
+    package: Package & {
+      shipmentPackageStatus: ShipmentPackageStatus
+      shipmentPackageIsDriverApproved: boolean
+    }
+  }
+}
+
+export async function approveForwarderTransferShipmentPackageById(options: {
+  shipmentId: number
+  packageId: string
+}) {
+  const sessionStr = await AsyncStorage.getItem("session")
+  if (sessionStr === null) {
+    throw new Error("Unauthorized.")
+  }
+
+  const { session } = JSON.parse(sessionStr) as SessionAndUserJSON
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_API_URL}/v1/transfer/forwarder/${options.shipmentId}/package/${options.packageId}/driver-approve`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.id}`,
+      },
+    },
+  )
+
+  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error("ServerError: Approving forwarder transfer package failed.")
+  }
+
+  return responseJson as {
+    message: string
   }
 }

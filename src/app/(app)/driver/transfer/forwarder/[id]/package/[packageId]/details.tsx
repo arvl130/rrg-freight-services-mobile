@@ -1,7 +1,11 @@
-import { getPackageById } from "@/api/package"
+import {
+  getForwarderTransferShipment,
+  getForwarderTransferShipmentPackageById,
+} from "@/api/shipment/transfer/fowarder"
 import { ErrorView } from "@/components/error-view"
 import { LoadingView } from "@/components/loading-view"
 import { useLocationTracker } from "@/components/location-tracker"
+import { ApproveButton } from "@/screens/transfer/forwarder/view-package-details-screen/approve-button"
 import { Feather } from "@expo/vector-icons"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
@@ -9,13 +13,22 @@ import { Linking, Text, TouchableOpacity, View } from "react-native"
 
 export default function PackageDetailsPage() {
   const { isLoading } = useLocationTracker()
-  const { packageId } = useLocalSearchParams<{
+  const { id, packageId } = useLocalSearchParams<{
     id: string
     packageId: string
   }>()
   const { status, data, error, refetch } = useQuery({
-    queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+    queryKey: ["getForwarderTransferShipmentPackageById", id, packageId],
+    queryFn: () =>
+      getForwarderTransferShipmentPackageById({
+        shipmentId: Number(id),
+        packageId,
+      }),
+  })
+
+  const getForwarderTransferShipmentQuery = useQuery({
+    queryKey: ["getForwarderTransferShipment", id],
+    queryFn: () => getForwarderTransferShipment(Number(id)),
   })
 
   return (
@@ -248,6 +261,18 @@ export default function PackageDetailsPage() {
                     </Text>
                   </TouchableOpacity>
                 </View>
+                {getForwarderTransferShipmentQuery.data !== undefined &&
+                  getForwarderTransferShipmentQuery.data !== null &&
+                  getForwarderTransferShipmentQuery.data.shipment.status ===
+                    "IN_TRANSIT" &&
+                  !data.package.shipmentPackageIsDriverApproved && (
+                    <ApproveButton
+                      shipmentId={
+                        getForwarderTransferShipmentQuery.data.shipment.id
+                      }
+                      packageId={data.package.id}
+                    />
+                  )}
               </View>
             </View>
           )}
