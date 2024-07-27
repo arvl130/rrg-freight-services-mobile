@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { createContext, useContext } from "react"
-import type { PermissionResponse } from "expo-camera/next"
-import { PermissionStatus, useCameraPermissions } from "expo-camera/next"
+import type { PermissionResponse } from "expo-camera"
+import { PermissionStatus, useCameraPermissions } from "expo-camera"
 import { Button, Text, View } from "react-native"
 import Camera from "phosphor-react-native/src/icons/Camera"
 

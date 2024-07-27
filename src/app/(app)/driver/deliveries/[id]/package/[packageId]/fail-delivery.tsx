@@ -157,7 +157,7 @@ function PackageDetailsPage() {
   }>()
   const { status, data, error, refetch } = useQuery({
     queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+    queryFn: () => getPackageById(packageId ?? ""),
   })
 
   return (
@@ -327,14 +327,14 @@ function UpdateForm() {
   }>()
   const { status, data } = useQuery({
     queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+    queryFn: () => getPackageById(packageId ?? ""),
   })
   const queryClient = useQueryClient()
   const { isPending, mutate } = useMutation({
     mutationFn: async (input: { failureReason: string }) => {
       await updatePackageStatusToFailedDelivery({
         shipmentId: Number(id),
-        packageId,
+        packageId: packageId ?? "",
         failureReason: input.failureReason,
       })
     },

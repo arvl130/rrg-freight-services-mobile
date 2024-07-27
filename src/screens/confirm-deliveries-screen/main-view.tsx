@@ -1,5 +1,5 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
-import { CameraView } from "expo-camera/next"
+import { CameraView } from "expo-camera"
 import { useEffect, useRef, useState } from "react"
 import {
   Alert,
@@ -296,7 +296,7 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
     mutationFn: (input: { code: number }) =>
       getOtpValidity({
         shipmentId: Number(id),
-        packageId,
+        packageId: packageId ?? "",
         code: input.code,
       }),
     onSuccess: () => {
@@ -407,7 +407,7 @@ function EnterOtpView(props: { onValidOtpEntered: (code: number) => void }) {
             </Text>
           </TouchableOpacity>
         </View>
-        <ResendOtpButton shipmentId={Number(id)} packageId={packageId} />
+        <ResendOtpButton shipmentId={Number(id)} packageId={packageId ?? ""} />
       </View>
 
       <ProgressDialog
@@ -444,7 +444,7 @@ function FinalConfirmationView(props: { otp: number; pictureUri: string }) {
 
       await updatePackageStatusToDelivered({
         shipmentId: Number(id),
-        packageId,
+        packageId: packageId ?? "",
         code: props.otp,
         imageUrl,
       })
@@ -603,7 +603,7 @@ export default function PackageDetailsPage() {
   }>()
   const { status, data, error, refetch } = useQuery({
     queryKey: ["getPackageById", packageId],
-    queryFn: () => getPackageById(packageId),
+    queryFn: () => getPackageById(packageId ?? ""),
   })
 
   return (

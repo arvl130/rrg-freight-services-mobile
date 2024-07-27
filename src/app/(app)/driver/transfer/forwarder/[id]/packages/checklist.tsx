@@ -1,5 +1,5 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
-import { CameraView } from "expo-camera/next"
+import { CameraView } from "expo-camera"
 import { useState } from "react"
 import {
   RefreshControl,

@@ -267,7 +267,7 @@ export default function PackageDetailsPage() {
     queryFn: () =>
       getDeliveryPackageById({
         shipmentId: Number(id),
-        packageId,
+        packageId: packageId ?? "",
       }),
   })
 
@@ -622,7 +622,7 @@ export default function PackageDetailsPage() {
                         {data.package.status !== "DELIVERED" && (
                           <BottomButtons
                             shipmentId={Number(id)}
-                            packageId={packageId}
+                            packageId={packageId ?? ""}
                             packageStatus={data.package.status}
                           />
                         )}
@@ -630,7 +630,7 @@ export default function PackageDetailsPage() {
                     ) : (
                       <ApproveButton
                         shipmentId={Number(id)}
-                        packageId={packageId}
+                        packageId={packageId ?? ""}
                       />
                     )}
                   </View>

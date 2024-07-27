@@ -29,7 +29,7 @@ export default function PackageDetailsPage() {
     queryFn: () =>
       getForwarderTransferShipmentPackageById({
         shipmentId: Number(id),
-        packageId,
+        packageId: packageId ?? "",
       }),
   })
 

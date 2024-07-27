@@ -2,7 +2,7 @@ import {
   RequestCameraPermissionView,
   useCameraPermission,
 } from "@/components/camera-permission/main-component"
-import { CameraView, PermissionStatus } from "expo-camera/next"
+import { CameraView, PermissionStatus } from "expo-camera"
 import { useState } from "react"
 import {
   RefreshControl,

@@ -31,7 +31,7 @@ export function ViewPackageLocationPage() {
 
   const { status, data, error, refetch } = useQuery({
     queryKey: ["getPackageAddressByPackageId", packageId],
-    queryFn: () => getPackageAddressByPackageId(packageId),
+    queryFn: () => getPackageAddressByPackageId(packageId ?? ""),
   })
 
   return (

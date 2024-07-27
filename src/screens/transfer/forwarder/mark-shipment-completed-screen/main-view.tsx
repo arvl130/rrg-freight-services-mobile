@@ -1,5 +1,5 @@
 import { CameraPermissionRequiredView } from "@/components/camera-permission/main-component"
-import { CameraView } from "expo-camera/next"
+import { CameraView } from "expo-camera"
 import { useRef, useState } from "react"
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native"
 import Aperture from "phosphor-react-native/src/icons/Aperture"
